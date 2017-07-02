@@ -1,6 +1,5 @@
 *.class
 *.log
-build.sbt
 project/
 target/
 .idea/
