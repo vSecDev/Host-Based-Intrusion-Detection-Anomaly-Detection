@@ -5,7 +5,7 @@ package TreeTest
   */
 class Sequence (val sequence: List[Int], var predictions: Map[Int, Double]){
 
-  override def toString: String = "\n--------\nSequence:\nsequence:\n" + sequence + "\n-predictions:\n" + predictions + "\n-------"
+  override def toString: String = "\n--------\nSequence\n-sequence:\n    " + sequence + "\n-predictions:\n    " + predictions + "\n-------"
 
 }
 

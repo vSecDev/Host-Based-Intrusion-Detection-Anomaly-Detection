@@ -1,6 +1,7 @@
 package TreeTest
 
 import org.scalatest.FunSuite
+//import TreeTest._
 
 /**
   * Created by Case on 02/07/2017.
@@ -13,7 +14,8 @@ class SequenceTest extends FunSuite{
   val shortMap = Map(1 -> 0.1, 2 -> 0.2, 3 -> 0.3)
 
   test("toString"){
-    val s1 = Sequence)
+    val s1 = new Sequence(shortListTrace, shortMap)
+    println(s1)
 
   }
 }
