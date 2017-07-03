@@ -3,9 +3,9 @@ package TreeTest
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A] (val sequence: List[A], var predictions: Map[A, Double]){
+class Sequence[A,B] (val sequence: List[A], var predictions: Map[B, Double]){
 
-  def getProbability(input: A): Option[Double] = predictions.get(input)
+  def getProbability(input: B): Option[Double] = predictions.get(input)
   override def toString: String = "\n--------\nSequence\n-sequence:\n    " + sequence + "\n-predictions:\n    " + predictions + "\n-------"
 }
 
