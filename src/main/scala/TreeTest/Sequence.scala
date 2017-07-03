@@ -7,6 +7,7 @@ class Sequence (val sequence: List[Int], var predictions: Map[Int, Double]){
 
   override def toString: String = "\n--------\nSequence\n-sequence:\n    " + sequence + "\n-predictions:\n    " + predictions + "\n-------"
 
+  def getProbability(input:Int): Option[Double] = predictions.get(input)
 }
 
 

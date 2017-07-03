@@ -16,6 +16,13 @@ class SequenceTest extends FunSuite{
   test("toString"){
     val s1 = new Sequence(shortListTrace, shortMap)
     println(s1)
-
   }
+  test("Sequence returns probability for input"){
+    val s1 = new Sequence(shortListTrace, shortMap)
+
+    assert(s1.getProbability(1).get == 0.1)
+    assert(s1.getProbability(2).get == 0.2)
+    assert(s1.getProbability(3).get == 0.3)
+  }
+
 }
