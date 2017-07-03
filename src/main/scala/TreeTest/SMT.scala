@@ -40,30 +40,18 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     }
 
     def updatePredictions: Unit = {
-      println("--------------------")
+
       if (eventCount > 0){
         predictions match {
-          case None => predictions = Some(Map[B, Double]()); println("predictions did not exist. creating predictions")
-          case _ => println("predictions existed. didn't create new one")
+          case None => predictions = Some(Map[B, Double]())
+          case _ =>
         }
 
         for ((k,v) <- events.get){
-          println("\n(k,v) from events: " + (k,v))
-          if(predictions.get.contains(k)) {
-            println("predictions contained k: " + k)
-            println("v.toDouble: " + v.toDouble)
-            println("eventCount.toDouble: " + eventCount.toDouble)
-            println("(v.toDouble / eventCount.toDouble): " + (v.toDouble / eventCount.toDouble))
+          if(predictions.get.contains(k))
             predictions.get.update(k, (v.toDouble / eventCount.toDouble))
-          }else{
-            println("predictions did not contain k: " + k)
-            println("eventCount.toDouble: " + eventCount.toDouble)
-            println("(1.00/eventCount.toDouble): " + (1.00/(eventCount.toDouble)))
-            predictions.get += (k -> (1.toDouble / (eventCount.toDouble)))
-
-          }
-          println("updated predictions")
-          for((keyV,valV) <- predictions.get) println("(keyV, valV) : " + (keyV, valV))
+          else
+            predictions.get += (k -> (1.00/eventCount))
         }
       }
     }
