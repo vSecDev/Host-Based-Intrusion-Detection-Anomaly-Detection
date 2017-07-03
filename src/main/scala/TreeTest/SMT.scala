@@ -14,7 +14,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
 
     private var key: Option[A] = None
     private var eventCount = 0
-    private var events: Option[Map[B, Int]] = None
+    private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
     private var children: List[SMT[A,B]] = Nil
 
@@ -27,13 +27,11 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     def updateEvents(newEvent: B): Unit = {
 
       //update events to keep count on how many times this input has been seen
-      events match {
-        case None => events = Some(Map[B, Int]()); events.get += (newEvent -> 1)
-        case Some(eventsMap) => eventsMap.get(newEvent) match {
-          case None => eventsMap += (newEvent -> 1)
-          case Some(event) => eventsMap.update(newEvent, eventsMap(newEvent) + 1)
+        events.get(newEvent) match {
+          case None => events += (newEvent -> 1)
+          case Some(event) => events.update(newEvent, events(newEvent) + 1)
         }
-      }
+
       //update event count to keep track of number of overall observations
       eventCount += 1
       updatePredictions
@@ -43,9 +41,9 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
 
       if (eventCount > 0){
 
-        for ((k,v) <- events.get){
+        for ((k,v) <- events){
           if(predictions.contains(k))
-            predictions.update(k, (v.toDouble / eventCount.toDouble))
+            predictions.update(k, v.toDouble / eventCount)
           else
             predictions += (k -> (1.00/eventCount))
         }
@@ -53,7 +51,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     }
     def getPredictions: Map[B, Double] = predictions
     def getChildren: List[SMT[A,B]] = children
-    def getEvents: Option[Map[B, Int]] = events
+    def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
   }
