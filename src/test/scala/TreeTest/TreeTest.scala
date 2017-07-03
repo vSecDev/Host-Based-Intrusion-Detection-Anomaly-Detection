@@ -52,5 +52,31 @@ class TreeTest extends FunSuite{
     val caught = intercept[IllegalStateException](n.setKey(3))
     assert(caught.getMessage == "Node key cannot be reset")
   }
+  test("Node value update"){
+    val n = new Node[Int, Int](1,1)
+    n.setKey(2)
+    assert(n.getEventCount == 0)
+    assert(n.getEvents == None)
+
+    n.updateEvents(666)
+    assert(n.getEventCount == 1)
+    assert(n.getEvents.get(666) == 1)
+    assert(n.getEvents.get.get(777) == None)
+
+
+    n.updateEvents(666)
+    assert(n.getEventCount == 2)
+    assert(n.getEvents.get(666) == 2)
+    assert(n.getEvents.get.get(777) == None)
+
+    n.updateEvents(777)
+    assert(n.getEventCount == 3)
+    assert(n.getEvents.get(666) == 2)
+    assert(n.getEvents.get(777) == 1)
+
+
+
+
+  }
 
 }
