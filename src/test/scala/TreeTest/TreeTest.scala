@@ -32,4 +32,25 @@ class TreeTest extends FunSuite{
     val num = 1
     assert(n.getProbability(num) == None)
   }
+  test("Node initialises without key"){
+    val n = new Node[Int](1, 1)
+    assert(n.getKey == None)
+  }
+  test("Node setKey works"){
+    val n = new Node[Int](1,1)
+    n.setKey(2)
+    assert(n.getKey.get == 2)
+  }
+  test("Node key cannot be reset"){
+    val n = new Node[Int](1,1)
+    n.setKey(2)
+    assertThrows[IllegalStateException](n.setKey(3))
+  }
+  test("Node correct error message for invalid key reset"){
+    val n = new Node[Int](1,1)
+    n.setKey(2)
+    val caught = intercept[IllegalStateException](n.setKey(3))
+    assert(caught.getMessage == "Node key cannot be reset")
+  }
+
 }
