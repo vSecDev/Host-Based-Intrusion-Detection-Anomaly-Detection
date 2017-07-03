@@ -11,7 +11,7 @@ class TreeTest extends FunSuite{
   val intTrace = "1 2 3 4 5 6 7 8 9 10 11 1 2 3 12 13 4 5 6 7 8 9 10 11 1 2 3 14 13 4 5 6 7 8 9 10 11 1 2 3 15 4 5 6 7 8 9 10 11 1 2 3 15"
   val intListTrace = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
 
-  test("Node Test"){
+/*  test("Node Test"){
     //val n = new Node(1,2,3,4, ())
     /*val n = new Node(2, 1, 3, 6, Nil)
     println(n)*/
@@ -73,10 +73,34 @@ class TreeTest extends FunSuite{
     assert(n.getEventCount == 3)
     assert(n.getEvents.get(666) == 2)
     assert(n.getEvents.get(777) == 1)
-
-
-
-
   }
-
+  test("Node updatePredictions is none before events are added"){
+    val n = new Node[Int, Int](1,1)
+    n.setKey(2)
+    assert(n.getPredictions == None)
+  }*/
+/*  test("Node updatePrediction has single element after first event update"){
+    val n = new Node[Int, Int](1,1)
+    n.setKey(2)
+    n.updateEvents(666)
+    assert(n.getPredictions.size == 1)
+  }*/
+  test("Node updatePrediction has two elements after two different event key updates"){
+    val n = new Node[Int, Int](1,1)
+    n.setKey(2)
+    n.updateEvents(666)
+    assert(n.getPredictions.size == 1)
+    n.updateEvents(777)
+    assert(n.getPredictions.size == 2)
+  }
+ /* test("Node updatePrediction has one element after the same event key is updated twice"){
+    val n = new Node[Int, Int](1,1)
+    n.setKey(2)
+    n.updateEvents(666)
+    assert(n.getPredictions.size == 1)
+    n.updateEvents(666)
+    assert(n.getPredictions.size == 1)
+    n.updateEvents(666)
+    assert(n.getPredictions.size == 1)
+  }*/
 }

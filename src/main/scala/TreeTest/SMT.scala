@@ -18,13 +18,13 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     private var predictions: Option[Map[B, Double]] = None
     private var children: List[SMT[A,B]] = Nil
 
-    def getKey = key
-    def setKey(aKey: A) = key match {
+    def getKey: Option[A] = key
+    def setKey(aKey: A): Unit = key match {
       case Some(x) => throw new IllegalStateException("Node key cannot be reset")
       case None => key = Option(aKey)
     }
-    def getEventCount = eventCount
-    def updateEvents(newEvent: B) = {
+    def getEventCount: Int = eventCount
+    def updateEvents(newEvent: B): Unit = {
 
       //update events to keep count on how many times this input has been seen
       events match {
@@ -36,19 +36,40 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
       }
       //update event count to keep track of number of overall observations
       eventCount += 1
-      println("checking if eventcount is correct")
-      println("eventCount == events.get.foldLeft(0)(_+_._2): " + (eventCount == events.get.foldLeft(0)(_+_._2)))
-
-    /*  //update predictions for the new event
-      predictions match {
-        None => predictions = Some(Map[B, Double]()); predictions.get += (newEvent -> 1)
-      }*/
+      updatePredictions
     }
 
-    def updatePredictions = {}
-    def getPredictions = predictions
-    def getChildren = children
-    def getEvents = events
+    def updatePredictions: Unit = {
+      println("--------------------")
+      if (eventCount > 0){
+        predictions match {
+          case None => predictions = Some(Map[B, Double]()); println("predictions did not exist. creating predictions")
+          case _ => println("predictions existed. didn't create new one")
+        }
+
+        for ((k,v) <- events.get){
+          println("\n(k,v) from events: " + (k,v))
+          if(predictions.get.contains(k)) {
+            println("predictions contained k: " + k)
+            println("v.toDouble: " + v.toDouble)
+            println("eventCount.toDouble: " + eventCount.toDouble)
+            println("(v.toDouble / eventCount.toDouble): " + (v.toDouble / eventCount.toDouble))
+            predictions.get.update(k, (v.toDouble / eventCount.toDouble))
+          }else{
+            println("predictions did not contain k: " + k)
+            println("eventCount.toDouble: " + eventCount.toDouble)
+            println("(1.00/eventCount.toDouble): " + (1.00/(eventCount.toDouble)))
+            predictions.get += (k -> (1.toDouble / (eventCount.toDouble)))
+
+          }
+          println("updated predictions")
+          for((keyV,valV) <- predictions.get) println("(keyV, valV) : " + (keyV, valV))
+        }
+      }
+    }
+    def getPredictions: Option[Map[B, Double]]  = predictions
+    def getChildren: List[SMT[A,B]] = children
+    def getEvents: Option[Map[B, Int]] = events
 
     def getProbability(input: B): Option[Double] = predictions match {
       case None => None
