@@ -15,13 +15,13 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     private var key: Option[A] = None
     private var eventCount = 0
     private var events: Option[Map[B, Int]] = None
-    private var predictions: Option[Map[B, Double]] = None
+    private var predictions: Map[B, Double] = Map[B, Double]()
     private var children: List[SMT[A,B]] = Nil
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
-      case Some(x) => throw new IllegalStateException("Node key cannot be reset")
       case None => key = Option(aKey)
+      case _ => throw new IllegalStateException("Node key cannot be reset")
     }
     def getEventCount: Int = eventCount
     def updateEvents(newEvent: B): Unit = {
@@ -42,27 +42,20 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     def updatePredictions: Unit = {
 
       if (eventCount > 0){
-        predictions match {
-          case None => predictions = Some(Map[B, Double]())
-          case _ =>
-        }
 
         for ((k,v) <- events.get){
-          if(predictions.get.contains(k))
-            predictions.get.update(k, (v.toDouble / eventCount.toDouble))
+          if(predictions.contains(k))
+            predictions.update(k, (v.toDouble / eventCount.toDouble))
           else
-            predictions.get += (k -> (1.00/eventCount))
+            predictions += (k -> (1.00/eventCount))
         }
       }
     }
-    def getPredictions: Option[Map[B, Double]]  = predictions
+    def getPredictions: Map[B, Double] = predictions
     def getChildren: List[SMT[A,B]] = children
     def getEvents: Option[Map[B, Int]] = events
 
-    def getProbability(input: B): Option[Double] = predictions match {
-      case None => None
-      case Some(x) => x.get(input)
-    }
+    def getProbability(input: B): Option[Double] = predictions.get(input)
   }
   case class SequenceList[A,B](list: List[Sequence[A,B]]) extends SMT(maxDepth=0, maxPhi = 0){}
 
