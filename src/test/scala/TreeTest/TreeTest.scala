@@ -27,4 +27,9 @@ class TreeTest extends FunSuite{
     assert(n.EXPAND_SEQUENCE_COUNT == 3)
     assert(n.key == 4)*/
   }
+  test("Node with 'None' predictions returns None for getProbability") {
+    val n = new Node[Int](1, 1)
+    val num = 1
+    assert(n.getProbability(num) == None)
+  }
 }
