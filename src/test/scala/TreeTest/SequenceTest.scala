@@ -15,17 +15,15 @@ class SequenceTest extends FunSuite{
   val shortStringListTrace = List("ntdll.dll+0x2173e, ntdll.dll+0x21639, ntdll.dll+0xeac7, kernel32.dll+0x15568, comctl32.dll+0x8ac2d")
   val shortStringMap = Map("ntdll.dll+0x2173e" -> 0.1, "ntdll.dll+0x21639" -> 0.2, "ntdll.dll+0xeac7" -> 0.3)
 
-  test("toString"){
-    val s1 = new Sequence(shortListTrace, shortMap)
-    println(s1)
-  }
-  /*test("Sequence returns probability for input"){
+
+
+  test("Sequence returns probability for input"){
     val s1 = new Sequence(shortListTrace, shortMap)
 
     assert(s1.getProbability(1).get == 0.1)
     assert(s1.getProbability(2).get == 0.2)
     assert(s1.getProbability(3).get == 0.3)
-  }*/
+  }
   test("Generic Sequence returns probability for Int input"){
     val s1 = new Sequence[Int, Int](shortListTrace, shortMap)
 

@@ -16,7 +16,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     private var eventCount = 0
     private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
-    private var children: List[SMT[A,B]] = Nil
+    private var children: List[List[SMT[A,B]]] = Nil
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -55,6 +55,15 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
   }
-  case class SequenceList[A,B](list: List[Sequence[A,B]]) extends SMT(maxDepth=0, maxPhi = 0){}
+
+
+  //TODO - DO THIS CLASS!
+  case class SequenceList[A,B](list: List[Sequence[A,B]]) extends SMT(maxDepth=0, maxPhi = 0){
+    /*private var keys: List[A] = Nil
+    private var eventCount = 0
+    private var events: Map[B, Int] = Map[B, Int]()
+    private var predictions: Map[B, Double] = Map[B, Double]()
+    private var children: List[List[SMT[A,B]]] = Nil*/
+  }
 
 
