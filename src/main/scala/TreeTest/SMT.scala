@@ -57,7 +57,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
   }
 
 
-  //TODO - DO THIS CLASS!
+  //TODO - DO THIS CLASS! +++
+
   case class SequenceList[A,B](list: List[Sequence[A,B]]) extends SMT(maxDepth=0, maxPhi = 0){
     /*private var keys: List[A] = Nil
     private var eventCount = 0
