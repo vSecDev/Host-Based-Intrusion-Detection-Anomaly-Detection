@@ -50,7 +50,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: List[SMT[A,B]] = children
+    def getChildren: List[List[SMT[A,B]]] = children
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
