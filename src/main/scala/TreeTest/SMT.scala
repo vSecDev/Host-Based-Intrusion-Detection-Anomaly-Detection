@@ -16,6 +16,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     private var eventCount = 0
     private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
+
+    //TODO SHOULD BELOW BE A List[Set[SMT[A,B]]] ???
     private var children: List[List[SMT[A,B]]] = Nil
 
     def getKey: Option[A] = key
