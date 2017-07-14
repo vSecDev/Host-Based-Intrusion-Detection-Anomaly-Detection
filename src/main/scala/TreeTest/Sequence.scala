@@ -5,26 +5,33 @@ import scala.collection.mutable.Map
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A,B] (_key: List[A], _event: B){
+class Sequence[A,B] (_key: Vector[A], _event: B){
 
-  private var key: List[A] = Nil
+  private var key: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
 
   //Constructor argument validation
-  require(_key != Nil, "Sequence key cannot be an empty list!")
+  require(!_key.isEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
   //Initialise Sequence
   setKey(_key)
   updateEvents(_event)
 
-  def getKey: List[A] = key
+  def getKey: Vector[A] = key
 
-  def setKey(aKey: List[A]): Unit = key match {
+  def setKey(aKey: Vector[A]): Unit = {
+    if(key.isEmpty)
+      key = aKey
+    else
+      throw new IllegalStateException("Sequence key cannot be reset")
+  }
+
+  /*key match {
+      case x +: xs => throw new IllegalStateException("Sequence key cannot be reset")
       case Nil => key = aKey
-      case _ => throw new IllegalStateException("Sequence key cannot be reset")
-    }
+    }*/
 
   def getEventCount: Int = eventCount
 

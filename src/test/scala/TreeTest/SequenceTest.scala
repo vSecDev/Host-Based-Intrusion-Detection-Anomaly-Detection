@@ -10,19 +10,19 @@ class SequenceTest extends FunSuite{
   val strTrace = "ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15040 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15fa7 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc"
   val intTrace = "1 2 3 4 5 6 7 8 9 10 11 1 2 3 12 13 4 5 6 7 8 9 10 11 1 2 3 14 13 4 5 6 7 8 9 10 11 1 2 3 15 4 5 6 7 8 9 10 11 1 2 3 15"
   val intListTrace = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
-  val shortListTrace = List(1,2,3,4,5)
+  val shortListTrace = Vector(1,2,3,4,5)
   val shortMap = Map(1 -> 0.1, 2 -> 0.2, 3 -> 0.3)
-  val shortStringListTrace = List("ntdll.dll+0x2173e, ntdll.dll+0x21639, ntdll.dll+0xeac7, kernel32.dll+0x15568, comctl32.dll+0x8ac2d")
+  val shortStringListTrace = Vector("ntdll.dll+0x2173e, ntdll.dll+0x21639, ntdll.dll+0xeac7, kernel32.dll+0x15568, comctl32.dll+0x8ac2d")
   val shortStringMap = Map("ntdll.dll+0x2173e" -> 0.1, "ntdll.dll+0x21639" -> 0.2, "ntdll.dll+0xeac7" -> 0.3)
 
   test("Sequence constructor arg validation. Key isn't Nil!"){
-    assertThrows[IllegalArgumentException](new Sequence[Int, Int](Nil, 666))
+    assertThrows[IllegalArgumentException](new Sequence[Int, Int](Vector(), 666))
   }
   test("Sequence constructor arg validation. Key isn't empty list!"){
-    assertThrows[IllegalArgumentException](new Sequence[Int, Int](List[Int](), 666))
+    assertThrows[IllegalArgumentException](new Sequence[Int, Int](Vector[Int](), 666))
   }
   test("Sequence constructor arg validation. Correct error message if key is Nil!"){
-    val caught = intercept[IllegalArgumentException](new Sequence[Int, Int](List[Int](), 666))
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Int](Vector[Int](), 666))
     assert(caught.getMessage == "requirement failed: Sequence key cannot be an empty list!")
   }
   test("Sequence constructor arg validation. Event isn't Nil!"){
@@ -60,11 +60,11 @@ class SequenceTest extends FunSuite{
   test("Sequence key cannot be reset with new key"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666)
     assert(s1.getKey == shortListTrace)
-    assertThrows[IllegalStateException](s1.setKey(List(444,555,666)))
+    assertThrows[IllegalStateException](s1.setKey(Vector(444,555,666)))
   }
   test("Sequence setKey error message correct for key reset"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666)
-    val caught = intercept[IllegalStateException](s1.setKey(List(1,2,3)))
+    val caught = intercept[IllegalStateException](s1.setKey(Vector(1,2,3)))
     assert(caught.getMessage == "Sequence key cannot be reset")
   }
   test("Sequence eventCount is correct"){
