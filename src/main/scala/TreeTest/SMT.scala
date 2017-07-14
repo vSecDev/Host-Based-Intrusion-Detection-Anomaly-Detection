@@ -59,7 +59,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
 
-    //TODO growTree
+    //TODO GROWTREE
+  //  def growTree()
+
+
   }
 
 

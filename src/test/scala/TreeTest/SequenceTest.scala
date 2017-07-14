@@ -15,8 +15,33 @@ class SequenceTest extends FunSuite{
   val shortStringListTrace = List("ntdll.dll+0x2173e, ntdll.dll+0x21639, ntdll.dll+0xeac7, kernel32.dll+0x15568, comctl32.dll+0x8ac2d")
   val shortStringMap = Map("ntdll.dll+0x2173e" -> 0.1, "ntdll.dll+0x21639" -> 0.2, "ntdll.dll+0xeac7" -> 0.3)
 
-
-
+  test("Sequence constructor arg validation. Key isn't Nil!"){
+    assertThrows[IllegalArgumentException](new Sequence[Int, Int](Nil, 666))
+  }
+  test("Sequence constructor arg validation. Key isn't empty list!"){
+    assertThrows[IllegalArgumentException](new Sequence[Int, Int](List[Int](), 666))
+  }
+  test("Sequence constructor arg validation. Correct error message if key is Nil!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Int](List[Int](), 666))
+    assert(caught.getMessage == "requirement failed: Sequence key cannot be an empty list!")
+  }
+  test("Sequence constructor arg validation. Event isn't Nil!"){
+    assertThrows[IllegalArgumentException](new Sequence[Int, List[Int]](shortListTrace, Nil))
+  }
+  test("Sequence constructor arg validation. Event isn't empty list!"){
+    assertThrows[IllegalArgumentException](new Sequence[Int, List[Int]](shortListTrace, List[Int]()))
+  }
+  test("Sequence constructor arg validation. Correct error message if event is Nil!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, List[Int]](shortListTrace, Nil))
+    assert(caught.getMessage == "requirement failed: Sequence event cannot be Nil or None!")
+  }
+  test("Sequence constructor arg validation. Event isn't None!"){
+    assertThrows[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, None))
+  }
+  test("Sequence constructor arg validation. Correct error message if event is None!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, None))
+    assert(caught.getMessage == "requirement failed: Sequence event cannot be Nil or None!")
+  }
   test("Sequence returns probability for input"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666)
 

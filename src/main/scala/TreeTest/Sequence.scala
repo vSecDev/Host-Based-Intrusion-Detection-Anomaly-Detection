@@ -12,6 +12,10 @@ class Sequence[A,B] (_key: List[A], _event: B){
   private var events: mutable.Map[B, Int] = mutable.Map[B, Int]()
   private var predictions: mutable.Map[B, Double] = mutable.Map[B, Double]()
 
+  //Constructor argument validation
+  require(_key != Nil, "Sequence key cannot be an empty list!")
+  require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
+  //Initialise Sequence
   setKey(_key)
   updateEvents(_event)
 
