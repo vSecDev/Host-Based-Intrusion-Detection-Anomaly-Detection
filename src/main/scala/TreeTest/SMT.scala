@@ -69,17 +69,26 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
   case class SequenceList[A,B](maxSeqCount: Int) extends SMT(maxDepth=0, maxPhi = 0, maxSeqCount){
     //TODO - DO THIS CLASS! +++++
 
-  /*  var list: List[Sequence[A,B]] =
+    var sequences: List[Sequence[A,B]] = List[Sequence[A,B]]()
+
     /*private var keys: List[A] = Nil
     private var eventCount = 0
     private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
     private var children: List[List[SMT[A,B]]] = Nil*/
 
-    require()
-    require(maxSeqCount > 0, "Max sequence count must be positive!")*/
+    //Constructor arg validation
+    require(maxSeqCount > 0, "Max sequence count must be positive!")
 
 
+    //TODO : updateSequenceList MUST CHECK IF SEQUENCELIST HAS TO SPLIT, NEW SEQUENCE HAS UNIQUE KEY
+    /**
+      * Updates the sequence list with a new sequence.
+      * The updated sequence list cannot exceed maxSeqCount in size.
+      * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
+      * @return true if the sequence list has been updated, false otherwise.
+      */
+    //def updateSequences(newSeq: Sequence[A,B]): Boolean
 
   }
 
