@@ -1,6 +1,6 @@
 package TreeTest
 
-import scala.collection.mutable
+import scala.collection.mutable.Map
 
 /**
   * Created by Case on 02/07/2017.
@@ -9,8 +9,8 @@ class Sequence[A,B] (_key: List[A], _event: B){
 
   private var key: List[A] = Nil
   private var eventCount: Int = 0
-  private var events: mutable.Map[B, Int] = mutable.Map[B, Int]()
-  private var predictions: mutable.Map[B, Double] = mutable.Map[B, Double]()
+  private var events: Map[B, Int] = Map[B, Int]()
+  private var predictions: Map[B, Double] = Map[B, Double]()
 
   //Constructor argument validation
   require(_key != Nil, "Sequence key cannot be an empty list!")
@@ -28,9 +28,9 @@ class Sequence[A,B] (_key: List[A], _event: B){
 
   def getEventCount: Int = eventCount
 
-  def getEvents: mutable.Map[B, Int] = events
+  def getEvents: Map[B, Int] = events
 
-  def getPredictions: mutable.Map[B, Double] = predictions
+  def getPredictions: Map[B, Double] = predictions
 
   def getProbability(input: B): Option[Double] = predictions.get(input)
 

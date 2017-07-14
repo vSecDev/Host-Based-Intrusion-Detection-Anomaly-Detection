@@ -10,14 +10,17 @@ import scala.collection.mutable.Set
   * @param maxDepth the maximum depth of the tree
   * @param maxPhi the maximum number of wildcards in the tree
   */
-abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
+abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
-  case class Node[A,B](val maxDepth: Int, val maxPhi: Int) extends SMT(maxDepth, maxPhi){
+  case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){
 
     private var key: Option[A] = None
     private var eventCount = 0
     private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
+
+    //TODO ADD CONSTRUCTOR ARG CHECKING LOGIC. NO NEGATIVE MAXDEPTH,MAXPHI/MAXSEQCOUNT
+
 
     //TODO SHOULD BELOW BE A List[Set[SMT[A,B]]] ???
     private var children: List[Set[SMT[A,B]]] = Nil
@@ -63,14 +66,21 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
   //  def growTree()
   }
 
-  case class SequenceList[A,B](list: List[Sequence[A,B]]) extends SMT(maxDepth=0, maxPhi = 0){
+  case class SequenceList[A,B](maxSeqCount: Int) extends SMT(maxDepth=0, maxPhi = 0, maxSeqCount){
     //TODO - DO THIS CLASS! +++++
 
+  /*  var list: List[Sequence[A,B]] =
     /*private var keys: List[A] = Nil
     private var eventCount = 0
     private var events: Map[B, Int] = Map[B, Int]()
     private var predictions: Map[B, Double] = Map[B, Double]()
     private var children: List[List[SMT[A,B]]] = Nil*/
+
+    require()
+    require(maxSeqCount > 0, "Max sequence count must be positive!")*/
+
+
+
   }
 
 
