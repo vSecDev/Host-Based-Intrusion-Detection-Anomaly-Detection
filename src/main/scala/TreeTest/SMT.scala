@@ -89,7 +89,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: Sequence[A,B]): Boolean = ??? /*sequences.find(x => x.getKey == newSeq.getKey) match {
+    def updateSequences(newSeq: (Vector[A], B)): Boolean =
+
+
+
+
+    /*sequences.find(x => x.getKey == newSeq.getKey) match {
       case Some(x) => x.updateEvents(newSeq.getE)
 
      /* if(sequences.exists { x => x.getKey == newSeq.getKey}){

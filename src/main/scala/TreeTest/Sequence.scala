@@ -21,17 +21,7 @@ class Sequence[A,B] (_key: Vector[A], _event: B){
 
   def getKey: Vector[A] = key
 
-  def setKey(aKey: Vector[A]): Unit = {
-    if(key.isEmpty)
-      key = aKey
-    else
-      throw new IllegalStateException("Sequence key cannot be reset")
-  }
-
-  /*key match {
-      case x +: xs => throw new IllegalStateException("Sequence key cannot be reset")
-      case Nil => key = aKey
-    }*/
+  def setKey(aKey: Vector[A]): Unit = if(key.isEmpty) key = aKey else throw new IllegalStateException("Sequence key cannot be reset")
 
   def getEventCount: Int = eventCount
 
