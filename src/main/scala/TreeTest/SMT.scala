@@ -1,6 +1,8 @@
 package TreeTest
 
 import scala.collection.mutable.Map
+import scala.collection.mutable.Set
+
 /**
   * Created by Case on 02/07/2017.
   * Implementation of Sparse Markov Tree
@@ -18,7 +20,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
     private var predictions: Map[B, Double] = Map[B, Double]()
 
     //TODO SHOULD BELOW BE A List[Set[SMT[A,B]]] ???
-    private var children: List[List[SMT[A,B]]] = Nil
+    private var children: List[Set[SMT[A,B]]] = Nil
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -52,7 +54,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: List[List[SMT[A,B]]] = children
+    def getChildren: List[Set[SMT[A,B]]] = children
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
