@@ -1,7 +1,7 @@
 package TreeTest
 
 import org.scalatest.FunSuite
-//import TreeTest._
+//import NodeTest._
 
 /**
   * Created by Case on 02/07/2017.
