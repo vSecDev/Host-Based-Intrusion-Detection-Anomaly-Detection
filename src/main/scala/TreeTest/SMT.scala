@@ -1,5 +1,6 @@
 package TreeTest
 
+//import scala.collection.mutable
 import scala.collection.mutable.Map
 import scala.collection.mutable.Set
 
@@ -69,7 +70,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
   case class SequenceList[A,B](maxSeqCount: Int) extends SMT(maxDepth=0, maxPhi = 0, maxSeqCount){
     //TODO - DO THIS CLASS! +++++
 
-    var sequences: List[Sequence[A,B]] = List[Sequence[A,B]]()
+    var sequences: Set[Sequence[A,B]] = Set[Sequence[A,B]]()
 
     /*private var keys: List[A] = Nil
     private var eventCount = 0
@@ -89,10 +90,15 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @return true if the sequence list has been updated, false otherwise.
       */
     def updateSequences(newSeq: Sequence[A,B]): Boolean = {
-      if(sequences.size == maxSeqCount)
-        false
 
+      if(sequences.exists { x => x.getKey == newSeq.getKey}){
 
+      }else if{
+        /*if(sequences.size == maxSeqCount)  //only if new sequence would increase sequences.size
+          false*/
+      }else{
+
+      }
     }
 
   }

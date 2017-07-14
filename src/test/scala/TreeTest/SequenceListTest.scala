@@ -47,5 +47,23 @@ class SequenceListTest extends FunSuite{
     sl.updateSequences(seq1)
     assert(sl.updateSequences(seq2))
   }
+  test("SequenceList, only one Sequence exists with a given key "){
+    val sl = new SequenceList[Int, Int](1)
+    val seq1 = new Sequence(shortListTrace, 666)
+    val seq2 = new Sequence(shortListTrace, 777)
+    val seq3 = new Sequence(shortListTrace, 888)
+    val seq4 = new Sequence(shortListTrace, 999)
+
+    assert(sl.sequences.size == 0)
+    sl.updateSequences(seq1)
+    assert(sl.sequences.size == 1)
+    sl.updateSequences(seq2)
+    assert(sl.sequences.size == 1)
+    sl.updateSequences(seq3)
+    assert(sl.sequences.size == 1)
+    sl.updateSequences(seq4)
+    assert(sl.sequences.size == 1)
+
+  }
 
 }
