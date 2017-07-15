@@ -181,6 +181,12 @@ class SequenceTest extends FunSuite{
     s1.updateEvents(777)
     assert(s1.getProbability(666).get == 0.5)
     assert(s1.getProbability(777).get == 0.5)
+
+    assert(s1.getProbability(777).get == 0.5)
+    assert(s1.getProbability(777).get == 0.5)
+    assert(s1.getProbability(777).get == 0.5)
+    assert(s1.getProbability(777).get == 0.5)
+
     s1.updateEvents(888)
     assert(s1.getProbability(666).get == 1.0/3)
     assert(s1.getProbability(777).get == 1.0/3)

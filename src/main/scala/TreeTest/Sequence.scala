@@ -5,15 +5,16 @@ import scala.collection.mutable.Map
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A,B] (_key: Vector[A], _event: B){
+class Sequence[A,B] (_key: Vector[A], _event: B) {
 
   private var key: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
+  private var isChanged: Boolean = false
 
   //Constructor argument validation
-  require(!_key.isEmpty, "Sequence key cannot be an empty list!")
+  require(_key.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
   //Initialise Sequence
   setKey(_key)
@@ -21,17 +22,25 @@ class Sequence[A,B] (_key: Vector[A], _event: B){
 
   def getKey: Vector[A] = key
 
-  def setKey(aKey: Vector[A]): Unit = if(key.isEmpty) key = aKey else throw new IllegalStateException("Sequence key cannot be reset")
+  def setKey(aKey: Vector[A]): Unit = if (key.isEmpty) key = aKey else throw new IllegalStateException("Sequence key cannot be reset")
 
   def getEventCount: Int = eventCount
 
+  //TODO MAKE THIS PRIVATE OR CONTROL ACCESS
   def getEvents: Map[B, Int] = events
 
-  def getPredictions: Map[B, Double] = predictions
+  def getPredictions: Map[B, Double] = {
+    if (isChanged) {
+      updatePredictions
+      isChanged = false
+    }
+    predictions
+  }
 
-  def getProbability(input: B): Option[Double] = predictions.get(input)
+  def getProbability(input: B): Option[Double] = getPredictions.get(input)
 
   def updateEvents(newEvent: B): Unit = {
+
     //update events to keep count on how many times this input has been seen
     events.get(newEvent) match {
       case None => events += (newEvent -> 1)
@@ -39,17 +48,20 @@ class Sequence[A,B] (_key: Vector[A], _event: B){
     }
     //update event count to keep track of number of overall observations
     eventCount += 1
+    isChanged = true
     //TODO MOVE UPDATEPREDICTIONS OUTSIDE THIS FUNCTION. BUT MAKE SURE GETPREDICTIONS ALWAYS USES UP-DO-DATE DATA.
-    updatePredictions
+    //updatePredictions
   }
 
   def updatePredictions(): Unit = {
-    if (eventCount > 0){
-      for ((k,v) <- events){
-        if(predictions.contains(k))
-          predictions.update(k, v.toDouble / eventCount)
-        else
-          predictions += (k -> (1.00/eventCount))
+
+    for ((k, v) <- events) {
+      if (predictions.contains(k)) {
+        predictions.update(k, v.toDouble / eventCount)
+      }
+      else {
+        //predictions += (k -> (1.00/eventCount))}
+        predictions += (k -> (v.toDouble / eventCount))
       }
     }
   }
