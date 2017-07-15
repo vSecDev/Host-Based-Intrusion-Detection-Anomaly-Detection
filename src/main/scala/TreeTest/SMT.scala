@@ -24,7 +24,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
 
     //TODO SHOULD BELOW BE A List[Set[SMT[A,B]]] ???
-    private var children: List[Set[SMT[A,B]]] = Nil
+    private var children: Vector[Set[SMT[A,B]]] = Vector[Set[SMT[A,B]]]()
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -58,7 +58,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: List[Set[SMT[A,B]]] = children
+    def getChildren: Vector[Set[SMT[A,B]]] = children
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
@@ -89,7 +89,20 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Boolean =
+    def updateSequences(newSeq: (Vector[A], B)): Boolean = sequences.find(x => x.getKey == newSeq._1) match {
+      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + + sequences.count(y => y.getKey == newSeq._1)); true }
+      case None => {
+        if(sequences.size == maxSeqCount){
+          println("sequences.size == maxSeqCount. -> " + sequences.size + " . Reached split size. Sequence not added! Make sure it's added after split!")
+          false
+        }else{
+          println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
+          sequences.add(new Sequence[A, B](newSeq._1, newSeq._2))
+          println("Sequences.size after adding newSeq: " + sequences.size + " - maxSeqCount: " + maxSeqCount)
+          true
+        }
+      }
+    }
 
 
 
