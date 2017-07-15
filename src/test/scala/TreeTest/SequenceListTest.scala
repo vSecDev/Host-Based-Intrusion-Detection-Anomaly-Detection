@@ -22,7 +22,7 @@ class SequenceListTest extends FunSuite{
   test("SequenceList constructor arg validation. maxSeqcount is not negative."){
     assertThrows[IllegalArgumentException](new SequenceList[Int, Int](-1))
   }
-  test("SequenceList constructor arg validation. Correct error message if maxSeqCount is zero.!"){
+  test("SequenceList constructor arg validation. Correct error message if maxSeqCount is zero.!") {
     val caught = intercept[IllegalArgumentException](new SequenceList[Int, Int](0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
@@ -48,22 +48,22 @@ class SequenceListTest extends FunSuite{
     assert(sl.updateSequences(seq2))
   }
   test("SequenceList, only one Sequence exists with a given key "){
-    val sl = new SequenceList[Int, Int](1)
-    val seq1 = (shortListTrace, 666)
-    val seq2 = (shortListTrace, 777)
-    val seq3 = (shortListTrace, 888)
-    val seq4 = (shortListTrace, 999)
+  val sl = new SequenceList[Int, Int](1)
+  val seq1 = (shortListTrace, 666)
+  val seq2 = (shortListTrace, 777)
+  val seq3 = (shortListTrace, 888)
+  val seq4 = (shortListTrace, 999)
 
-    assert(sl.sequences.size == 0)
-    sl.updateSequences(seq1)
-    assert(sl.sequences.size == 1)
-    sl.updateSequences(seq2)
-    assert(sl.sequences.size == 1)
-    sl.updateSequences(seq3)
-    assert(sl.sequences.size == 1)
-    sl.updateSequences(seq4)
-    assert(sl.sequences.size == 1)
+  assert(sl.sequences.size == 0)
+  sl.updateSequences(seq1)
+  assert(sl.sequences.size == 1)
+  sl.updateSequences(seq2)
+  assert(sl.sequences.size == 1)
+  sl.updateSequences(seq3)
+  assert(sl.sequences.size == 1)
+  sl.updateSequences(seq4)
+  assert(sl.sequences.size == 1)
 
-  }
+}
 
 }
