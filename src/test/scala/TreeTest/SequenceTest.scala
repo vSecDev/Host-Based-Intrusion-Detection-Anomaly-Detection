@@ -250,4 +250,46 @@ class SequenceTest extends FunSuite{
     assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/6)
     assert(s1.getProbability("kernel32.dll+0x15568").get == 1.0/6)
   }
+  test("Sequence eventCount == events sum in events"){
+    val s1 = new Sequence[Int, Int](shortListTrace, 666)
+    assert(s1.getEventCount == 1)
+    var eventNum = 0
+    for(e <- s1.getEvents){
+      eventNum += e._2
+    }
+    assert(eventNum == s1.getEventCount)
+
+
+    s1.updateEvents(666)
+    assert(s1.getEventCount == 2)
+    var eventNum2 = 0
+    for(e <- s1.getEvents){
+      eventNum2 += e._2
+    }
+    assert(eventNum2 == s1.getEventCount)
+    assert(eventNum2 == 2)
+    assert(2 == s1.getEventCount)
+
+
+    s1.updateEvents(777)
+    assert(s1.getEventCount == 3)
+    var eventNum3 = 0
+    for(e <- s1.getEvents){
+      eventNum3 += e._2
+    }
+    assert(eventNum3 == s1.getEventCount)
+    assert(eventNum3 == 3)
+    assert(3 == s1.getEventCount)
+
+
+    s1.updateEvents(888)
+    assert(s1.getEventCount == 4)
+    var eventNum4 = 0
+    for(e <- s1.getEvents){
+      eventNum4 += e._2
+    }
+    assert(eventNum4 == s1.getEventCount)
+    assert(eventNum4 == 4)
+    assert(4 == s1.getEventCount)
+  }
 }

@@ -103,23 +103,6 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         }
       }
     }
-
-
-
-
-    /*sequences.find(x => x.getKey == newSeq.getKey) match {
-      case Some(x) => x.updateEvents(newSeq.getE)
-
-     /* if(sequences.exists { x => x.getKey == newSeq.getKey}){
-
-      }else if{
-        /*if(sequences.size == maxSeqCount)  //only if new sequence would increase sequences.size
-          false*/
-      }else{
-
-      }*/
-    }*/
-
   }
 
 
