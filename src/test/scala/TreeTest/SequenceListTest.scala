@@ -91,17 +91,17 @@ class SequenceListTest extends FunSuite {
     sl.updateSequences(seq1)
     assert(sl.getSequence(shortListTrace).get.getKey == shortListTrace)
   }
-  test("SequenceList getKeys returns empty Vector if there are no sequences stored in SequenceList"){
+  test("SequenceList getKeys returns empty Vector if there are no sequences stored in SequenceList") {
     val sl = new SequenceList[Int, Int](1)
     assert(sl.getKeys.isEmpty)
   }
-  test("SequenceList getKeys returns Vector of size 1 if there is one sequence stored in SequenceList"){
+  test("SequenceList getKeys returns Vector of size 1 if there is one sequence stored in SequenceList") {
     val sl = new SequenceList[Int, Int](1)
     val seq1 = (shortListTrace, 666)
     sl.updateSequences(seq1)
-    assert(sl.getKeys.size ==1)
+    assert(sl.getKeys.size == 1)
   }
-  test("SequenceList getKeys returns Vector of correct size if there are multiple seque0nces stored in SequenceList"){
+  test("SequenceList getKeys returns Vector of correct size if there are multiple seque0nces stored in SequenceList") {
     val sl = new SequenceList[Int, Int](4)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 777)
@@ -144,7 +144,7 @@ class SequenceListTest extends FunSuite {
     sl.updateSequences(seq11)
     assert(sl.getKeys.size == 4)
   }
-  test("SequenceList, getKeys returns correct keys"){
+  test("SequenceList, getKeys returns correct keys") {
     val sl = new SequenceList[Int, Int](4)
     val seq1 = (shortListTrace, 666)
 
@@ -197,29 +197,20 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
   }
- test("temp"){
+  test("temp") {
 
-   var vVS: Vector[_ >: Vector[SMT[Int,Int]]] = Vector[Vector[SMT[Int, Int]]]()
-   var node = new Node[Int,Int](1,2,3)
-   var seqList = new SequenceList[Int, Int](1)
-   val seq1 = (shortListTrace, 666)
-   seqList.updateSequences(seq1)
-   //var v: Vector[_ >: SMT[Int, Int]] = Vector[Node[Int, Int]]()
-   var v: Vector[_ >: SMT[Int, Int]] = Vector[SMT[Int, Int]]()
-
-   //v = Vector[Node[Int, Int]](node)
-   v = v :+ node
-   v = v :+ seqList
-
-   println("\n----------------------\nv: " + v)
-   vVS = vVS :+ v
-   println("\n----------------------\nvVS: " + vVS)
- /*   val sl = new SequenceList[Int, Int](4)
+    var vVS: Vector[_ >: Vector[SMT[Int, Int]]] = Vector[Vector[SMT[Int, Int]]]()
+    var node = new Node[Int, Int](1, 2, 3)
+    var seqList = new SequenceList[Int, Int](1)
     val seq1 = (shortListTrace, 666)
-    sl.updateSequences(seq1)
+    seqList.updateSequences(seq1)
+    var v: Vector[_ >: SMT[Int, Int]] = Vector[SMT[Int, Int]]()
 
-    val newVec: Vector[Node[Int,Int]] = sl.split
-    println("newVec.size: " + newVec.size)
-    println("newVec: " + newVec(0))*/
+    v = v :+ node
+    v = v :+ seqList
+
+    println("\n----------------------\nv: " + v)
+    vVS = vVS :+ v
+    println("\n----------------------\nvVS: " + vVS)
   }
 }
