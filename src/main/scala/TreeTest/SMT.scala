@@ -2,7 +2,6 @@ package TreeTest
 
 //import scala.collection.mutable
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
 
 /**
   * Created by Case on 02/07/2017.
@@ -23,8 +22,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO ADD CONSTRUCTOR ARG CHECKING LOGIC. NO NEGATIVE MAXDEPTH,MAXPHI/MAXSEQCOUNT
 
 
-    //TODO SHOULD BELOW BE A List[Set[SMT[A,B]]] ???
-    private var children: Vector[Set[SMT[A,B]]] = Vector[Set[SMT[A,B]]]()
+    //TODO CHECK TYPE OF THIS VARIABLE. FIND OPTIMAL TYPE.
+    private var children: Vector[Vector[SMT[A,B]]] = Vector[Vector[SMT[A,B]]]()
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -58,7 +57,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: Vector[Set[SMT[A,B]]] = children
+    def getChildren: Vector[Vector[SMT[A,B]]] = children
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
@@ -68,9 +67,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
   }
 
   case class SequenceList[A,B](maxSeqCount: Int) extends SMT(maxDepth=0, maxPhi = 0, maxSeqCount){
-    //TODO - DO THIS CLASS! +++++
 
-    var sequences: Set[Sequence[A,B]] = Set[Sequence[A,B]]()
+    var sequences: Vector[Sequence[A,B]] = Vector[Sequence[A,B]]()
 
     /*private var keys: List[A] = Nil
     private var eventCount = 0
@@ -97,12 +95,48 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           false
         }else{
           println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
-          sequences.add(new Sequence[A, B](newSeq._1, newSeq._2))
+          sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
           println("Sequences.size after adding newSeq: " + sequences.size + " - maxSeqCount: " + maxSeqCount)
           true
         }
       }
     }
+
+    def getSequence(key: Vector[A]): Option[Sequence[A,B]] = sequences.find(x => x.getKey == key)
+    def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
+
+    //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
+    //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
+    /*def split(): Vector[SMT[A,B]] = {
+      var newVector: Vector[SMT[A,B]] = Vector[SMT[A,B]]()
+
+      for (s <- sequences){
+        newVector.find(x => x.getKey == s.getKey(0)) match {
+      }
+
+    }*/
+
+    /*foreach sequence in SequenceList {
+      take head :: tail and prediction/count
+        check if newList contains Node with key = head  ///newList.exists { x => customPredicate(x) }   ====> customPredicate could be x.getKey == head
+      if(newList.exists { x => x.getKey == head }){
+        //newList contains a Node with key = head.
+        nodeToAdd = that node in newList
+          nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
+      }else{
+        //newList does not contain a Node with key = head yet. A new Node needs to be created and added to newList
+        create Node (nodeToAdd) with key = head, maxDepth = previous maxDepth-1, maxPhi = previous maxPhi
+          nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
+
+        add Node to newList
+      }
+    }
+    replace split Sequence with newList (in "childrenGroup")*/
+
+
+
+
   }
+
 
 
