@@ -126,7 +126,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       if(newList.exists { x => x.getKey == head }){
         //newList contains a Node with key = head.
         nodeToAdd = that node in newList
-          nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
+        f  nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
       }else{
         //newList does not contain a Node with key = head yet. A new Node needs to be created and added to newList
         create Node (nodeToAdd) with key = head, maxDepth = previous maxDepth-1, maxPhi = previous maxPhi
