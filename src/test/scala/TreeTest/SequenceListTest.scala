@@ -22,7 +22,7 @@ class SequenceListTest extends FunSuite{
   test("SequenceList constructor arg validation. maxSeqcount is not negative."){
     assertThrows[IllegalArgumentException](new SequenceList[Int, Int](-1))
   }
-  test("SequenceList constructor arg validation. Correct error message if maxSeqCount is zero.!") {
+  test("SequenceList constructor arg validation. Correct error message displayed if maxSeqCount is zero.!") {
     val caught = intercept[IllegalArgumentException](new SequenceList[Int, Int](0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
@@ -37,15 +37,23 @@ class SequenceListTest extends FunSuite{
     val sl = new SequenceList[Int, Int](1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 666)
+    val seq3 = (shortListTrace, 666)
+    val seq4 = (shortListTrace, 666)
     sl.updateSequences(seq1)
     assert(sl.updateSequences(seq2))
+    assert(sl.updateSequences(seq3))
+    assert(sl.updateSequences(seq4))
   }
   test("SequenceList updateSequences doesn't not fail maxSeqSize check if Sequence with existing key is added multiple times. (Different event values)"){
     val sl = new SequenceList[Int, Int](1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 777)
+    val seq3 = (shortListTrace, 888)
+    val seq4 = (shortListTrace, 999)
     sl.updateSequences(seq1)
     assert(sl.updateSequences(seq2))
+    assert(sl.updateSequences(seq3))
+    assert(sl.updateSequences(seq4))
   }
   test("SequenceList, only one Sequence exists with a given key "){
   val sl = new SequenceList[Int, Int](1)

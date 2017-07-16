@@ -54,7 +54,6 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
   }
 
   def updatePredictions(): Unit = {
-
     for ((k, v) <- events) {
       if (predictions.contains(k)) {
         predictions.update(k, v.toDouble / eventCount)
