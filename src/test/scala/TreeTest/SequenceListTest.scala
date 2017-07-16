@@ -197,4 +197,25 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
   }
+ test("temp"){
+
+   var vVS: Vector[Vector[SMT[Int,Int]]] = Vector[Vector[SMT[Int, Int]]]()
+
+   var newVector: Vector[Node[Int,Int]] = Vector[Node[Int, Int]]()
+
+//   var node = new Node[Int,Int](1,2,3)
+//
+//   newVector = newVector :+ node
+//   println("\n----------------------\nnewVector: " + newVector)
+
+   vVS = vVS :+ newVector
+   println("\n----------------------\nvVS: " + vVS)
+ /*   val sl = new SequenceList[Int, Int](4)
+    val seq1 = (shortListTrace, 666)
+    sl.updateSequences(seq1)
+
+    val newVec: Vector[Node[Int,Int]] = sl.split
+    println("newVec.size: " + newVec.size)
+    println("newVec: " + newVec(0))*/
+  }
 }

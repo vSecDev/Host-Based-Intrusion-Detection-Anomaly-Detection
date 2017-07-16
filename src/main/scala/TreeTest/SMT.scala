@@ -107,14 +107,18 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    /*def split(): Vector[SMT[A,B]] = {
-      var newVector: Vector[SMT[A,B]] = Vector[SMT[A,B]]()
+    def split(): Vector[SMT [A,B]] = {
+      var newVector: Vector[SMT[A, B]] = Vector[SMT[A,B]]()
 
-      for (s <- sequences){
+      /*var node = new Node[A,B](1,2,3)
+
+      newVector = newVector :+ node*/
+      newVector
+      /*for (s <- sequences){
         newVector.find(x => x.getKey == s.getKey(0)) match {
-      }
+      }*/
 
-    }*/
+    }
 
     /*foreach sequence in SequenceList {
       take head :: tail and prediction/count
