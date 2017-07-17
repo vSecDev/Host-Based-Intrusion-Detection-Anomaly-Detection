@@ -262,8 +262,12 @@ class SequenceListTest extends FunSuite {
     vVS = vVS :+ v
     println("\n----------------------\nvVS: " + vVS)
 
-    vVS = vVS :+ AnyRef
-    println("\n----------------------\nvVS: " + vVS)
+    /*vVS = vVS :+ AnyRef
+    println("\n----------------------\nvVS: " + vVS)*/
+    println("\nvVB class: " + vVS.getClass)
+    println("\nvVB ele class: " + vVS(0).getClass)
+   val firstEle =  vVS(0)
+    println("firstEle(0): " + ((_ >: Vector[SMT [Int, Int]]) firstEle) (0))
 
   }
   test("temp2"){
@@ -282,6 +286,12 @@ class SequenceListTest extends FunSuite {
       println("More statements here")
 
     }
+
+    println("shortListTrace: " + shortListTrace)
+    println("shortListTrace.drop(0): " + shortListTrace.drop(0))
+    println("shortListTrace.drop(1): " + shortListTrace.drop(1))
+    println("shortListTrace.drop(2): " + shortListTrace.drop(2))
+    println("shortListTrace.drop(3): " + shortListTrace.drop(3))
 
   }
 }

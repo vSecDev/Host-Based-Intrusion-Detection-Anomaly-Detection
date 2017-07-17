@@ -23,7 +23,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
 
     //TODO CHECK TYPE OF THIS VARIABLE. FIND OPTIMAL TYPE.
-    private var children: Vector[Vector[SMT[A,B]]] = Vector[Vector[SMT[A,B]]]()
+    private var childrenGroup: Vector[_ >:Vector[SMT[A,B]]] = Vector[Vector[SMT[A,B]]]()
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -57,7 +57,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: Vector[Vector[SMT[A,B]]] = children
+    def getChildren: Vector[_ >: Vector[SMT[A, B]]] = childrenGroup
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
@@ -71,9 +71,21 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           i <- 0 to maxPhi
           if sequence.length > i
         }{
+          val newSequence = sequence.drop(i)
+          if(childrenGroup.size > i){
+            childrenGroup(0) match {
+              case SequenceList =>
+              case Node =>
+            }
+          }else{
+            // (!childrenGroup.size > i)	//current node DOESN'T have a list of children in "childrenGroup" at index i
+
+          }
 
         }
       }else{
+        //  (!maxDepth > 0)   //maxDepth is 0! here
+
 
       }
     }
