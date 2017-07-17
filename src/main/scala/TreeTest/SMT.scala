@@ -63,7 +63,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     def getProbability(input: B): Option[Double] = predictions.get(input)
 
     //TODO GROWTREE
-  //  def growTree()
+    def growTree(sequence: Vector[A], event: B): Unit = ???
   }
 
   case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){
@@ -116,8 +116,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           case None => {
             var newNode: Node[A,B] = Node[A,B](maxDepth, maxPhi, maxSeqCount)
             newNode.setKey(s.getKey(0))
-            //TODO, CALL GROWTREE ON THIS NODE WITH TAIL HERE
 
+            for((event, count) <- s.getEvents){
+              for(i <- 1 to count){
+                newNode.growTree(s.getKey.tail, event)
+              }
+            }
             newVector = newVector :+ newNode
           }
           //case Some(x) => x.growTree
