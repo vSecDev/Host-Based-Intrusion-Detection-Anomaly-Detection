@@ -63,7 +63,20 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     def getProbability(input: B): Option[Double] = predictions.get(input)
 
     //TODO GROWTREE
-    def growTree(sequence: Vector[A], event: B): Unit = ???
+    //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
+    //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
+    def growTree(sequence: Vector[A], event: B): Unit = {
+      if(maxDepth > 0){
+        for{
+          i <- 0 to maxPhi
+          if sequence.length > i
+        }{
+
+        }
+      }else{
+
+      }
+    }
   }
 
   case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){

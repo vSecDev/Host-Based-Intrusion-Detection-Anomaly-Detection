@@ -3,7 +3,7 @@ package TreeTest
 import javax.sound.midi.Sequence
 
 import org.scalatest.FunSuite
-
+import org.scalatest.Matchers._
 /**
   * Created by apinter on 14/07/2017.
   */
@@ -21,24 +21,24 @@ class SequenceListTest extends FunSuite {
   val shortStringMap = Map("ntdll.dll+0x2173e" -> 0.1, "ntdll.dll+0x21639" -> 0.2, "ntdll.dll+0xeac7" -> 0.3)
 
   test("SequenceList constructor arg validation. maxSeqcount is not zero.") {
-    assertThrows[IllegalArgumentException](new SequenceList[Int, Int](0))
+    assertThrows[IllegalArgumentException](new SequenceList[Int, Int](1,1,0))
   }
   test("SequenceList constructor arg validation. maxSeqcount is not negative.") {
-    assertThrows[IllegalArgumentException](new SequenceList[Int, Int](-1))
+    assertThrows[IllegalArgumentException](new SequenceList[Int, Int](1,1,-1))
   }
   test("SequenceList constructor arg validation. Correct error message displayed if maxSeqCount is zero.!") {
-    val caught = intercept[IllegalArgumentException](new SequenceList[Int, Int](0))
+    val caught = intercept[IllegalArgumentException](new SequenceList[Int, Int](1,1,0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
   test("SequenceList updateSequences fails if maxSeqSize would be exceeded") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
     sl.updateSequences(seq1)
     assert(!sl.updateSequences(seq2))
   }
   test("SequenceList updateSequences doesn't not fail maxSeqSize check if Sequence with existing key is added multiple times.") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 666)
     val seq3 = (shortListTrace, 666)
@@ -49,7 +49,7 @@ class SequenceListTest extends FunSuite {
     assert(sl.updateSequences(seq4))
   }
   test("SequenceList updateSequences doesn't not fail maxSeqSize check if Sequence with existing key is added multiple times. (Different event values)") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 777)
     val seq3 = (shortListTrace, 888)
@@ -60,7 +60,7 @@ class SequenceListTest extends FunSuite {
     assert(sl.updateSequences(seq4))
   }
   test("SequenceList, only one Sequence exists with a given key ") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 777)
     val seq3 = (shortListTrace, 888)
@@ -80,29 +80,29 @@ class SequenceListTest extends FunSuite {
     assert(sl.sequences.size == 1)
   }
   test("SequenceList, getSequence returns None if sequence with key doesn't exist in list") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     sl.updateSequences(seq1)
     assert(sl.getSequence(shortListTrace2).isEmpty)
   }
   test("SequenceList, getSequence returns sequence if sequence with key exists in list") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     sl.updateSequences(seq1)
     assert(sl.getSequence(shortListTrace).get.getKey == shortListTrace)
   }
   test("SequenceList getKeys returns empty Vector if there are no sequences stored in SequenceList") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     assert(sl.getKeys.isEmpty)
   }
   test("SequenceList getKeys returns Vector of size 1 if there is one sequence stored in SequenceList") {
-    val sl = new SequenceList[Int, Int](1)
+    val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     sl.updateSequences(seq1)
     assert(sl.getKeys.size == 1)
   }
-  test("SequenceList getKeys returns Vector of correct size if there are multiple seque0nces stored in SequenceList") {
-    val sl = new SequenceList[Int, Int](4)
+  test("SequenceList getKeys returns Vector of correct size if there are multiple sequences stored in SequenceList") {
+    val sl = new SequenceList[Int, Int](1,1,4)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace, 777)
     val seq3 = (shortListTrace, 888)
@@ -145,7 +145,7 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.size == 4)
   }
   test("SequenceList, getKeys returns correct keys") {
-    val sl = new SequenceList[Int, Int](4)
+    val sl = new SequenceList[Int, Int](1,1,4)
     val seq1 = (shortListTrace, 666)
 
     assert(sl.getKeys.isEmpty)
@@ -197,13 +197,56 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
   }
+  test("SequenceList, split returns an empty Vector[Node] when there is no sequence in the SequenceList"){
+    val sl = new SequenceList[Int, Int](1,1,4)
+    assert(sl.split.isEmpty)
+    sl.split shouldBe a [Vector[_]]
+  }
+  test("SequenceList, split returns a vector of one Node when there is one sequence in the SequenceList"){
+    val sl = new SequenceList[Int, Int](1,1,4)
+    assert(sl.split.isEmpty)
+    val seq1 = (shortListTrace, 666)
+    sl.updateSequences(seq1)
+    assert(sl.split.size == 1)
+
+    val nodeVector: Vector[Node[Int, Int]] = sl.split
+    assert(nodeVector.size == 1)
+
+
+
+  }
+  /*test("SequenceList, split returns correct Node in vector when there is one sequence in the SequenceList"){
+    val sl = new SequenceList[Int, Int](1,1,4)
+    assert(sl.split.isEmpty)
+
+    val seq1 = (shortListTrace, 666)
+    sl.updateSequences(seq1)
+    assert(sl.split.size == 1)
+
+    val nodeVector: Vector[Node[Int, Int]] = sl.split
+    assert(nodeVector.size == 1)
+    val node: Node[Int, Int] = nodeVector(0)
+    assert(node.getKey == shortListTrace.tail)
+  }*/
+ /* test("SequenceList, split returns a Vector[Node] of correct size when there are multiple sequences in the SequenceList"){
+    val sl = new SequenceList[Int, Int](1,1,4)
+    assert(sl.split.isEmpty)
+    val seq1 = (shortListTrace, 666)
+    sl.updateSequences(seq1)
+    assert(sl.split.size == 1)
+    val seq2 = (shortListTrace, 777)
+    sl.updateSequences(seq2)
+    assert(sl.split.size == 1)
+  }*/
+
+
   test("temp") {
 
     var vVS: Vector[_ >: Vector[SMT[Int, Int]]] = Vector[Vector[SMT[Int, Int]]]()
 
     var node = new Node[Int, Int](1, 2, 3)
     node.setKey(666)
-    var seqList = new SequenceList[Int, Int](1)
+    var seqList = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     seqList.updateSequences(seq1)
 
@@ -219,8 +262,26 @@ class SequenceListTest extends FunSuite {
     vVS = vVS :+ v
     println("\n----------------------\nvVS: " + vVS)
 
-  /*  vVS = vVS :+ AnyRef
-    println("\n----------------------\nvVS: " + vVS)*/
+    vVS = vVS :+ AnyRef
+    println("\n----------------------\nvVS: " + vVS)
+
+  }
+  test("temp2"){
+    val length0 = 0
+    val length1 = 1
+    val length2 = 2
+    val maxDepth0 = 0
+    val maxDepth1 = 1
+    val maxDepth2 = 2
+
+    for {
+      i <- 0 to maxDepth0
+      if(length1 <= maxDepth1)
+    }{
+      println("Don't bother" + i)
+      println("More statements here")
+
+    }
 
   }
 }
