@@ -112,25 +112,31 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
 
       for (s <- sequences){
+
         newVector.find(x => x.getKey == s.getKey(0)) match {
           case None => {
             var newNode: Node[A,B] = Node[A,B](maxDepth, maxPhi, maxSeqCount)
             newNode.setKey(s.getKey(0))
-
-            for((event, count) <- s.getEvents){
-              for(i <- 1 to count){
-                newNode.growTree(s.getKey.tail, event)
-              }
-            }
+            splitHelper(newNode, s.getKey.tail, s.getEvents)
             newVector = newVector :+ newNode
           }
-          //case Some(x) => x.growTree
+          case Some(x) => splitHelper(x, s.getKey.tail, s.getEvents)
         }
       }
-
-
-        //newVector
+      newVector
     }
+
+    def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+      for((event, count) <- events){
+        for(i <- 1 to count){
+          node.growTree(keyTail, event)
+        }
+      }
+    }
+
+
+
+
 
     /*foreach sequence in SequenceList {
       take head :: tail and prediction/count
