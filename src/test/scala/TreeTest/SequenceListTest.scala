@@ -200,17 +200,27 @@ class SequenceListTest extends FunSuite {
   test("temp") {
 
     var vVS: Vector[_ >: Vector[SMT[Int, Int]]] = Vector[Vector[SMT[Int, Int]]]()
+
     var node = new Node[Int, Int](1, 2, 3)
+    node.setKey(666)
     var seqList = new SequenceList[Int, Int](1)
     val seq1 = (shortListTrace, 666)
     seqList.updateSequences(seq1)
-    var v: Vector[_ >: SMT[Int, Int]] = Vector[SMT[Int, Int]]()
+
+
+    var v: Vector[Node[Int, Int]] = Vector[Node[Int, Int]]()
 
     v = v :+ node
-    v = v :+ seqList
+    //v = v :+ seqList
+
+    v.find(x => x.getKey == 666)
 
     println("\n----------------------\nv: " + v)
     vVS = vVS :+ v
     println("\n----------------------\nvVS: " + vVS)
+
+  /*  vVS = vVS :+ AnyRef
+    println("\n----------------------\nvVS: " + vVS)*/
+
   }
 }

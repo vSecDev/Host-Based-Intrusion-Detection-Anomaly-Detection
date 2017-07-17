@@ -44,7 +44,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       updatePredictions
     }
 
-    def updatePredictions: Unit = {
+    def updatePredictions(): Unit = {
 
       if (eventCount > 0){
 
@@ -66,7 +66,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
   //  def growTree()
   }
 
-  case class SequenceList[A,B](maxSeqCount: Int) extends SMT(maxDepth=0, maxPhi = 0, maxSeqCount){
+  case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){
 
     var sequences: Vector[Sequence[A,B]] = Vector[Sequence[A,B]]()
 
@@ -107,17 +107,25 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def split(): Vector[SMT [A,B]] = {
-      var newVector: Vector[SMT[A, B]] = Vector[SMT[A,B]]()
+    def split(): Vector[Node[A, B]] = {
 
-      /*var node = new Node[A,B](1,2,3)
+      var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
 
-      newVector = newVector :+ node*/
-      newVector
-      /*for (s <- sequences){
+      for (s <- sequences){
         newVector.find(x => x.getKey == s.getKey(0)) match {
-      }*/
+          case None => {
+            var newNode: Node[A,B] = Node[A,B](maxDepth, maxPhi, maxSeqCount)
+            newNode.setKey(s.getKey(0))
+            //TODO, CALL GROWTREE ON THIS NODE WITH TAIL HERE
 
+            newVector = newVector :+ newNode
+          }
+          //case Some(x) => x.growTree
+        }
+      }
+
+
+        //newVector
     }
 
     /*foreach sequence in SequenceList {
