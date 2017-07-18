@@ -67,43 +67,42 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
     def growTree(condition: Vector[A], event: B): Unit = {
       //TODO CHECK FOR condition == Nil here???
-      if(maxDepth > 0){
-        for{
-          i <- 0 to maxPhi
-          if condition.length > i
-        }{
-          val newCondition = condition.drop(i)
-          if(childrenGroup.size > i){
-            childrenGroup(i)(0) match {
-              case sl: SequenceList => {
-                sl.updateSequences((condition, event)) match {
-                  case Some(x) => childrenGroup.updated(i, x)
-                  case None =>
-                }
-              }
-              case node: Node => {
-                val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == condition.head)
-                nextNode match {
-                  case Some(x: Node[A,B]) => {
-                    condition.tail match {
-                      case Nil => println("should not ever get here with static window size"); updateEvents(event)
-                      case y::ys => x.growTree(condition.tail, event)
-                    }
-                  }
-                  case None => {
-                    var newNode: Node[A,B] = new Node(maxDepth-i-1, maxPhi, maxSeqCount)
-                    childrenGroup(i) :+ newNode.setKey(condition.head)
-                  }
-                }
-              }
+      if(maxDepth > 0) for{
+        i <- 0 to maxPhi
+        if condition.length > i
+      } {
+        val newCondition = condition.drop(i)
+        if (childrenGroup.size > i) childrenGroup(i)(0) match {
+          case sl: SequenceList =>
+            sl.updateSequences((condition, event)) match {
+              case Some(x) => childrenGroup.updated(i, x)
+              case None =>
             }
-          }else{
-            // (!childrenGroup.size > i)	//current node DOESN'T have a list of children in "childrenGroup" at index i
+          case node: Node =>
+            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == condition.head)
+            nextNode match {
+              case Some(x: Node[A, B]) =>
+                condition.tail match {
+                  case y +: ys => x.growTree(y +: ys, event)
+                  case _ => println("should not ever get here with static window size"); updateEvents(event)
+                }
+              case None =>
+              // TODO - THIS BIT ISN'T FINISHED!!!
+              /*
+                var newNode: Node[A, B] = new Node(maxDepth - i - 1, maxPhi, maxSeqCount)
+                newNode.setKey(condition.head)
+                newNode.growTree()
 
-          }
+                childrenGroup(i) :+ */
+            }
+        } else {
+          val newSeqList = new SequenceList[A,B](maxDepth-i-1, maxPhi, maxSeqCount)
+          newSeqList.updateSequences()
+          // (!childrenGroup.size > i)	//current node DOESN'T have a list of children in "childrenGroup" at index i
 
         }
-      }else{
+
+      } else{
         //  (!maxDepth > 0)   //maxDepth is 0! here
 
 
