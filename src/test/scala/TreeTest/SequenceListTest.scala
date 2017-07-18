@@ -197,6 +197,38 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
   }
+  test("SequenceList, getKeys returns empty Vector when no sequence is stored"){
+    val sl = new SequenceList[Int, Int](1,1,4)
+    assert(sl.getKeys.isEmpty)
+  }
+  test("SequenceList, getKeys returns Vector with correct keys when multiple sequences are stored"){
+
+    val sl = new SequenceList[Int, Int](1,1,4)
+    val seq1 = (shortListTrace, 666)
+    val seq2 = (shortListTrace2, 666)
+    val seq3 = (shortListTrace3, 777)
+    val seq4 = (shortListTrace4, 888)
+
+    assert(sl.getKeys.isEmpty)
+    sl.updateSequences(seq1)
+    assert(sl.getKeys.contains(shortListTrace))
+
+    sl.updateSequences(seq2)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+
+    sl.updateSequences(seq3)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+    assert(sl.getKeys.contains(shortListTrace3))
+
+    sl.updateSequences(seq4)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+    assert(sl.getKeys.contains(shortListTrace3))
+    assert(sl.getKeys.contains(shortListTrace4))
+  }
+
   test("SequenceList, split returns an empty Vector[Node] when there is no sequence in the SequenceList"){
     val sl = new SequenceList[Int, Int](1,1,4)
     assert(sl.split.isEmpty)
@@ -211,10 +243,37 @@ class SequenceListTest extends FunSuite {
 
     val nodeVector: Vector[Node[Int, Int]] = sl.split
     assert(nodeVector.size == 1)
-
-
-
   }
+  test("SequenceList, sequence added despite maxSeqCount is reached IF maxDepth < 1."){
+
+    val sl = new SequenceList[Int, Int](0,1,1)
+    val seq1 = (shortListTrace, 666)
+    val seq2 = (shortListTrace2, 666)
+    val seq3 = (shortListTrace3, 777)
+    val seq4 = (shortListTrace4, 888)
+
+    assert(sl.getKeys.isEmpty)
+    sl.updateSequences(seq1)
+    assert(sl.getKeys.contains(shortListTrace))
+
+    sl.updateSequences(seq2)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+
+    sl.updateSequences(seq3)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+    assert(sl.getKeys.contains(shortListTrace3))
+
+    sl.updateSequences(seq4)
+    assert(sl.getKeys.contains(shortListTrace))
+    assert(sl.getKeys.contains(shortListTrace2))
+    assert(sl.getKeys.contains(shortListTrace3))
+    assert(sl.getKeys.contains(shortListTrace4))
+  }
+
+
+
   /*test("SequenceList, split returns correct Node in vector when there is one sequence in the SequenceList"){
     val sl = new SequenceList[Int, Int](1,1,4)
     assert(sl.split.isEmpty)

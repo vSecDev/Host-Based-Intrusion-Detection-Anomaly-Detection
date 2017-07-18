@@ -65,7 +65,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def growTree(condition: Vector[A], event: B): Unit = {
+    def growTree(condition: Vector[A], event: B): Unit = ??? /*{
       if(maxDepth > 0){
         for{
           i <- 0 to maxPhi
@@ -73,11 +73,20 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         }{
           val newCondition = condition.drop(i)
           if(childrenGroup.size > i){
-            childrenGroup(0)(0) match {
+            childrenGroup(i)(0) match {
               case sl: SequenceList => {
                 sl.getSequence(condition) match {
                   case Some(sequence) => sequence.updateEvents(event)
-                  case None =>
+                  case None => {
+                    //CAN SEQUENCE SPLIT?
+                    if((maxDepth-i > 1) && sl.getKeys(0).tail.isEmpty){
+                      //yes, can split
+                      //SHOULD SEQUENCE SPLIT?
+
+                    }else{
+                      //no, cannot split
+                    }
+                  }
                 }
               }
               case node: Node =>
@@ -93,7 +102,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
 
       }
-    }
+    }*/
   }
 
   case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){
@@ -118,13 +127,13 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @return true if the sequence list has been updated, false otherwise.
       */
     def updateSequences(newSeq: (Vector[A], B)): Boolean = sequences.find(x => x.getKey == newSeq._1) match {
-      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + + sequences.count(y => y.getKey == newSeq._1)); true }
+      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + sequences.count(y => y.getKey == newSeq._1)); true }
       case None => {
-        if(sequences.size == maxSeqCount){
+        if(sequences.size == maxSeqCount && maxDepth > 0){
           println("sequences.size == maxSeqCount. -> " + sequences.size + " . Reached split size. Sequence not added! Make sure it's added after split!")
           false
         }else{
-          println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
+          println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount, unless maxDepth < 1): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
           println("Sequences.size after adding newSeq: " + sequences.size + " - maxSeqCount: " + maxSeqCount)
           true
