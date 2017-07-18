@@ -108,9 +108,9 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     //Constructor arg validation
     require(maxSeqCount > 0, "Max sequence count must be positive!")
+    require(maxDepth >= 0, "Max depth count must be non-negative!")
+    require(maxPhi >= 0, "Max Phi count must be non-negative!")
 
-
-    //TODO : updateSequenceList MUST CHECK IF SEQUENCELIST HAS TO SPLIT, NEW SEQUENCE HAS UNIQUE KEY
     /**
       * Updates the sequence list with a new sequence.
       * The updated sequence list cannot exceed maxSeqCount in size if maxDepth > 0, that is when the SequenceList CAN and SHOULD split.
@@ -118,15 +118,13 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @return true if the sequence list has been updated, false otherwise.
       */
     def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
-      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + sequences.count(y => y.getKey == newSeq._1)); None }
+      case Some(x) => {
+        x.updateEvents(newSeq._2)
+        None
+      }
       case None => {
-        if(sequences.size >= maxSeqCount && maxDepth > 0){
-          println("sequences.size == maxSeqCount. -> " + sequences.size + " . Reached split size. Sequence not added! Make sure it's added after split!")
-          Some(split(newSeq))
-        }else{
-          println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount, unless maxDepth < 1): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
+        if (canSplit) Some(split(newSeq)) else {
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
-          println("Sequences.size after adding newSeq: " + sequences.size + " - maxSeqCount: " + maxSeqCount)
           None
         }
       }
@@ -134,10 +132,11 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     def getSequence(key: Vector[A]): Option[Sequence[A,B]] = sequences.find(x => x.getKey == key)
     def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
+    private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
+    private def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
 
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)

@@ -35,14 +35,15 @@ class SequenceListTest extends FunSuite {
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
     sl.updateSequences(seq1)
-    assert(!sl.updateSequences(seq2))
+    //assert(sl.updateSequences(seq2).isDefined)
+    sl.updateSequences(seq2) shouldBe Some
   }
   test("SequenceList updateSequences succeeds if maxSeqSize would be exceeded BUT maxDepth < 1") {
     val sl = new SequenceList[Int, Int](0,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
     sl.updateSequences(seq1)
-    assert(sl.updateSequences(seq2))
+    sl.updateSequences(seq2) shouldBe None
     assert(sl.getKeys.size == 2)
     assert(sl.getKeys.contains(shortListTrace))
     assert(sl.getKeys.contains(shortListTrace2))
@@ -53,10 +54,14 @@ class SequenceListTest extends FunSuite {
     val seq2 = (shortListTrace, 666)
     val seq3 = (shortListTrace, 666)
     val seq4 = (shortListTrace, 666)
-    sl.updateSequences(seq1)
-    assert(sl.updateSequences(seq2))
+    //sl.updateSequences(seq1)
+    sl.updateSequences(seq1) shouldBe None
+    sl.updateSequences(seq2) shouldBe None
+    sl.updateSequences(seq3) shouldBe None
+    sl.updateSequences(seq4) shouldBe None
+    /*assert(sl.updateSequences(seq2))
     assert(sl.updateSequences(seq3))
-    assert(sl.updateSequences(seq4))
+    assert(sl.updateSequences(seq4))*/
   }
   test("SequenceList updateSequences doesn't not fail maxSeqSize check if Sequence with existing key is added multiple times. (Different event values)") {
     val sl = new SequenceList[Int, Int](1,1,1)
@@ -64,10 +69,14 @@ class SequenceListTest extends FunSuite {
     val seq2 = (shortListTrace, 777)
     val seq3 = (shortListTrace, 888)
     val seq4 = (shortListTrace, 999)
-    sl.updateSequences(seq1)
-    assert(sl.updateSequences(seq2))
+    //sl.updateSequences(seq1)
+    /*assert(sl.updateSequences(seq2))
     assert(sl.updateSequences(seq3))
-    assert(sl.updateSequences(seq4))
+    assert(sl.updateSequences(seq4))*/
+    sl.updateSequences(seq1) shouldBe None
+    sl.updateSequences(seq2) shouldBe None
+    sl.updateSequences(seq3) shouldBe None
+    sl.updateSequences(seq4) shouldBe None
   }
   test("SequenceList, only one Sequence exists with a given key ") {
     val sl = new SequenceList[Int, Int](1,1,1)
@@ -239,20 +248,17 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace4))
   }
 
-  test("SequenceList, split returns an empty Vector[Node] when there is no sequence in the SequenceList"){
-    val sl = new SequenceList[Int, Int](1,1,4)
-    assert(sl.split.isEmpty)
-    sl.split shouldBe a [Vector[_]]
-  }
-  test("SequenceList, split returns a vector of one Node when there is one sequence in the SequenceList"){
-    val sl = new SequenceList[Int, Int](1,1,4)
-    assert(sl.split.isEmpty)
-    val seq1 = (shortListTrace, 666)
-    sl.updateSequences(seq1)
-    assert(sl.split.size == 1)
 
-    val nodeVector: Vector[Node[Int, Int]] = sl.split
-    assert(nodeVector.size == 1)
+  test("SequenceList, split returns a vector of one Node when there is one sequence in the SequenceList"){
+    val sl = new SequenceList[Int, Int](1,1,1)
+    val seq1 = (shortListTrace, 666)
+    val seq2 = (shortListTrace2, 666)
+
+    assert(sl.getKeys.isEmpty)
+    sl.updateSequences(seq1) shouldBe None
+    assert(sl.getKeys.size == 1)
+    val splitSeq: Option[Vector[Node[Int, Int]]] = sl.updateSequences(seq2)
+    splitSeq shouldBe Some
   }
   test("SequenceList, sequence added despite maxSeqCount is reached IF maxDepth < 1."){
 
