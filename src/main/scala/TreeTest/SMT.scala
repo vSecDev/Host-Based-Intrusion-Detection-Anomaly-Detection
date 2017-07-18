@@ -65,16 +65,21 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def growTree(sequence: Vector[A], event: B): Unit = {
+    def growTree(condition: Vector[A], event: B): Unit = {
       if(maxDepth > 0){
         for{
           i <- 0 to maxPhi
-          if sequence.length > i
+          if condition.length > i
         }{
-          val newSequence = sequence.drop(i)
+          val newCondition = condition.drop(i)
           if(childrenGroup.size > i){
             childrenGroup(0)(0) match {
-              case sl: SequenceList =>
+              case sl: SequenceList => {
+                sl.getSequence(condition) match {
+                  case Some(sequence) => sequence.updateEvents(event)
+                  case None =>
+                }
+              }
               case node: Node =>
             }
           }else{
