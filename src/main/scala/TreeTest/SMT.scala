@@ -23,7 +23,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
 
     //TODO CHECK TYPE OF THIS VARIABLE. FIND OPTIMAL TYPE.
-    private var childrenGroup: Vector[Vector[_ >: SMT[A,B]]] = Vector[Vector[SMT[A,B]]]()
+    private var childrenGroup: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A,B]]]()
 
     def getKey: Option[A] = key
     def setKey(aKey: A): Unit = key match {
@@ -57,7 +57,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       }
     }
     def getPredictions: Map[B, Double] = predictions
-    def getChildren: Vector[Vector[_ >: SMT[A,B]]] = childrenGroup
+    def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = childrenGroup
     def getEvents: Map[B, Int] = events
 
     def getProbability(input: B): Option[Double] = predictions.get(input)
@@ -75,18 +75,9 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           if(childrenGroup.size > i){
             childrenGroup(i)(0) match {
               case sl: SequenceList => {
-                sl.getSequence(condition) match {
-                  case Some(sequence) => sequence.updateEvents(event)
-                  case None => {
-                    //CAN SEQUENCE SPLIT?
-                    if((maxDepth-i > 1) && sl.getKeys(0).tail.isEmpty){
-                      //yes, can split
-                      //SHOULD SEQUENCE SPLIT?
-
-                    }else{
-                      //no, cannot split
-                    }
-                  }
+                sl.updateSequences((condition, event)) match {
+                  case Some(x) => childrenGroup.updated(i, x)
+                  case None =>
                 }
               }
               case node: Node =>
@@ -126,17 +117,17 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Boolean = sequences.find(x => x.getKey == newSeq._1) match {
-      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + sequences.count(y => y.getKey == newSeq._1)); true }
+    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
+      case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + sequences.count(y => y.getKey == newSeq._1)); None }
       case None => {
         if(sequences.size >= maxSeqCount && maxDepth > 0){
           println("sequences.size == maxSeqCount. -> " + sequences.size + " . Reached split size. Sequence not added! Make sure it's added after split!")
-          false
+          Some(split(newSeq))
         }else{
           println("sequences.size != maxSeqCount. Sequences.size (should be smaller than maxSeqCount, unless maxDepth < 1): " + sequences.size + " - maxSeqCount: " + maxSeqCount + " Adding new sequence to sequences.")
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
           println("Sequences.size after adding newSeq: " + sequences.size + " - maxSeqCount: " + maxSeqCount)
-          true
+          None
         }
       }
     }
@@ -146,10 +137,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def split(): Vector[Node[A, B]] = {
+    def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
 
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
-
+      sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
       for (s <- sequences){
 
         newVector.find(x => x.getKey == s.getKey(0)) match {
@@ -165,7 +156,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       newVector
     }
 
-    def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+    private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
       for((event, count) <- events){
         for(i <- 1 to count){
           node.growTree(keyTail, event)
