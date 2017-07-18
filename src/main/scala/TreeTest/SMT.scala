@@ -65,7 +65,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    def growTree(condition: Vector[A], event: B): Unit = ??? /*{
+    def growTree(condition: Vector[A], event: B): Unit = {
+      //TODO CHECK FOR condition == Nil here???
       if(maxDepth > 0){
         for{
           i <- 0 to maxPhi
@@ -80,7 +81,16 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
                   case None =>
                 }
               }
-              case node: Node =>
+              case node: Node => {
+                childrenGroup(i).asInstanceOf[Vector[Node[A,B]]].find(x => x.getKey == condition.head) match {
+                  case Some(x) => {
+                    condition.tail match {
+                      case Nil => println("should not ever get here with static window size"); /// this bit isn't finished!
+                    }
+                  }
+                  case None => //NodeList does not contain a node with key = head of input.
+                }
+              }
             }
           }else{
             // (!childrenGroup.size > i)	//current node DOESN'T have a list of children in "childrenGroup" at index i
@@ -93,12 +103,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
 
       }
-    }*/
+    }
   }
 
-  case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount){
+  case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount) {
 
-    var sequences: Vector[Sequence[A,B]] = Vector[Sequence[A,B]]()
+    var sequences: Vector[Sequence[A, B]] = Vector[Sequence[A, B]]()
 
     /*private var keys: List[A] = Nil
     private var eventCount = 0
@@ -114,6 +124,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     /**
       * Updates the sequence list with a new sequence.
       * The updated sequence list cannot exceed maxSeqCount in size if maxDepth > 0, that is when the SequenceList CAN and SHOULD split.
+      *
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
@@ -130,8 +141,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       }
     }
 
-    def getSequence(key: Vector[A]): Option[Sequence[A,B]] = sequences.find(x => x.getKey == key)
+    def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
+
     def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
+
     private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
@@ -140,11 +153,11 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
-      for (s <- sequences){
+      for (s <- sequences) {
 
         newVector.find(x => x.getKey == s.getKey(0)) match {
           case None => {
-            var newNode: Node[A,B] = Node[A,B](maxDepth, maxPhi, maxSeqCount)
+            var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
             newNode.setKey(s.getKey(0))
             splitHelper(newNode, s.getKey.tail, s.getEvents)
             newVector = newVector :+ newNode
@@ -156,37 +169,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     }
 
     private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
-      for((event, count) <- events){
-        for(i <- 1 to count){
+      for ((event, count) <- events) {
+        for (i <- 1 to count) {
           node.growTree(keyTail, event)
         }
       }
     }
-
-
-
-
-
-    /*foreach sequence in SequenceList {
-      take head :: tail and prediction/count
-        check if newList contains Node with key = head  ///newList.exists { x => customPredicate(x) }   ====> customPredicate could be x.getKey == head
-      if(newList.exists { x => x.getKey == head }){
-        //newList contains a Node with key = head.
-        nodeToAdd = that node in newList
-        f  nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
-      }else{
-        //newList does not contain a Node with key = head yet. A new Node needs to be created and added to newList
-        create Node (nodeToAdd) with key = head, maxDepth = previous maxDepth-1, maxPhi = previous maxPhi
-          nodeToAdd . call growTree with tail and predictions  //two method for this: 1. call growTree with same input and once for each instance of each event, OR 2. create a setEvents function that allows updating events + eventCount with multiple events once.
-
-        add Node to newList
-      }
-    }
-    replace split Sequence with newList (in "childrenGroup")*/
-
-
-
-
   }
 
 
