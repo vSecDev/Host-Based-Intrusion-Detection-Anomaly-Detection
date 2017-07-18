@@ -82,13 +82,18 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
                 }
               }
               case node: Node => {
-                childrenGroup(i).asInstanceOf[Vector[Node[A,B]]].find(x => x.getKey == condition.head) match {
-                  case Some(x) => {
+                val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == condition.head)
+                nextNode match {
+                  case Some(x: Node[A,B]) => {
                     condition.tail match {
-                      case Nil => println("should not ever get here with static window size"); /// this bit isn't finished!
+                      case Nil => println("should not ever get here with static window size"); updateEvents(event)
+                      case y::ys => x.growTree(condition.tail, event)
                     }
                   }
-                  case None => //NodeList does not contain a node with key = head of input.
+                  case None => {
+                    var newNode: Node[A,B] = new Node(maxDepth-i-1, maxPhi, maxSeqCount)
+                    childrenGroup(i) :+ newNode.setKey(condition.head)
+                  }
                 }
               }
             }
