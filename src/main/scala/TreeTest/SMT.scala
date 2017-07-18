@@ -122,14 +122,14 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO : updateSequenceList MUST CHECK IF SEQUENCELIST HAS TO SPLIT, NEW SEQUENCE HAS UNIQUE KEY
     /**
       * Updates the sequence list with a new sequence.
-      * The updated sequence list cannot exceed maxSeqCount in size.
+      * The updated sequence list cannot exceed maxSeqCount in size if maxDepth > 0, that is when the SequenceList CAN and SHOULD split.
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
     def updateSequences(newSeq: (Vector[A], B)): Boolean = sequences.find(x => x.getKey == newSeq._1) match {
       case Some(x) => { println("SequenceList.updateSequences: found Sequence with key = newSeq.key. Number of Sequences with this key (should be 1): " + sequences.count(y => y.getKey == newSeq._1)); x.updateEvents(newSeq._2); println("After update. Number of Sequences with the same key as newSeq (should still be 1): " + sequences.count(y => y.getKey == newSeq._1)); true }
       case None => {
-        if(sequences.size == maxSeqCount && maxDepth > 0){
+        if(sequences.size >= maxSeqCount && maxDepth > 0){
           println("sequences.size == maxSeqCount. -> " + sequences.size + " . Reached split size. Sequence not added! Make sure it's added after split!")
           false
         }else{
