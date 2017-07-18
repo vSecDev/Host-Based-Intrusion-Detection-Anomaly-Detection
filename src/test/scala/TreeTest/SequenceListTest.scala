@@ -242,7 +242,7 @@ class SequenceListTest extends FunSuite {
 
   test("temp") {
 
-    var vVS: Vector[_ >: Vector[SMT[Int, Int]]] = Vector[Vector[SMT[Int, Int]]]()
+    var vVS: Vector[ Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
 
     var node = new Node[Int, Int](1, 2, 3)
     node.setKey(666)
@@ -251,24 +251,29 @@ class SequenceListTest extends FunSuite {
     seqList.updateSequences(seq1)
 
 
-    var v: Vector[Node[Int, Int]] = Vector[Node[Int, Int]]()
+    var v: Vector[SMT[_ <: Int, _ <: Int]] = Vector[SMT[Int, Int]]()
 
     v = v :+ node
-    //v = v :+ seqList
+    v = v :+ seqList
 
-    v.find(x => x.getKey == 666)
+    //v.find(x => x.getKey == 666)
 
-    println("\n----------------------\nv: " + v)
+    //println("\n----------------------\nv: " + v)
     vVS = vVS :+ v
-    println("\n----------------------\nvVS: " + vVS)
+    /*println("\n----------------------\nvVS: " + vVS)
+    println("\nvVS class: " + vVS.getClass)
+    println("vVS ele class: " + vVS(0).getClass)
 
-    /*vVS = vVS :+ AnyRef
-    println("\n----------------------\nvVS: " + vVS)*/
-    println("\nvVB class: " + vVS.getClass)
-    println("\nvVB ele class: " + vVS(0).getClass)
-   val firstEle =  vVS(0)
-    println("firstEle(0): " + ((_ >: Vector[SMT [Int, Int]]) firstEle) (0))
+    val firstEle: Vector[SMT[_ <: Int, _ <: Int]] =  vVS(0)
+    println("\nfirstEle class : " + firstEle.getClass)
+    println("firstEle(0) class : " + firstEle(0).getClass)
 
+    val firstSubele: SMT[_ <: Int, _ <: Int] = firstEle(0)
+    println("\nfirstSubEle class : " + firstSubele.getClass)
+    println("firstSubEle(0) class : " + firstSubele.getClass)
+
+    val subEleQuick: SMT[_ <: Int, _ <: Int] = vVS(0)(0) */
+    println("\n\n------\nvVS(0)(0) class : " + vVS(0)(0).getClass)
   }
   test("temp2"){
     val length0 = 0
