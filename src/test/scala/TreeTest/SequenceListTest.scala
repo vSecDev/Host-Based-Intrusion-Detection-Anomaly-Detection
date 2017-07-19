@@ -263,7 +263,7 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.isEmpty)
     sl.updateSequences(seq1) shouldBe None
     assert(sl.getKeys.size == 1)
-    val splitSeq: Option[Vector[Node[Int, Int]]] = sl.updateSequences(seq2)
+    val splitSeq: Option[Vector[SMT[_ <: Int, _ <: Int]]] = sl.updateSequences(seq2)
     splitSeq shouldBe Some
   }
   test("SequenceList, sequence added despite maxSeqCount is reached IF maxDepth < 1."){

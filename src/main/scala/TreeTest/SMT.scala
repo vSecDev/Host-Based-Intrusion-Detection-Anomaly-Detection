@@ -106,11 +106,18 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
             }
         } else {
           val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
-          newSeqList.updateSequences((newCondition, event))
+          //newSeqList.updateSequences((newCondition, event))
           println("Trying to update childrenGroup. size before update: " + childrenGroup.size)
 //TODO UPDATE CHILDRENGROUP --> DOESN'T WORK -> FIX THIS
           //childrenGroup.updated(i, Vector[SMT[_ <: A, _ <: B]](newSeqList))
-          //childrenGroup +: Vector(newSeqList)
+          //val typeCheck: String = newSeqList.updateSequences((newCondition, event)).get
+          newSeqList.updateSequences((newCondition, event)) match{
+            Some(x) = >
+            None =>
+          }
+
+
+
           println("updated childrenGroup. size: " + childrenGroup.size)
         }
       } else {
@@ -143,7 +150,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = {
+    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] = {
       println("in updateSequences. newSeq._1: " + newSeq._1)
       sequences.find(x => x.getKey == newSeq._1) match {
         case Some(x) =>
@@ -175,10 +182,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
-    private def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
+    private def split(newSeq: (Vector[A], B)): Vector[SMT[_ <: A, _ <: B]] = {
       println("\nin split. newSeq._1 : " + newSeq._1)
 
-      var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
+      var newVector: Vector[SMT[_ <: A, _ <: B]] = Vector[SMT[A, B]]()
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
 
       println("in split. added the extra sequence to sequences before splitting. currently stored sequences:")
@@ -189,7 +196,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       for (s <- sequences) {
         println("in split for loop. sequence s.getKey: " + s.getKey)
 
-        newVector.find(x => x.getKey == s.getKey(0)) match {
+        newVector.asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == s.getKey(0)) match {
           case None => {
             var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
             println("Creating new node with key: " + s.getKey(0))
