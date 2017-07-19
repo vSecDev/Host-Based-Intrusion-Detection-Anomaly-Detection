@@ -78,6 +78,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         if condition.length > i
       } {
         val newCondition = condition.drop(i)
+        println("growTree. newCondition is: " + newCondition)
+
         if (childrenGroup.size > i) childrenGroup(i)(0) match {
           case sl: SequenceList[A,B] =>
             sl.updateSequences((newCondition, event)) match {
@@ -170,16 +172,23 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
     private def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
-      println("in split. newSeq._1 : " + newSeq._1)
+      println("\nin split. newSeq._1 : " + newSeq._1)
 
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
+
+      println("in split. added the extra sequence to sequences before splitting. currently stored sequences:")
+      for(s <- sequences) println(s)
+
+
+      println("")
       for (s <- sequences) {
         println("in split for loop. sequence s.getKey: " + s.getKey)
 
         newVector.find(x => x.getKey == s.getKey(0)) match {
           case None => {
             var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
+            println("Creating new node with key: " + s.getKey(0))
             newNode.setKey(s.getKey(0))
             splitHelper(newNode, s.getKey.tail, s.getEvents)
             newVector = newVector :+ newNode
@@ -187,6 +196,9 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           case Some(x) => splitHelper(x, s.getKey.tail, s.getEvents)
         }
       }
+
+      println("------------------------------------newVector returned by split.: " + newVector)
+      println("newVector size: " + newVector.size)
       newVector
     }
 
