@@ -72,13 +72,13 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
 
     def growTree(condition: Vector[A], event: B): Unit = {
-      println("Inside growTree. Current node key: " + getKey.get)
+      println("Inside growTree. Current node key: " + getKey.get + " - maxDepth: " + maxDepth + " - maxPhi: " + maxPhi)
       if (maxDepth > 0) for {
         i <- 0 to maxPhi
         if condition.length > i
       } {
         val newCondition = condition.drop(i)
-        println("growTree. newCondition is: " + newCondition)
+        println("\ngrowTree. newCondition is: " + newCondition)
 
         if (childrenGroup.size > i) childrenGroup(i)(0) match {
           case sl: SequenceList[A,B] =>
@@ -107,7 +107,11 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         } else {
           val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
           newSeqList.updateSequences((newCondition, event))
-          childrenGroup.updated(i, Vector[SMT[_ <: A, _ <: B]](newSeqList))
+          println("Trying to update childrenGroup. size before update: " + childrenGroup.size)
+//TODO UPDATE CHILDRENGROUP --> DOESN'T WORK -> FIX THIS
+          //childrenGroup.updated(i, Vector[SMT[_ <: A, _ <: B]](newSeqList))
+          //childrenGroup +: Vector(newSeqList)
+          println("updated childrenGroup. size: " + childrenGroup.size)
         }
       } else {
         //  (!maxDepth > 0)   //maxDepth is 0! here
