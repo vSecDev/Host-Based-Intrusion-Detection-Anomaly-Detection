@@ -95,6 +95,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
                   case _ => println("should not ever get here with static window size"); updateEvents(event)
                 }
               case None =>
+                //TODO - BELOW LINE IS INCORRECT. CHECK MAXDEPH VALUE FOR NEWLY CREATED NODES...
                 val newNode: Node[A, B] = new Node(maxDepth - i - 1, maxPhi, maxSeqCount)
                 newNode.setKey(newCondition.head)
 
@@ -108,12 +109,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
           //newSeqList.updateSequences((newCondition, event))
           println("Trying to update childrenGroup. size before update: " + childrenGroup.size)
-//TODO UPDATE CHILDRENGROUP --> DOESN'T WORK -> FIX THIS
+          //TODO UPDATE CHILDRENGROUP --> DOESN'T WORK -> FIX THIS
           //childrenGroup.updated(i, Vector[SMT[_ <: A, _ <: B]](newSeqList))
           //val typeCheck: String = newSeqList.updateSequences((newCondition, event)).get
-          newSeqList.updateSequences((newCondition, event)) match{
-            Some(x) = >
-            None =>
+          newSeqList.updateSequences((newCondition, event)) match {
+            case Some(x) => println("newSeqList split. Should never get here."); childrenGroup = childrenGroup :+ x
+            case None => println("newSeqList updated, not split"); childrenGroup = childrenGroup :+ Vector(newSeqList)
           }
 
 
