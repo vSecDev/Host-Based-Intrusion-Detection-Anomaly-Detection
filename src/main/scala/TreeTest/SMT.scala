@@ -72,28 +72,31 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
 
     def growTree(condition: Vector[A], event: B): Unit = {
+      println("Inside growTree. Current node key: " + getKey.get)
       if (maxDepth > 0) for {
         i <- 0 to maxPhi
         if condition.length > i
-      } {if (childrenGroup.size > i) childrenGroup(i)(0) match {
-          case sl: SequenceList =>
-            sl.updateSequences((condition.drop(i), event)) match {
+      } {
+        val newCondition = condition.drop(i)
+        if (childrenGroup.size > i) childrenGroup(i)(0) match {
+          case sl: SequenceList[A,B] =>
+            sl.updateSequences((newCondition, event)) match {
               case Some(x) => childrenGroup.updated(i, x) // TODO CHECK IF UPDATESEQUENCES, REMOVES THE HEAD/CORRECT NUMBER OF ELEMENTS FROM CONDITION
               case None =>
             }
-          case node: Node =>
-            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == condition.drop(i).head)
+          case _: Node[A,B] =>
+            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == newCondition.head)
             nextNode match {
               case Some(x: Node[A, B]) =>
-                condition.drop(i).tail match {
+                newCondition.tail match {
                   case y +: ys => x.growTree(y +: ys, event)
                   case _ => println("should not ever get here with static window size"); updateEvents(event)
                 }
               case None =>
                 val newNode: Node[A, B] = new Node(maxDepth - i - 1, maxPhi, maxSeqCount)
-                newNode.setKey(condition.drop(i).head)
+                newNode.setKey(newCondition.head)
 
-                condition.drop(i).tail match {
+                newCondition.tail match {
                   case y +: ys => newNode.growTree(y +: ys, event)
                   case _ => println("should not ever get here with static window size"); updateEvents(event)
                 }
@@ -101,7 +104,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
             }
         } else {
           val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
-          newSeqList.updateSequences((condition.drop(i), event))
+          newSeqList.updateSequences((newCondition, event))
           childrenGroup.updated(i, Vector[SMT[_ <: A, _ <: B]](newSeqList))
         }
       } else {
@@ -134,15 +137,28 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
-      case Some(x) =>
-        x.updateEvents(newSeq._2)
-        None
-      case None =>
-        if (canSplit) Some(split(newSeq)) else {
+    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = {
+      println("in updateSequences. newSeq._1: " + newSeq._1)
+      sequences.find(x => x.getKey == newSeq._1) match {
+        case Some(x) =>
+          x.updateEvents(newSeq._2)
+
+          //TODO DELETE NEXT TWO LINES
+          println("------------------\nAfter SequenceList updateSequences update. Stored sequences: ")
+          for (s <- sequences) println(s)
+
+          None
+        case None => if (canSplit) Some(split(newSeq))
+        else {
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
+
+          //TODO DELETE NEXT TWO LINES
+          println("------------------\nAfter SequenceList updateSequences update. Stored sequences: ")
+          for (s <- sequences) println(s)
+
           None
         }
+      }
     }
 
     def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
@@ -154,10 +170,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
     private def split(newSeq: (Vector[A], B)): Vector[Node[A, B]] = {
+      println("in split. newSeq._1 : " + newSeq._1)
 
       var newVector: Vector[Node[A, B]] = Vector[Node[A, B]]()
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
       for (s <- sequences) {
+        println("in split for loop. sequence s.getKey: " + s.getKey)
 
         newVector.find(x => x.getKey == s.getKey(0)) match {
           case None => {
@@ -173,8 +191,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     }
 
     private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+      println("in splitHelper. keyTail: " + keyTail)
       for ((event, count) <- events) {
         for (i <- 1 to count) {
+          println("calling growTree with (keyTail, event) = " + (keyTail, event))
           node.growTree(keyTail, event)
         }
       }

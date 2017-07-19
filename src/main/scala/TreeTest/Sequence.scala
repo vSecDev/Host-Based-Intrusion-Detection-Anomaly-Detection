@@ -64,6 +64,8 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
       }
     }
   }
+
+  override def toString: String = "\nSequence\nkey: " + key + "\nevents: " + events + "\n"
 }
 
 

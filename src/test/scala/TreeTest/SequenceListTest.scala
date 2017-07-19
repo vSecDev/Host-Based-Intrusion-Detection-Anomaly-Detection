@@ -34,9 +34,15 @@ class SequenceListTest extends FunSuite {
     val sl = new SequenceList[Int, Int](1,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
+
+    println("shortListTrace: " + shortListTrace)
     sl.updateSequences(seq1)
-    //assert(sl.updateSequences(seq2).isDefined)
-    sl.updateSequences(seq2) shouldBe Some
+
+    println("\n\n---\nAdding the second trace.")
+    println("shortListTrace2: " + shortListTrace2)
+    sl.updateSequences(seq2) should be('defined)
+
+    //sl.updateSequences(seq2) shouldBe Some
   }
   test("SequenceList updateSequences succeeds if maxSeqSize would be exceeded BUT maxDepth < 1") {
     val sl = new SequenceList[Int, Int](0,1,1)
