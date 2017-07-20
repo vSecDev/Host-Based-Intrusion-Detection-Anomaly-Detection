@@ -121,7 +121,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getEvents.size == 1)
     assert(n1.getProbability(666).get == 1.00)
   }
-  test("Sequence events is correct after updates with different events") {
+  test("SMT events is correct after updates with different events") {
     val n1 = new Node[Int, Int](5,1,1)
 
     assert(n1.getEventCount == 0)
@@ -168,187 +168,180 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getProbability(777).get == 2.00/6)
     assert(n1.getProbability(888).get == 1.00/6)
   }
-  /*
-  test("Sequence predictiona has single element after first event update"){
+  test("SMT predictions has single element after first event update"){
     val n1 = new Node[Int, Int](5,1,1)
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
   }
-  test("Sequence updatePrediction has two elements after two different event key updates"){
-    val n1 = new Node[Int, Int](5,1,1)
-
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
-    s1.updateEvents(777)
-    assert(s1.getPredictions.size == 2)
-  }
-  test("Sequence updatePrediction has one element after the same event key is updated twice"){
+  test("SMT predictions has two elements after two different event key updates"){
     val n1 = new Node[Int, Int](5,1,1)
 
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
+    n1.updateEvents(777)
+    assert(n1.getPredictions.size == 2)
   }
-  test("Sequence updatePrediction has two elements after adding three events, two the same"){
+  test("SMT predictions has one element after the same event key is updated twice"){
     val n1 = new Node[Int, Int](5,1,1)
-
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getPredictions.size == 1)
-    s1.updateEvents(777)
-    assert(s1.getPredictions.size == 2)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
   }
-  test("Sequence predictions are correct"){
+  test("SMT predictions has two elements after adding three events, two the same"){
     val n1 = new Node[Int, Int](5,1,1)
-    assert(s1.getPredictions(666) == 1.0)
-    s1.updateEvents(666)
-    assert(s1.getPredictions(666) == 1.0)
-    s1.updateEvents(777)
-    assert(s1.getPredictions(777) == 1.0/3)
-    s1.updateEvents(777)
-    assert(s1.getPredictions(777) == 2.0/4)
-    s1.updateEvents(888)
-    assert(s1.getPredictions(666) == 2.0/5)
-    assert(s1.getPredictions(777) == 2.0/5)
-    assert(s1.getPredictions(888) == 1.0/5)
-    s1.updateEvents(999)
-    assert(s1.getPredictions(666) == 2.0/6)
-    assert(s1.getPredictions(777) == 2.0/6)
-    assert(s1.getPredictions(888) == 1.0/6)
-    assert(s1.getPredictions(999) == 1.0/6)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
+    n1.updateEvents(666)
+    assert(n1.getPredictions.size == 1)
+    n1.updateEvents(777)
+    assert(n1.getPredictions.size == 2)
   }
-  test("Sequence getProbability for single event"){
+  test("SMT predictions are correct"){
     val n1 = new Node[Int, Int](5,1,1)
-
-    s1.updateEvents(666)
-    assert(s1.getProbability(666).get == 1.0)
+    n1.updateEvents(666)
+    assert(n1.getPredictions(666) == 1.0)
+    n1.updateEvents(666)
+    assert(n1.getPredictions(666) == 1.0)
+    n1.updateEvents(777)
+    assert(n1.getPredictions(777) == 1.0/3)
+    n1.updateEvents(777)
+    assert(n1.getPredictions(777) == 2.0/4)
+    n1.updateEvents(888)
+    assert(n1.getPredictions(666) == 2.0/5)
+    assert(n1.getPredictions(777) == 2.0/5)
+    assert(n1.getPredictions(888) == 1.0/5)
+    n1.updateEvents(999)
+    assert(n1.getPredictions(666) == 2.0/6)
+    assert(n1.getPredictions(777) == 2.0/6)
+    assert(n1.getPredictions(888) == 1.0/6)
+    assert(n1.getPredictions(999) == 1.0/6)
   }
-  test("Sequence getProbability for events after multiple updates"){
+  test("SMT getProbability for single event"){
     val n1 = new Node[Int, Int](5,1,1)
-    assert(s1.getProbability(666).get == 1.0)
-    s1.updateEvents(777)
-    assert(s1.getProbability(666).get == 0.5)
-    assert(s1.getProbability(777).get == 0.5)
-
-    assert(s1.getProbability(777).get == 0.5)
-    assert(s1.getProbability(777).get == 0.5)
-    assert(s1.getProbability(777).get == 0.5)
-    assert(s1.getProbability(777).get == 0.5)
-
-    s1.updateEvents(888)
-    assert(s1.getProbability(666).get == 1.0/3)
-    assert(s1.getProbability(777).get == 1.0/3)
-    assert(s1.getProbability(888).get == 1.0/3)
-    s1.updateEvents(888)
-    assert(s1.getProbability(666).get == 1.0/4)
-    assert(s1.getProbability(777).get == 1.0/4)
-    assert(s1.getProbability(888).get == 2.0/4)
-    s1.updateEvents(999)
-    assert(s1.getProbability(666).get == 1.0/5)
-    assert(s1.getProbability(777).get == 1.0/5)
-    assert(s1.getProbability(888).get == 2.0/5)
-    assert(s1.getProbability(999).get == 1.0/5)
-    s1.updateEvents(666)
-    assert(s1.getProbability(666).get == 2.0/6)
-    assert(s1.getProbability(777).get == 1.0/6)
-    assert(s1.getProbability(888).get == 2.0/6)
-    assert(s1.getProbability(999).get == 1.0/6)
+    n1.updateEvents(666)
+    assert(n1.getProbability(666).get == 1.0)
   }
-  test("Sequence getProbability for String events after multiple updates. (String key)"){
-    val s1 = new Sequence[String, String](shortStringListTrace, "ntdll.dll+0x2173e")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0)
-    s1.updateEvents("ntdll.dll+0x21639")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 0.5)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 0.5)
-    s1.updateEvents("ntdll.dll+0xeac7")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/3)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/3)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 1.0/3)
-    s1.updateEvents("ntdll.dll+0xeac7")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/4)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/4)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/4)
-    s1.updateEvents("kernel32.dll+0x15568")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/5)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/5)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/5)
-    assert(s1.getProbability("kernel32.dll+0x15568").get == 1.0/5)
-    s1.updateEvents("ntdll.dll+0x2173e")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 2.0/6)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/6)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/6)
-    assert(s1.getProbability("kernel32.dll+0x15568").get == 1.0/6)
+  test("SMT getProbability for events after multiple updates"){
+    val n1 = new Node[Int, Int](5,1,1)
+    n1.updateEvents(666)
+    assert(n1.getProbability(666).get == 1.0)
+    n1.updateEvents(777)
+    assert(n1.getProbability(666).get == 0.5)
+    assert(n1.getProbability(777).get == 0.5)
+
+    n1.updateEvents(888)
+    assert(n1.getProbability(666).get == 1.0/3)
+    assert(n1.getProbability(777).get == 1.0/3)
+    assert(n1.getProbability(888).get == 1.0/3)
+    n1.updateEvents(888)
+    assert(n1.getProbability(666).get == 1.0/4)
+    assert(n1.getProbability(777).get == 1.0/4)
+    assert(n1.getProbability(888).get == 2.0/4)
+    n1.updateEvents(999)
+    assert(n1.getProbability(666).get == 1.0/5)
+    assert(n1.getProbability(777).get == 1.0/5)
+    assert(n1.getProbability(888).get == 2.0/5)
+    assert(n1.getProbability(999).get == 1.0/5)
+    n1.updateEvents(666)
+    assert(n1.getProbability(666).get == 2.0/6)
+    assert(n1.getProbability(777).get == 1.0/6)
+    assert(n1.getProbability(888).get == 2.0/6)
+    assert(n1.getProbability(999).get == 1.0/6)
+  }
+  test("SMT getProbability for String events after multiple updates. (String key)"){
+    val n1 = new Node[Int, String](5,1,1)
+    n1.updateEvents("ntdll.dll+0x2173e")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0)
+    n1.updateEvents("ntdll.dll+0x21639")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 0.5)
+    n1.updateEvents("ntdll.dll+0xeac7")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/3)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/3)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 1.0/3)
+    n1.updateEvents("ntdll.dll+0xeac7")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/4)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/4)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/4)
+    n1.updateEvents("kernel32.dll+0x15568")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/5)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/5)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/5)
+    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0/5)
+    n1.updateEvents("ntdll.dll+0x2173e")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 2.0/6)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/6)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/6)
+    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0/6)
   }
   test("Sequence getProbability for String events after multiple updates. (Int key)"){
-    val s1 = new Sequence[String, String](shortStringListTrace, "ntdll.dll+0x2173e")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0)
-    s1.updateEvents("ntdll.dll+0x21639")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 0.5)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 0.5)
-    s1.updateEvents("ntdll.dll+0xeac7")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/3)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/3)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 1.0/3)
-    s1.updateEvents("ntdll.dll+0xeac7")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/4)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/4)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/4)
-    s1.updateEvents("kernel32.dll+0x15568")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 1.0/5)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/5)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/5)
-    assert(s1.getProbability("kernel32.dll+0x15568").get == 1.0/5)
-    s1.updateEvents("ntdll.dll+0x2173e")
-    assert(s1.getProbability("ntdll.dll+0x2173e").get == 2.0/6)
-    assert(s1.getProbability("ntdll.dll+0x21639").get == 1.0/6)
-    assert(s1.getProbability("ntdll.dll+0xeac7").get == 2.0/6)
-    assert(s1.getProbability("kernel32.dll+0x15568").get == 1.0/6)
+    val n1 = new Node[Int, String](5,1,1)
+    n1.updateEvents("ntdll.dll+0x2173e")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0)
+    n1.updateEvents("ntdll.dll+0x21639")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 0.5)
+    n1.updateEvents("ntdll.dll+0xeac7")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/3)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/3)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 1.0/3)
+    n1.updateEvents("ntdll.dll+0xeac7")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/4)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/4)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/4)
+    n1.updateEvents("kernel32.dll+0x15568")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0/5)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/5)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/5)
+    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0/5)
+    n1.updateEvents("ntdll.dll+0x2173e")
+    assert(n1.getProbability("ntdll.dll+0x2173e").get == 2.0/6)
+    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0/6)
+    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0/6)
+    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0/6)
   }
-  test("Sequence eventCount == events sum in events"){
+  test("SMT eventCount == events sum in events"){
     val n1 = new Node[Int, Int](5,1,1)
-    assert(s1.getEventCount == 1)
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 1)
     var eventNum = 0
-    for(e <- s1.getEvents){
+    for(e <- n1.getEvents){
       eventNum += e._2
     }
-    assert(eventNum == s1.getEventCount)
+    assert(eventNum == n1.getEventCount)
 
-
-    s1.updateEvents(666)
-    assert(s1.getEventCount == 2)
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 2)
     var eventNum2 = 0
-    for(e <- s1.getEvents){
+    for(e <- n1.getEvents){
       eventNum2 += e._2
     }
-    assert(eventNum2 == s1.getEventCount)
+    assert(eventNum2 == n1.getEventCount)
     assert(eventNum2 == 2)
-    assert(2 == s1.getEventCount)
+    assert(2 == n1.getEventCount)
 
-
-    s1.updateEvents(777)
-    assert(s1.getEventCount == 3)
+    n1.updateEvents(777)
+    assert(n1.getEventCount == 3)
     var eventNum3 = 0
-    for(e <- s1.getEvents){
+    for(e <- n1.getEvents){
       eventNum3 += e._2
     }
-    assert(eventNum3 == s1.getEventCount)
+    assert(eventNum3 == n1.getEventCount)
     assert(eventNum3 == 3)
-    assert(3 == s1.getEventCount)
+    assert(3 == n1.getEventCount)
 
-
-    s1.updateEvents(888)
-    assert(s1.getEventCount == 4)
+    n1.updateEvents(888)
+    assert(n1.getEventCount == 4)
     var eventNum4 = 0
-    for(e <- s1.getEvents){
+    for(e <- n1.getEvents){
       eventNum4 += e._2
     }
-    assert(eventNum4 == s1.getEventCount)
+    assert(eventNum4 == n1.getEventCount)
     assert(eventNum4 == 4)
-    assert(4 == s1.getEventCount)
+    assert(4 == n1.getEventCount)
   }
-   */
+
 }
