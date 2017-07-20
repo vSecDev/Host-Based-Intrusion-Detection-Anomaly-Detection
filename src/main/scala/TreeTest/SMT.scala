@@ -140,7 +140,6 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     }
   }
 
-
   case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount) {
 
     var sequences: Vector[Sequence[A, B]] = Vector[Sequence[A, B]]()
