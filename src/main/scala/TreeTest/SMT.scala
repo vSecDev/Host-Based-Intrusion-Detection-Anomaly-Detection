@@ -123,7 +123,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
           childrenGroup(i)(0) match {
             case sl: SequenceList[A, B] =>
-              buf ++= " - group type: SequenceList. Sequences in list:\n"
+              buf ++= " - group type: SequenceList. maxDepth: " + sl.maxDepth + " -  Sequences in list:\n"
               val ss = sl.sequences
               for (s <- ss) {
                 buf ++= s.toString
