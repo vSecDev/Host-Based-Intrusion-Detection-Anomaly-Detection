@@ -169,7 +169,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           //TODO DELETE NEXT TWO LINES
           println("------------------\nAfter SequenceList updateSequences update. Stored sequences: ")
           for (s <- sequences) println(s)
-
+          println("------------------\neeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
           None
         }
       }
@@ -179,7 +179,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
 
-    private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
+    private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
 
     //TODO SEQUENCELIST WITHIN SMTS WILL SPLIT WHEN MAXSEQCOUNT WOULD BE EXCEEDED AS A RESULT ADDING A SEQUENCE WITH A NEW KEY
     //TODO SO MAKE SURE THE SEQUENCE THAT COULD NOT BE ADDED (BECAUSE UPDATESEQUENCES RETURNED FALSE) IS ADDED AFTER THE SPLIT!!!!!
