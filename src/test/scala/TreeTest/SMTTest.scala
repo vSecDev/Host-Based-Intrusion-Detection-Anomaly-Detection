@@ -22,7 +22,7 @@ class SMTTest extends FunSuite {
 //  TODO - DELETE BELOW
   test("SMT first. "){
     val root: Node[Int, Int] = Node(5, 1, 3)
-    root.setKey(0)
+    //root.setKey(0)
 
     root.growTree(shortListTrace, 666)
   }

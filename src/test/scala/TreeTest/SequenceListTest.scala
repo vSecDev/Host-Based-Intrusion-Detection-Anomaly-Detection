@@ -30,8 +30,8 @@ class SequenceListTest extends FunSuite {
     val caught = intercept[IllegalArgumentException](new SequenceList[Int, Int](1,1,0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
-  test("SequenceList updateSequences fails if maxSeqSize would be exceeded and maxDepth > 0") {
-    val sl = new SequenceList[Int, Int](1,1,1)
+  test("SequenceList updateSequences fails if maxSeqSize would be exceeded and maxDepth > 1") {
+    val sl = new SequenceList[Int, Int](2,1,1)
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
 
@@ -252,19 +252,6 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace2))
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
-  }
-
-
-  test("SequenceList, split returns a vector of one Node when there is one sequence in the SequenceList"){
-    val sl = new SequenceList[Int, Int](1,1,1)
-    val seq1 = (shortListTrace, 666)
-    val seq2 = (shortListTrace2, 666)
-
-    assert(sl.getKeys.isEmpty)
-    sl.updateSequences(seq1) shouldBe None
-    assert(sl.getKeys.size == 1)
-    val splitSeq: Option[Vector[SMT[_ <: Int, _ <: Int]]] = sl.updateSequences(seq2)
-    splitSeq shouldBe Some
   }
   test("SequenceList, sequence added despite maxSeqCount is reached IF maxDepth < 1."){
 

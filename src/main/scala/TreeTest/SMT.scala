@@ -72,7 +72,11 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     //TODO GROWTREE
 
     def growTree(condition: Vector[A], event: B): Unit = {
-      println("Inside growTree. Current node key: " + getKey.get + " - maxDepth: " + maxDepth + " - maxPhi: " + maxPhi)
+      getKey match {
+        case Some(x) => println("Inside growTree. Current node key: " + getKey.get + " - maxDepth: " + maxDepth + " - maxPhi: " + maxPhi)
+        case None => println("No key. This should be a root node")
+      }
+
       if (maxDepth > 0) for {
         i <- 0 to maxPhi
         if condition.length > i
@@ -154,16 +158,18 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] = {
       println("in updateSequences. newSeq._1: " + newSeq._1)
       sequences.find(x => x.getKey == newSeq._1) match {
-        case Some(x) =>
+        case Some(x) => {
+          println("Found sequence with key " + x.getKey)
           x.updateEvents(newSeq._2)
 
           //TODO DELETE NEXT TWO LINES
           println("------------------\nAfter SequenceList updateSequences update. Stored sequences: ")
           for (s <- sequences) println(s)
 
-          None
-        case None => if (canSplit) Some(split(newSeq))
+          None}
+        case None => if(canSplit) { println("Didn't find sequence with key: " + newSeq._1 + " - Trying to split."); Some(split(newSeq)) }
         else {
+          println("Didn't find sequence with key: " + newSeq._1 + " - Cannot/Doesn't have to split so adding sequence to current SequenceList")
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
 
           //TODO DELETE NEXT TWO LINES
