@@ -343,5 +343,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(eventNum4 == 4)
     assert(4 == n1.getEventCount)
   }
+  //SMT ----------------------------------
+  test("SMT, invalid argument to growTree: empty Vector|Y"){
+    val n1 = new Node[Int, Int](5,1,1)
+    n1.growTree(Vector.empty[Int], 666)
+    assert(n1.getEventCount == 0)
+    assert(n1.getEvents.isEmpty)
+    assert(n1.getPredictions.isEmpty)
+    assert(n1.getChildren.isEmpty)
+
+
+  }
+
+
+
 
 }

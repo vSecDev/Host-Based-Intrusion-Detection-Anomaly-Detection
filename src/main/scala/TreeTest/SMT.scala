@@ -115,7 +115,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     override def toString: String = {
       val buf = new StringBuilder
-      buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
+      buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + " - eventCount: " + getEventCount + " - events size: " + getEvents.size + " - predictions size: " + getPredictions.size + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
       for (i <- 0 to maxPhi) {
         if (childrenGroup.nonEmpty) {
           buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
