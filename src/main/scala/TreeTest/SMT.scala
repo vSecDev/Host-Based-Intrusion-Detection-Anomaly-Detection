@@ -31,7 +31,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     def setKey(aKey: A): Unit = key match {
       case None => key = Option(aKey)
-      case _ => throw new IllegalStateException("Node key cannot be reset")
+      case _ => throw new IllegalStateException("Node key cannot be reset!")
     }
 
     def getEventCount: Int = eventCount

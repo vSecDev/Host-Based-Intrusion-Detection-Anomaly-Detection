@@ -34,7 +34,7 @@ class NodeTest extends FunSuite{
     val n = new Node[Int, Int](1, 1, 1)
     n.setKey(2)
     val caught = intercept[IllegalStateException](n.setKey(3))
-    assert(caught.getMessage == "Node key cannot be reset")
+    assert(caught.getMessage == "Node key cannot be reset!")
   }
   test("Node value update"){
     val n = new Node[Int, Int](1, 1, 1)
