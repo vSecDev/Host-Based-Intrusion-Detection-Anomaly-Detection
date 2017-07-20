@@ -21,7 +21,9 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     private var predictions: Map[B, Double] = Map[B, Double]()
 
     //TODO ADD CONSTRUCTOR ARG CHECKING LOGIC. NO NEGATIVE MAXDEPTH,MAXPHI/MAXSEQCOUNT
-
+    require(maxSeqCount > 0, "Max sequence count must be positive!")
+    require(maxDepth > 0, "Max depth count must be positive!")
+    require(maxPhi >= 0, "Max Phi count must be non-negative!")
 
     //TODO CHECK TYPE OF THIS VARIABLE. FIND OPTIMAL TYPE.
     private var childrenGroup: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
@@ -135,20 +137,23 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       val buf = new StringBuilder
       buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
       for (i <- 0 to maxPhi) {
-        buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
+        if (childrenGroup.nonEmpty) {
+          buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
 
-        childrenGroup(i)(0) match {
-          case sl: SequenceList[A, B] =>
-            buf ++= " - group type: SequenceList. Sequences in list:\n"
-            val ss = sl.sequences
-            for (s <- ss) {
-              buf ++= s.toString
-            }
-          case _: Node[A, B] => buf ++= " - type: Node list. Nodes in list:\n"
-            val ns = childrenGroup(i)
-            for (n <- ns) {
-              buf ++= n.toString
-            }
+
+          childrenGroup(i)(0) match {
+            case sl: SequenceList[A, B] =>
+              buf ++= " - group type: SequenceList. Sequences in list:\n"
+              val ss = sl.sequences
+              for (s <- ss) {
+                buf ++= s.toString
+              }
+            case _: Node[A, B] => buf ++= " - type: Node list. Nodes in list:\n"
+              val ns = childrenGroup(i)
+              for (n <- ns) {
+                buf ++= n.toString
+              }
+          }
         }
       }
       buf.toString
