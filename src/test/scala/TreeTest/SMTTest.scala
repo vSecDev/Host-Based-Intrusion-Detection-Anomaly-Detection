@@ -24,19 +24,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   }*/
 
-  //  TODO - DELETE BELOW
- /* test("SMT first. ") {
-    val root: Node[Int, Int] = Node(5, 1, 3)
-    //root.setKey(0)
-
-    root.growTree(shortListTrace, 666)
-    println(root.toString)
-  }
-  test("SMT, root toString") {
-    val root: Node[Int, Int] = Node(5, 1, 3)
-    println("Only root:")
-    println(root.toString)
-  }*/
   test("SMT. maxDepth is not zero"){
     assertThrows[IllegalArgumentException](Node(0, 1, 3))
     val caught = intercept[IllegalArgumentException](Node(0, 1, 3))

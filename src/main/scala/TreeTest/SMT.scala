@@ -47,7 +47,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       predictions
     }
 
-    def getProbability(input: B): Option[Double] = predictions.get(input)
+    def getProbability(input: B): Option[Double] = getPredictions.get(input)
 
     def updateEvents(newEvent: B): Unit = {
 
@@ -194,7 +194,6 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     }
 
     private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
-
       for ((event, count) <- events) {
         for (i <- 1 to count) node.growTree(keyTail, event)
       }

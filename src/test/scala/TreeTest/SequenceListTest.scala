@@ -1,7 +1,5 @@
 package TreeTest
 
-import javax.sound.midi.Sequence
-
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
 /**
@@ -35,14 +33,8 @@ class SequenceListTest extends FunSuite {
     val seq1 = (shortListTrace, 666)
     val seq2 = (shortListTrace2, 666)
 
-    println("shortListTrace: " + shortListTrace)
     sl.updateSequences(seq1)
-
-    println("\n\n---\nAdding the second trace.")
-    println("shortListTrace2: " + shortListTrace2)
     sl.updateSequences(seq2) should be('defined)
-
-    //sl.updateSequences(seq2) shouldBe Some
   }
   test("SequenceList updateSequences succeeds if maxSeqSize would be exceeded BUT maxDepth < 1") {
     val sl = new SequenceList[Int, Int](0,1,1)
@@ -60,14 +52,11 @@ class SequenceListTest extends FunSuite {
     val seq2 = (shortListTrace, 666)
     val seq3 = (shortListTrace, 666)
     val seq4 = (shortListTrace, 666)
-    //sl.updateSequences(seq1)
+
     sl.updateSequences(seq1) shouldBe None
     sl.updateSequences(seq2) shouldBe None
     sl.updateSequences(seq3) shouldBe None
     sl.updateSequences(seq4) shouldBe None
-    /*assert(sl.updateSequences(seq2))
-    assert(sl.updateSequences(seq3))
-    assert(sl.updateSequences(seq4))*/
   }
   test("SequenceList updateSequences doesn't not fail maxSeqSize check if Sequence with existing key is added multiple times. (Different event values)") {
     val sl = new SequenceList[Int, Int](1,1,1)
@@ -75,10 +64,7 @@ class SequenceListTest extends FunSuite {
     val seq2 = (shortListTrace, 777)
     val seq3 = (shortListTrace, 888)
     val seq4 = (shortListTrace, 999)
-    //sl.updateSequences(seq1)
-    /*assert(sl.updateSequences(seq2))
-    assert(sl.updateSequences(seq3))
-    assert(sl.updateSequences(seq4))*/
+
     sl.updateSequences(seq1) shouldBe None
     sl.updateSequences(seq2) shouldBe None
     sl.updateSequences(seq3) shouldBe None
@@ -279,92 +265,5 @@ class SequenceListTest extends FunSuite {
     assert(sl.getKeys.contains(shortListTrace2))
     assert(sl.getKeys.contains(shortListTrace3))
     assert(sl.getKeys.contains(shortListTrace4))
-  }
-
-
-
-  /*test("SequenceList, split returns correct Node in vector when there is one sequence in the SequenceList"){
-    val sl = new SequenceList[Int, Int](1,1,4)
-    assert(sl.split.isEmpty)
-
-    val seq1 = (shortListTrace, 666)
-    sl.updateSequences(seq1)
-    assert(sl.split.size == 1)
-
-    val nodeVector: Vector[Node[Int, Int]] = sl.split
-    assert(nodeVector.size == 1)
-    val node: Node[Int, Int] = nodeVector(0)
-    assert(node.getKey == shortListTrace.tail)
-  }*/
- /* test("SequenceList, split returns a Vector[Node] of correct size when there are multiple sequences in the SequenceList"){
-    val sl = new SequenceList[Int, Int](1,1,4)
-    assert(sl.split.isEmpty)
-    val seq1 = (shortListTrace, 666)
-    sl.updateSequences(seq1)
-    assert(sl.split.size == 1)
-    val seq2 = (shortListTrace, 777)
-    sl.updateSequences(seq2)
-    assert(sl.split.size == 1)
-  }*/
-
-
-  test("temp") {
-
-    var vVS: Vector[ Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
-
-    var node = new Node[Int, Int](1, 2, 3)
-    node.setKey(666)
-    var seqList = new SequenceList[Int, Int](1,1,1)
-    val seq1 = (shortListTrace, 666)
-    seqList.updateSequences(seq1)
-
-
-    var v: Vector[SMT[_ <: Int, _ <: Int]] = Vector[SMT[Int, Int]]()
-
-    v = v :+ node
-    v = v :+ seqList
-
-    //v.find(x => x.getKey == 666)
-
-    //println("\n----------------------\nv: " + v)
-    vVS = vVS :+ v
-    /*println("\n----------------------\nvVS: " + vVS)
-    println("\nvVS class: " + vVS.getClass)
-    println("vVS ele class: " + vVS(0).getClass)
-
-    val firstEle: Vector[SMT[_ <: Int, _ <: Int]] =  vVS(0)
-    println("\nfirstEle class : " + firstEle.getClass)
-    println("firstEle(0) class : " + firstEle(0).getClass)
-
-    val firstSubele: SMT[_ <: Int, _ <: Int] = firstEle(0)
-    println("\nfirstSubEle class : " + firstSubele.getClass)
-    println("firstSubEle(0) class : " + firstSubele.getClass)
-
-    val subEleQuick: SMT[_ <: Int, _ <: Int] = vVS(0)(0) */
-    println("\n\n------\nvVS(0)(0) class : " + vVS(0)(0).getClass)
-  }
-  test("temp2"){
-    val length0 = 0
-    val length1 = 1
-    val length2 = 2
-    val maxDepth0 = 0
-    val maxDepth1 = 1
-    val maxDepth2 = 2
-
-    for {
-      i <- 0 to maxDepth0
-      if(length1 <= maxDepth1)
-    }{
-      println("Don't bother" + i)
-      println("More statements here")
-
-    }
-
-    println("shortListTrace: " + shortListTrace)
-    println("shortListTrace.drop(0): " + shortListTrace.drop(0))
-    println("shortListTrace.drop(1): " + shortListTrace.drop(1))
-    println("shortListTrace.drop(2): " + shortListTrace.drop(2))
-    println("shortListTrace.drop(3): " + shortListTrace.drop(3))
-
   }
 }
