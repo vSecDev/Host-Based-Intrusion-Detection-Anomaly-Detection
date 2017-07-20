@@ -49,19 +49,12 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
     //update event count to keep track of number of overall observations
     eventCount += 1
     isChanged = true
-    //TODO MOVE UPDATEPREDICTIONS OUTSIDE THIS FUNCTION. BUT MAKE SURE GETPREDICTIONS ALWAYS USES UP-DO-DATE DATA.
-    //updatePredictions
   }
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
-      if (predictions.contains(k)) {
-        predictions.update(k, v.toDouble / eventCount)
-      }
-      else {
-        //predictions += (k -> (1.00/eventCount))}
-        predictions += (k -> (v.toDouble / eventCount))
-      }
+      if (predictions.contains(k)) predictions.update(k, v.toDouble / eventCount)
+      else predictions += (k -> (v.toDouble / eventCount))
     }
   }
 
