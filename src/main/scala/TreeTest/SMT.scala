@@ -85,12 +85,12 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         println("\ngrowTree. newCondition is: " + newCondition)
 
         if (childrenGroup.size > i) childrenGroup(i)(0) match {
-          case sl: SequenceList[A,B] =>
+          case sl: SequenceList[A, B] =>
             sl.updateSequences((newCondition, event)) match {
               case Some(x) => childrenGroup.updated(i, x) // TODO CHECK IF UPDATESEQUENCES, REMOVES THE HEAD/CORRECT NUMBER OF ELEMENTS FROM CONDITION
               case None =>
             }
-          case _: Node[A,B] =>
+          case _: Node[A, B] =>
             val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == newCondition.head)
             nextNode match {
               case Some(x: Node[A, B]) =>
@@ -122,7 +122,6 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           }
 
 
-
           println("updated childrenGroup. size: " + childrenGroup.size)
         }
       } else {
@@ -131,7 +130,31 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
       }
     }
+
+    override def toString: String = {
+      val buf = new StringBuilder
+      buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
+      for (i <- 0 to maxPhi) {
+        buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
+
+        childrenGroup(i)(0) match {
+          case sl: SequenceList[A, B] =>
+            buf ++= " - group type: SequenceList. Sequences in list:\n"
+            val ss = sl.sequences
+            for (s <- ss) {
+              buf ++= s.toString
+            }
+          case _: Node[A, B] => buf ++= " - type: Node list. Nodes in list:\n"
+            val ns = childrenGroup(i)
+            for (n <- ns) {
+              buf ++= n.toString
+            }
+        }
+      }
+      buf.toString
+    }
   }
+
 
   case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount) {
 
@@ -175,7 +198,6 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           //TODO DELETE NEXT TWO LINES
           println("------------------\nAfter SequenceList updateSequences update. Stored sequences: ")
           for (s <- sequences) println(s)
-          println("------------------\neeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
           None
         }
       }

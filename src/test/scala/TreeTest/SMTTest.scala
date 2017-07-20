@@ -25,5 +25,6 @@ class SMTTest extends FunSuite {
     //root.setKey(0)
 
     root.growTree(shortListTrace, 666)
+    println(root.toString)
   }
   }
