@@ -344,17 +344,39 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(4 == n1.getEventCount)
   }
   //SMT ----------------------------------
-  test("SMT, invalid argument to growTree: empty Vector|Y"){
+  test("SMT, invalid argument to growTree: empty Vector| event"){
     val n1 = new Node[Int, Int](5,1,1)
     n1.growTree(Vector.empty[Int], 666)
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
     assert(n1.getPredictions.isEmpty)
     assert(n1.getChildren.isEmpty)
-
-
   }
+  test("SMT, growTree called with Vector size == 1 | event"){
+    val n1 = new Node[Int, Int](5,1,1)
+    val condition = Vector(1)
+    val event = 666
+    n1.growTree(condition, event)
+    n1.getKey shouldBe None
+    assert(n1.getEventCount == 0)
+    assert(n1.getEvents.isEmpty)
+    assert(n1.getPredictions.isEmpty)
+    n1.getPredictions.get(event) shouldBe None
+    assert(n1.getChildren.size == 1)
+    assert(n1.getChildren(0).size == 1)
+    n1.getChildren(0)(0) shouldBe a [SequenceList[Int, Int]]
 
+    val child: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
+
+    assert(child.getKeys.size == 1)
+    assert(child.getKeys(0) == condition)
+    assert(child.getSequence(condition).get.getKey == condition)
+    assert(child.getSequence(condition).get.getEventCount == 1)
+    assert(child.getSequence(condition).get.getEvents.size == 1)
+    assert(child.getSequence(condition).get.getEvents(event) == 1)
+    assert(child.getSequence(condition).get.getPredictions.size == 1)
+    assert(child.getSequence(condition).get.getPredictions(event) == 1.00)
+  }
 
 
 
