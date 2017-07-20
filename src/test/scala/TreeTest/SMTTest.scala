@@ -98,48 +98,77 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, events initialised empty"){
     val n1 = new Node[Int, Int](5,1,1)
     assertThrows[NoSuchElementException](n1.getEvents(666))
-    assert(n1.getEvents.size == 0)
+    assert(n1.getEvents.isEmpty)
   }
-
-
-  /*
-
-
-  test("Sequence events is correct after updates with same event") {
+  test("SMT 'events' is correct after updates with same event") {
     val n1 = new Node[Int, Int](5,1,1)
-    assert(s1.getEvents(666) == 1)
-    assert(s1.getEvents.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getEvents(666) == 2)
-    assert(s1.getEvents.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getEvents(666) == 3)
-    assert(s1.getEvents.size == 1)
+
+    assert(n1.getEventCount == 0)
+    assert(n1.getEvents.isEmpty)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 1)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 2)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 3)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
   }
   test("Sequence events is correct after updates with different events") {
     val n1 = new Node[Int, Int](5,1,1)
-    assert(s1.getEvents(666) == 1)
-    assert(s1.getEvents.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getEvents(666) == 2)
-    assert(s1.getEvents.size == 1)
-    s1.updateEvents(666)
-    assert(s1.getEvents(666) == 3)
-    assert(s1.getEvents.size == 1)
-    s1.updateEvents(777)
-    assert(s1.getEvents(666) == 3)
-    assert(s1.getEvents(777) == 1)
-    assert(s1.getEvents.size == 2)
-    s1.updateEvents(777)
-    assert(s1.getEvents(666) == 3)
-    assert(s1.getEvents(777) == 2)
-    assert(s1.getEvents.size == 2)
-    s1.updateEvents(888)
-    assert(s1.getEvents(666) == 3)
-    assert(s1.getEvents(777) == 2)
-    assert(s1.getEvents(888) == 1)
-    assert(s1.getEvents.size == 3)
+
+    assert(n1.getEventCount == 0)
+    assert(n1.getEvents.isEmpty)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 1)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 2)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
+
+    n1.updateEvents(666)
+    assert(n1.getEventCount == 3)
+    assert(n1.getEvents.size == 1)
+    assert(n1.getProbability(666).get == 1.00)
+
+    n1.updateEvents(777)
+    assert(n1.getEventCount == 4)
+    assert(n1.getEvents.size == 2)
+    assert(n1.getEvents.get(666).get == 3)
+    assert(n1.getEvents.get(777).get == 1)
+    assert(n1.getProbability(666).get == 3.00/4)
+    assert(n1.getProbability(777).get == 1.00/4)
+
+    n1.updateEvents(777)
+    assert(n1.getEventCount == 5)
+    assert(n1.getEvents.size == 2)
+    assert(n1.getEvents.get(666).get == 3)
+    assert(n1.getEvents.get(777).get == 2)
+    assert(n1.getProbability(666).get == 3.00/5)
+    assert(n1.getProbability(777).get == 2.00/5)
+
+    n1.updateEvents(888)
+    assert(n1.getEventCount == 6)
+    assert(n1.getEvents.size == 3)
+    assert(n1.getEvents.get(666).get == 3)
+    assert(n1.getEvents.get(777).get == 2)
+    assert(n1.getEvents.get(888).get == 1)
+    assert(n1.getProbability(666).get == 3.00/6)
+    assert(n1.getProbability(777).get == 2.00/6)
+    assert(n1.getProbability(888).get == 1.00/6)
   }
+  /*
   test("Sequence predictiona has single element after first event update"){
     val n1 = new Node[Int, Int](5,1,1)
     s1.updateEvents(666)
