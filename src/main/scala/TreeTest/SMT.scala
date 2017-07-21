@@ -201,28 +201,44 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
 
     private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
 
-    private def split(newSeq: (Vector[A], B)): Vector[SMT[_ <: A, _ <: B]] = {
-      var newVector: Vector[SMT[_ <: A, _ <: B]] = Vector[SMT[A, B]]()
+    //private def split(newSeq: (Vector[A], B)): Vector[SMT[_ <: A, _ <: B]] = {
+    private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
+      //var newVector: Vector[SMT[_ <: A, _ <: B]] = Vector[SMT[A, B]]()
+      var newVector = Vector[Node[A, B]]()
+      println("newVector is emtpy after declaration: " + newVector.isEmpty)
+
       sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
 
       for (s <- sequences) {
-        newVector.asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == s.getKey(0)) match {
+        println("\nadding sequence " + s.getKey + " to new nodeVector")
+        newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
           case None => {
+            println("Didn't find node with head " + s.getKey(0) + " . Creating a new one")
             var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
             newNode.setKey(s.getKey(0))
             splitHelper(newNode, s.getKey.tail, s.getEvents)
             newVector = newVector :+ newNode
           }
-          case Some(x) => splitHelper(x, s.getKey.tail, s.getEvents)
+          case Some(x) => { println("Found node with key: " + x.getKey + " . Updating this node.") ; splitHelper(x, s.getKey.tail, s.getEvents)}
         }
       }
       println("created new vector with split: " + newVector)
+      /*println("\nnewVector after adding new node with key: " + newNode.getKey)
+      println(newVector.size)
+      println("------------- nodes in newVector: ")
+      for(nx <- newVector){
+        println("node key: " + nx.getKey)
+      }*/
+
+
       newVector
     }
 
     private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+      println("In splitHelper. Updating node with key " + node.getKey)
       for ((event, count) <- events) {
-        for (i <- 1 to count) node.growTree(keyTail, event)
+        println("Updating node with event " + event)
+        for (i <- 1 to count) { println("calling growTree on node with keyTail: " + keyTail + " and event: " + event ) ; node.growTree(keyTail, event)}
       }
     }
   }

@@ -696,7 +696,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'"){
     val n1 = new Node[Int, Int](3,1,1)
     val condition = Vector(1,2)
-    val condition2 = Vector(3,4)
+    val condition2 = Vector(1,4)
     val event = 666
 
     n1.growTree(condition, event)
@@ -790,14 +790,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
  /* test("asdfsfd"){
     var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
     childrenGroup = childrenGroup :+ Vector(SequenceList[Int, Int](11,11,11))
+    println("childrenGroup.size " + childrenGroup.size)
     println("childreanGroup: " + childrenGroup)
     println("childrenGroup(0): " + childrenGroup(0))
 
-    val nV = Vector(Node[Int, Int](22,22,22))
+    val nV = Vector(Node[Int, Int](22,22,22), Node[Int, Int](66,66,66))
     childrenGroup = childrenGroup.updated(0, nV)
     println("after: ")
+    println("childrenGroup.size " + childrenGroup.size)
+    println("childrenGroup-------------")
     println("childreanGroup: " + childrenGroup)
+    println("childrenGroup-------------")
     println("childrenGroup(0): " + childrenGroup(0))
+
 
   }*/
 }
