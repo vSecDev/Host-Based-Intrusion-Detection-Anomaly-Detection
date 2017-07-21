@@ -71,21 +71,37 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
     def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = childrenGroup
 
     def growTree(condition: Vector[A], event: B): Unit = {
-
+      println("\n\n-------\ncondition: " + condition)
       if (maxDepth > 0) for {
         i <- 0 to maxPhi
         if condition.length > i
       } {
         val newCondition = condition.drop(i)
+        println("------------------  i: " + i)
+        println("newCondition: " + newCondition)
 
-        if (childrenGroup.size > i) childrenGroup(i)(0) match {
-          case sl: SequenceList[A, B] =>
+        if (childrenGroup.size > i) {
+          println("childrenGroup.size > i (i=" + i + ") => true");
+          childrenGroup(i)(0) match {
+          case sl: SequenceList[A, B] =>{
+            println("childrenGroup(" + i + ")(0) = SequenceList")
             sl.updateSequences((newCondition, event)) match {
-              case Some(x) => childrenGroup.updated(i, x)
-              case None =>
+              case Some(x) => println("??? i: " + i + " - newCondition: " + newCondition);childrenGroup = childrenGroup.updated(i, x)
+              case None => println("??? i: " + i + " - newCondition: " + newCondition)
             }
-          case _: Node[A, B] =>
+          }
+            println("\n\n\n-childrenGroup after update: " + childrenGroup)
+          case _: Node[A, B] =>{
+            println("childrenGroup(" + i + ")(0) = Node")
+
             val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == newCondition.head)
+
+            nextNode match{
+              case Some(x: Node[A, B]) => println("found node with key: " + x.getKey)
+              case _ => println("did not find node with key: " + newCondition.head)
+            }
+
+
             nextNode match {
               case Some(x: Node[A, B]) =>
                 newCondition.tail match {
@@ -102,7 +118,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
                 }
                 childrenGroup(i) :+ newNode
             }
-        } else {
+        }}} else {
+          println("childrenGroup.size > i (i=" + i + ") => false ==> Creating a new SequenceList under this node.")
+          println("i: " + i + " - newCondition: " + newCondition)
+
           val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
 
           newSeqList.updateSequences((newCondition, event)) match {
@@ -156,17 +175,25 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] = sequences.find(x => x.getKey == newSeq._1) match {
-      case Some(x) =>
-        x.updateEvents(newSeq._2)
+    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] ={
+      println("updateSequences seq: " + newSeq)
+
+      sequences.find(x => x.getKey == newSeq._1) match {
+      case Some(y) =>{
+        println("Found stored seq with key: " + y.asInstanceOf[Sequence[A,B]].getKey)
+        y.updateEvents(newSeq._2)
         None
+      }
       case None =>
-        if (canSplit) Some(split(newSeq))
+        if (canSplit){ println("canSplit is: " + canSplit); val sp = Some(split(newSeq)); println("after split returning: " + sp.get); sp}
         else {
+          println("canSplit: " + canSplit)
+          println("adding seq with key: " + newSeq._1 + " to current sequencelist")
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
+          println("added seq with key: " + newSeq._1 + " to current sequencelist")
           None
         }
-    }
+    }}
 
     def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
 
@@ -189,6 +216,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           case Some(x) => splitHelper(x, s.getKey.tail, s.getEvents)
         }
       }
+      println("created new vector with split: " + newVector)
       newVector
     }
 
