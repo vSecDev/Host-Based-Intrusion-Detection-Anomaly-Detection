@@ -86,11 +86,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           case sl: SequenceList[A, B] =>{
             println("childrenGroup(" + i + ")(0) = SequenceList")
             sl.updateSequences((newCondition, event)) match {
-              case Some(x) => println("??? i: " + i + " - newCondition: " + newCondition);childrenGroup = childrenGroup.updated(i, x)
-              case None => println("??? i: " + i + " - newCondition: " + newCondition)
+              case Some(x) => println("??? Some, i: " + i + " - newCondition: " + newCondition);childrenGroup = childrenGroup.updated(i, x)
+              case None => println("??? None, i: " + i + " - newCondition: " + newCondition)
             }
           }
-            println("\n\n\n-childrenGroup after update: " + childrenGroup)
           case _: Node[A, B] =>{
             println("childrenGroup(" + i + ")(0) = Node")
 
@@ -118,7 +117,10 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
                 }
                 childrenGroup(i) :+ newNode
             }
-        }}} else {
+        }}
+
+          println("\n\n\n-childrenGroup after update: " + childrenGroup)
+        } else {
           println("childrenGroup.size > i (i=" + i + ") => false ==> Creating a new SequenceList under this node.")
           println("i: " + i + " - newCondition: " + newCondition)
 
@@ -175,7 +177,8 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
       * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
       * @return true if the sequence list has been updated, false otherwise.
       */
-    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] ={
+    //def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] ={
+    def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] ={
       println("updateSequences seq: " + newSeq)
 
       sequences.find(x => x.getKey == newSeq._1) match {
@@ -185,7 +188,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
         None
       }
       case None =>
-        if (canSplit){ println("canSplit is: " + canSplit); val sp = Some(split(newSeq)); println("after split returning: " + sp.get); sp}
+        if (canSplit){ println("canSplit is: " + canSplit); val sp = Some(split(newSeq)); println("after split returning: " + sp.get.size); sp}
         else {
           println("canSplit: " + canSplit)
           println("adding seq with key: " + newSeq._1 + " to current sequencelist")
@@ -222,7 +225,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
           case Some(x) => { println("Found node with key: " + x.getKey + " . Updating this node.") ; splitHelper(x, s.getKey.tail, s.getEvents)}
         }
       }
-      println("created new vector with split: " + newVector)
+      println("created new vector with split: " + newVector.size + "  -------------------------")
       /*println("\nnewVector after adding new node with key: " + newNode.getKey)
       println(newVector.size)
       println("------------- nodes in newVector: ")
