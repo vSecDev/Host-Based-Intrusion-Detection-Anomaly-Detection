@@ -795,14 +795,26 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("childrenGroup(0): " + childrenGroup(0))
 
     val nV = Vector(Node[Int, Int](22,22,22), Node[Int, Int](66,66,66))
+    //childrenGroup = childrenGroup.updated(0, nV)
     childrenGroup = childrenGroup.updated(0, nV)
     println("after: ")
     println("childrenGroup.size " + childrenGroup.size)
-    println("childrenGroup-------------")
+    println("---------------------childrenGroup-------------")
     println("childreanGroup: " + childrenGroup)
-    println("childrenGroup-------------")
-    println("childrenGroup(0): " + childrenGroup(0))
+    /*println("---------------------childrenGroup-------------")
+    println("childrenGroup(0): " + childrenGroup(0))*/
 
+
+    //childrenGroup(0) = childrenGroup(0)
+
+    childrenGroup = childrenGroup :+ Vector(Node[Int, Int](7777777,7777777,7777777))
+
+    println("????????????????????????????????????????????????????? after append: ")
+    println("childrenGroup.size " + childrenGroup.size)
+    println("---------------------childrenGroup-------------")
+    println("childreanGroup: " + childrenGroup)
+    /*println("---------------------childrenGroup-------------")
+    println("childrenGroup(0): " + childrenGroup(0))*/
 
   }*/
 }
