@@ -152,7 +152,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     val buf = new StringBuilder
     buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + " - eventCount: " + getEventCount + " - events size: " + getEvents.size + " - predictions size: " + getPredictions.size + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
-      if (childrenGroup.nonEmpty) {
+      //if (childrenGroup.nonEmpty && childrenGroup.size > i) {
+        if (childrenGroup.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
 
 
@@ -293,7 +294,9 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
     println("splitHelper. finished calling growTree on node. printing node below:\nkey:" + node.getKey.get)
     println("children size: " + node.getChildren.size)
     println("children(0): " + node.getChildren(0))
+    println("children(0) size: " + node.getChildren(0).size)
     println("children(0)(0): " + node.getChildren(0)(0))
+
     println("children(0)(0) sequence list first element key: " + node.getChildren(0)(0).asInstanceOf[SequenceList[A,B]].sequences(0).getKey)
 
     println("Printing rest of the details of node: " + node)

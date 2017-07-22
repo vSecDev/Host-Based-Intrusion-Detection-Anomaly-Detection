@@ -696,11 +696,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'"){
     val n1 = new Node[Int, Int](3,1,1)
     val condition = Vector(1,2)
-    val condition2 = Vector(1,4)
+    //val condition2 = Vector(1,4)
+    val condition2 = Vector(3,4)
     val event = 666
 
     n1.growTree(condition, event)
-   /* n1.getKey shouldBe None
+    n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
     assert(n1.getPredictions.isEmpty)
@@ -709,17 +710,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0).size == 1)
     assert(n1.getChildren(1).size == 1)
     n1.getChildren(0)(0) shouldBe a [SequenceList[_,_]]
-    n1.getChildren(1)(0) shouldBe a [SequenceList[_,_]]*/
+    n1.getChildren(1)(0) shouldBe a [SequenceList[_,_]]
 
     println("After adding first condition")
     println(n1)
 
-    println("before adding second condition")
-    n1.growTree(condition2, event)
-    println("After adding second condition")
-    println(n1)
 
-   /* val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
+    val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
     val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
 
     for(i <- n1.getChildren.indices){
@@ -733,6 +730,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
+
     println("before adding cond 2")
     n1.growTree(condition2, event)
 
@@ -785,7 +783,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
     println("\n\n-----\nAfter adding condition2|666")
-    println(n1)*/
+    println(n1)
   }
  /* test("asdfsfd"){
     var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
