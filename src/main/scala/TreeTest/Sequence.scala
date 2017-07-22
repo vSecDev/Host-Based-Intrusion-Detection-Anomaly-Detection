@@ -12,6 +12,8 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
   private var isChanged: Boolean = false
+  //TODO - MODIFY THIS, SO PRIOR COULD BE SET IN CONSTRUCTOR
+  //private var prior: Option[Double] = Some(0.00)
 
   //Constructor argument validation
   require(_key.nonEmpty, "Sequence key cannot be an empty list!")

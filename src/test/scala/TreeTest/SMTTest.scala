@@ -774,9 +774,29 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           assert(n1.getChildren(i).size == 2)
           n1.getChildren(i) shouldBe a [Vector[Node[_,_]]]
 
-          for(j <- 0 to n1.getChildren(i).size){
+          for(j <- n1.getChildren(i).indices){
             val curr = n1.getChildren(i)(j).asInstanceOf[Node[_,_]]
-            assert((curr.getKey.get == condition.drop(i)) || (curr.getKey.get ==  condition2.drop(i)))
+
+            if(j == 0) {
+              assert(curr.getKey.get == condition.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 2)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+            else if(j == 1) {
+              assert(curr.getKey.get == condition2.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 4)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
           }
 
         }
