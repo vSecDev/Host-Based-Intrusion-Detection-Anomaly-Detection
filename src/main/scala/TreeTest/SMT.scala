@@ -74,7 +74,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     println("\n\n-------\ncondition: " + condition)
     if (maxDepth > 0) for {
       i <- 0 to maxPhi
-      if condition.length > i
+      if condition.length > i && maxDepth - i > 0
     } {
       val newCondition = condition.drop(i)
       println("------------------  i: " + i)
@@ -93,10 +93,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
           case _: Node[A, B] =>{
             println("childrenGroup(" + i + ")(0) = Node")
 
-            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey == newCondition.head)
+            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
 
             nextNode match{
-              case Some(x: Node[A, B]) => println("found node with key: " + x.getKey)
+              case Some(x: Node[A, B]) => println("found node with key: " + x.getKey.get)
               case _ => println("did not find node with key: " + newCondition.head)
             }
 
@@ -133,7 +133,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
         println("childrenGroup.size > i (i=" + i + ") => false ==> Creating a new SequenceList under this node.")
         println("i: " + i + " - newCondition: " + newCondition)
 
+        println("\nAfter creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition + " - maxDepth: " + (maxDepth - i - 1))
         val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
+        println("After creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition)
+
 
         newSeqList.updateSequences((newCondition, event)) match {
           case Some(x) => println("newSeqList split. Should never get here."); childrenGroup = childrenGroup :+ x
@@ -218,7 +221,8 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
   def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
 
-  private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
+  //private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
+  private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
   //private def split(newSeq: (Vector[A], B)): Vector[SMT[_ <: A, _ <: B]] = {
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {

@@ -472,8 +472,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
-    println("After adding condition|666")
-    println(n1)
 
     n1.growTree(condition2, event)
     n1.getKey shouldBe None
@@ -482,31 +480,63 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.isEmpty)
     n1.getPredictions.get(event) shouldBe None
     assert(n1.getChildren.size == 2)
-    assert(n1.getChildren(0).size == 1)
+    assert(n1.getChildren(0).size == 2)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
-    n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
+    n1.getChildren(0)(0) shouldBe a[Node[_, _]]
+    n1.getChildren(1)(0) shouldBe a[SequenceList[_,_]]
 
     for (i <- n1.getChildren.indices) {
-      val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
-      assert(child.getKeys.size == 2)
-      assert(child.getKeys(0) == condition.drop(i))
-      assert(child.getKeys(1) == condition2.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
-      assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getEventCount == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEventCount == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents(event) == 1)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00)
+      val c = n1.getChildren(i)(0)
+
+      c match {
+        case child: SequenceList[Int,Int] => {
+          assert(child.getKeys.size == 2)
+          assert(child.getKeys(0) == condition.drop(i))
+          assert(child.getKeys(1) == condition2.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
+          assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getEventCount == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEventCount == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents(event) == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00)
+        }
+        case _: Node[Int,Int] => {
+          assert(n1.getChildren(i).size == 2)
+          n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
+
+          for (j <- n1.getChildren(i).indices) {
+            val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
+
+            if (j == 0) {
+              assert(curr.getKey.get == condition.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 2)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 1) {
+              assert(curr.getKey.get == condition2.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 4)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+          }
+        }
+      }
     }
-    println("\n\n-----\nAfter adding condition2|666")
-    println(n1)
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences") {
     val n1 = new Node[Int, Int](2, 1, 1)
@@ -527,41 +557,80 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.isEmpty)
     n1.getPredictions.get(event) shouldBe None
     assert(n1.getChildren.size == 2)
-    assert(n1.getChildren(0).size == 1)
+    assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
-    n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
-
-    val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
-    val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
-      val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
-      assert(child.getKeys.size == 3)
-      assert(child.getKeys(0) == condition.drop(i))
-      assert(child.getKeys(1) == condition2.drop(i))
-      assert(child.getKeys(2) == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
-      assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
-      assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getEventCount == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEventCount == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getEventCount == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 1)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 1.00)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 1.00)
+      val c = n1.getChildren(i)(0)
+
+      c match {
+        case child: SequenceList[Int, Int] => {
+          assert(child.getKeys.size == 3)
+          assert(child.getKeys(0) == condition.drop(i))
+          assert(child.getKeys(1) == condition2.drop(i))
+          assert(child.getKeys(2) == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
+          assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
+          assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getEventCount == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEventCount == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEventCount == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 1.00)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 1.00)
+        }
+        case _: Node[Int, Int] => {
+          assert(n1.getChildren(i).size == 3)
+          n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
+
+          for (j <- n1.getChildren(i).indices) {
+            val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
+
+            if (j == 0) {
+              assert(curr.getKey.get == condition.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 2)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 1) {
+              assert(curr.getKey.get == condition2.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 4)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(777).get == 1.00)
+              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 2) {
+              assert(curr.getKey.get == condition3.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 6)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(888).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+          }
+        }
+      }
     }
-    println("After adding 3 conditions: 'Vector.size 2| three different events'")
-    println(n1)
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each") {
     val n1 = new Node[Int, Int](2, 1, 1)
@@ -586,41 +655,86 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.isEmpty)
     n1.getPredictions.get(event) shouldBe None
     assert(n1.getChildren.size == 2)
-    assert(n1.getChildren(0).size == 1)
+    assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
-    n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
-
-    val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
-    val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
-      val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
-      assert(child.getKeys.size == 3)
-      assert(child.getKeys(0) == condition.drop(i))
-      assert(child.getKeys(1) == condition2.drop(i))
-      assert(child.getKeys(2) == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
-      assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
-      assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition2.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition3.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 2)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 2)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 2)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 1)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 1.00)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 1.00)
+      val c = n1.getChildren(i)(0)
+
+      c match {
+        case child: SequenceList[Int, Int] => {
+          assert(child.getKeys.size == 3)
+          assert(child.getKeys(0) == condition.drop(i))
+          assert(child.getKeys(1) == condition2.drop(i))
+          assert(child.getKeys(2) == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
+          assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
+          assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition2.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition3.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 2)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 2)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 2)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 1.00)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 1.00)
+        }
+        case _: Node[Int, Int] => {
+          assert(n1.getChildren(i).size == 3)
+          n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
+
+          for (j <- n1.getChildren(i).indices) {
+            val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
+
+            if (j == 0) {
+              assert(curr.getKey.get == condition.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 2)
+              assert(currSeq(0).getEventCount == 2)
+              assert(currSeq(0).getEvents.size == 1)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(666).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 1) {
+              assert(curr.getKey.get == condition2.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 4)
+              assert(currSeq(0).getEventCount == 2)
+              assert(currSeq(0).getEvents.size == 1)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(777).get == 1.00)
+              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 2) {
+              assert(curr.getKey.get == condition3.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 6)
+              assert(currSeq(0).getEventCount == 2)
+              assert(currSeq(0).getEvents.size == 1)
+              assert(currSeq(0).getPredictions.size == 1)
+              assert(currSeq(0).getProbability(888).get == 1.00)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+            }
+          }
+        }
+      }
     }
-    println("After adding 3 conditions: 'Vector.size 2| three different events'")
-    println(n1)
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each with different events for each") {
     val n1 = new Node[Int, Int](2, 1, 1)
@@ -645,54 +759,94 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.isEmpty)
     n1.getPredictions.get(event) shouldBe None
     assert(n1.getChildren.size == 2)
-    assert(n1.getChildren(0).size == 1)
+    assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
-    n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
-
-    val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
-    val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
-      val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
-      assert(child.getKeys.size == 3)
-      assert(child.getKeys(0) == condition.drop(i))
-      assert(child.getKeys(1) == condition2.drop(i))
-      assert(child.getKeys(2) == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
-      assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
-      assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
-      assert(child.getSequence(condition.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition2.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition3.drop(i)).get.getEventCount == 2)
-      assert(child.getSequence(condition.drop(i)).get.getEvents.size == 2)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 2)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 2)
+      val c = n1.getChildren(i)(0)
 
-      assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
-      assert(child.getSequence(condition.drop(i)).get.getEvents(event3) == 1)
+      c match {
+        case child: SequenceList[Int, Int] => {
+          assert(child.getKeys.size == 3)
+          assert(child.getKeys(0) == condition.drop(i))
+          assert(child.getKeys(1) == condition2.drop(i))
+          assert(child.getKeys(2) == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
+          assert(child.getSequence(condition2.drop(i)).get.getKey == condition2.drop(i))
+          assert(child.getSequence(condition3.drop(i)).get.getKey == condition3.drop(i))
+          assert(child.getSequence(condition.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition2.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition3.drop(i)).get.getEventCount == 2)
+          assert(child.getSequence(condition.drop(i)).get.getEvents.size == 2)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents.size == 2)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents.size == 2)
+          assert(child.getSequence(condition.drop(i)).get.getEvents(event) == 1)
+          assert(child.getSequence(condition.drop(i)).get.getEvents(event3) == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 1)
+          assert(child.getSequence(condition2.drop(i)).get.getEvents(event) == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 1)
+          assert(child.getSequence(condition3.drop(i)).get.getEvents(event2) == 1)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 2)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 2)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 2)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 0.50)
+          assert(child.getSequence(condition.drop(i)).get.getPredictions(event3) == 0.50)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 0.50)
+          assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 0.50)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 0.50)
+          assert(child.getSequence(condition3.drop(i)).get.getPredictions(event2) == 0.50)
+        }
+        case _: Node[Int, Int] => {
+          assert(n1.getChildren(i).size == 3)
+          n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
 
-      assert(child.getSequence(condition2.drop(i)).get.getEvents(event2) == 1)
-      assert(child.getSequence(condition2.drop(i)).get.getEvents(event) == 1)
+          for (j <- n1.getChildren(i).indices) {
+            val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
 
-      assert(child.getSequence(condition3.drop(i)).get.getEvents(event3) == 1)
-      assert(child.getSequence(condition3.drop(i)).get.getEvents(event2) == 1)
-
-      assert(child.getSequence(condition.drop(i)).get.getPredictions.size == 2)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions.size == 2)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions.size == 2)
-
-      assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00 / 2)
-      assert(child.getSequence(condition.drop(i)).get.getPredictions(event3) == 1.00 / 2)
-
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions(event2) == 1.00 / 2)
-      assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00 / 2)
-
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions(event3) == 1.00 / 2)
-      assert(child.getSequence(condition3.drop(i)).get.getPredictions(event2) == 1.00 / 2)
+            if (j == 0) {
+              assert(curr.getKey.get == condition.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 2)
+              assert(currSeq(0).getEventCount == 2)
+              assert(currSeq(0).getEvents.size == 2)
+              assert(currSeq(0).getPredictions.size == 2)
+              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(888).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 1) {
+              assert(curr.getKey.get == condition2.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 4)
+              assert(currSeq(0).getEventCount == 2)
+              assert(currSeq(0).getEvents.size == 2)
+              assert(currSeq(0).getPredictions.size == 2)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+            }
+            else if (j == 2) {
+              assert(curr.getKey.get == condition3.drop(i)(0))
+              assert(curr.getChildren.size == 1)
+              val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
+              assert(currSeq.size == 1)
+              assert(currSeq(0).getKey(0) == 6)
+              assert(currSeq(0).getEvents.size == 2)
+              assert(currSeq(0).getPredictions.size == 2)
+              assert(currSeq(0).getProbability(888).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.50)
+              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+            }
+          }
+        }
+      }
     }
-    println("After adding 3 conditions: 'Vector.size 2| three different events'")
-    println(n1)
   }
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'") {
     val n1 = new Node[Int, Int](3, 1, 1)
@@ -713,10 +867,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
 
-    println("After adding first condition")
-    println(n1)
-
-
     val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
     val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
 
@@ -732,12 +882,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    println("before adding cond 2")
     n1.growTree(condition2, event)
-
-    println("after adding cond 2")
-    println(n1)
-
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -803,8 +948,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
       }
     }
-    println("\n\n-----\nAfter adding condition2|666")
-    println(n1)
   }
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event' - first element same") {
     val n1 = new Node[Int, Int](3, 1, 1)
@@ -825,10 +968,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
 
-    println("After adding first condition")
-    println(n1)
-
-
     val child0: SequenceList[Int, Int] = n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
     val child1: SequenceList[Int, Int] = n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]]
 
@@ -844,12 +983,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    println("before adding cond 2")
     n1.growTree(condition2, event)
-
-    println("after adding cond 2")
-    println(n1)
-
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -867,13 +1001,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       c match {
         case child: SequenceList[Int, Int] => {
-          //  assert(child.getKeys.size == 2)
-
-          println("\n\n\n\n\n\n\n\n\n-------KEYS-------")
           for (k <- child.getKeys) println(k)
-          println("-------KEYS-------\n\n\n\n\n\n\n\n\n")
-
-
           assert(child.getKeys(0) == condition.drop(i))
           assert(child.getKeys(1) == condition2.drop(i))
           assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
@@ -925,8 +1053,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
       }
     }
-    //println("\n\n-----\nAfter adding condition2|666")
-    //println(n1)
   }
   /* test("asdfsfd"){
     var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
@@ -958,7 +1084,35 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("childrenGroup(0): " + childrenGroup(0))*/
 
   }*/
-  test("sliding window test") {
+
+
+  test("temp") {
+    val n1 = new Node[Int, Int](1, 1, 1)
+    val condition = Vector(1, 2)
+    val condition2 = Vector(3, 4)
+    val event = 666
+    n1.growTree(condition, event)
+    n1.getKey shouldBe None
+    assert(n1.getEventCount == 0)
+    assert(n1.getEvents.isEmpty)
+    assert(n1.getPredictions.isEmpty)
+    n1.getPredictions.get(event) shouldBe None
+    assert(n1.getChildren.size == 1)
+    assert(n1.getChildren(0).size == 1)
+    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
+
+
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys.size == 1)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
+  }
+
+
+
+
+
+
+  /*test("sliding window test") {
     val n1 = new Node[Int, Int](5, 3, 1)
     var count: Int = 0
     for (t <- intVectorTrace.sliding(5, 1)) {
@@ -971,5 +1125,5 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("--------------------------n1--------------------------")
     println("count : " + count)
 
-  }
+  }*/
 }
