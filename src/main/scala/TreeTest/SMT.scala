@@ -288,7 +288,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
   }
 
   private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
-    println("In splitHelper. Updating node with key " + node.getKey + " . Printing out node below: \n" + node)
+    println("????????????????????????????     In splitHelper. Updating node with key " + node.getKey + " . Printing out node below: \n" + node)
 
     for ((event, count) <- events) {
       println("Updating node with event " + event)
@@ -296,12 +296,12 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
     }
     println("\nsplitHelper. called growTree n times which has returned.")
     println("splitHelper. finished calling growTree on node. printing node below:\nkey:" + node.getKey.get)
-    println("children size: " + node.getChildren.size)
+  /*  println("children size: " + node.getChildren.size)
     println("children(0): " + node.getChildren(0))
     println("children(0) size: " + node.getChildren(0).size)
-    println("children(0)(0): " + node.getChildren(0)(0))
+    println("children(0)(0): " + node.getChildren(0)(0))*/
 
-    println("children(0)(0) sequence list first element key: " + node.getChildren(0)(0).asInstanceOf[SequenceList[A,B]].sequences(0).getKey)
+    //println("children(0)(0) sequence list first element key: " + node.getChildren(0)(0).asInstanceOf[SequenceList[A,B]].sequences(0).getKey)
 
     println("Printing rest of the details of node: " + node)
 

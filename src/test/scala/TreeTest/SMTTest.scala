@@ -1054,6 +1054,60 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
+  test("SMT, mD = 5, window size 5") {
+    val n1 = new Node[Int, Int](5, 2, 1)
+    val event = 666
+    val event2 = 777
+    val event3 = 888
+
+    val t1 = Vector(1, 2, 9, 4, 5)
+    val t2 = Vector(5, 4, 3, 2, 1)
+
+    /*n1.growTree(shortListTrace, event)
+    n1.growTree(shortListTrace2, event)*/
+    n1.growTree(t1, event)
+    n1.growTree(t2, event)
+
+    assert(n1.getChildren.size == 3)
+    assert(n1.getChildren(0).size == 2)
+    assert(n1.getChildren(1).size == 2)
+    assert(n1.getChildren(2).size == 2)
+
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+
+    println("n1.getChildren(1):")
+    println("n1.getChildren(1) size: " + n1.getChildren(1).size)
+    println("n1.getChildren(1)(1): ")
+    println(n1.getChildren(1)(1))
+
+
+  /*  println()
+    for (s <- n1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].sequences){
+      println("sequence key: " + s.getKey)
+    }*/
+
+
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")
+
+
+   // assert(n1.getChildren(2).size == 2)
+   /* n1.getChildren(0)(0) shouldBe a[Node[_, _]]
+    n1.getChildren(1)(0) shouldBe a[Node[_, _]]
+    n1.getChildren(2)(0) shouldBe a[Node[_, _]]*/
+
+   /* n1.growTree(shortListTrace, event2)
+    n1.growTree(shortListTrace2, event3)*/
+  }
+
+
   /* test("asdfsfd"){
     var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
     childrenGroup = childrenGroup :+ Vector(SequenceList[Int, Int](11,11,11))
@@ -1101,15 +1155,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0).size == 1)
     n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
 
-
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys.size == 1)
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
   }
-
-
-
-
 
 
   /*test("sliding window test") {
