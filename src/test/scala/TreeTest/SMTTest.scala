@@ -1079,10 +1079,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
 
-    println("n1.getChildren(1):")
-    println("n1.getChildren(1) size: " + n1.getChildren(1).size)
-    println("n1.getChildren(1)(1): ")
-    println(n1.getChildren(1)(1))
+    println("n1.getChildren(2):")
+    println("n1.getChildren(2) size: " + n1.getChildren(2).size)
+    println("n1.getChildren(2)(0): ")
+    println(n1.getChildren(2)(0))
 
 
   /*  println()
@@ -1097,14 +1097,56 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
 
+    val phi_0 = n1.getChildren(0)
+    val phi_0_node_0 = phi_0(0).asInstanceOf[Node[Int,Int]]
+    val phi_0_node_1 = phi_0(1).asInstanceOf[Node[Int,Int]]
 
-   // assert(n1.getChildren(2).size == 2)
-   /* n1.getChildren(0)(0) shouldBe a[Node[_, _]]
-    n1.getChildren(1)(0) shouldBe a[Node[_, _]]
-    n1.getChildren(2)(0) shouldBe a[Node[_, _]]*/
+    val phi_1 = n1.getChildren(1)
+    val phi_1_node_0 = phi_1(0).asInstanceOf[Node[Int,Int]]
+    val phi_1_node_1 = phi_1(1).asInstanceOf[Node[Int,Int]]
 
-   /* n1.growTree(shortListTrace, event2)
-    n1.growTree(shortListTrace2, event3)*/
+    val phi_2 = n1.getChildren(2)
+    val phi_2_node_0 = phi_2(0).asInstanceOf[Node[Int,Int]]
+    val phi_2_node_1 = phi_2(1).asInstanceOf[Node[Int,Int]]
+
+    assert(phi_0_node_0.getKey.get == t1.head)
+    assert(phi_0_node_0.getChildren.size == 3)
+    assert(phi_0_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(1))
+    assert(phi_0_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(2))
+    assert(phi_0_node_0.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(3))
+
+    assert(phi_0_node_1.getKey.get == t2.head)
+    assert(phi_0_node_1.getChildren.size == 3)
+    assert(phi_0_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(1))
+    assert(phi_0_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(2))
+    assert(phi_0_node_1.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(3))
+
+
+    assert(phi_1_node_0.getKey.get == t1.drop(1).head)
+    assert(phi_1_node_0.getChildren.size == 3)
+    assert(phi_1_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(2))
+    assert(phi_1_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(3))
+    assert(phi_1_node_0.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(4))
+
+    assert(phi_1_node_1.getKey.get == t2.drop(1).head)
+    assert(phi_1_node_1.getChildren.size == 3)
+    assert(phi_1_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(2))
+    assert(phi_1_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(3))
+    assert(phi_1_node_1.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(4))
+
+    assert(phi_2_node_0.getKey.get == t1.drop(2).head)
+    assert(phi_2_node_0.getChildren.size == 2)
+    assert(phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(3))
+    assert(phi_2_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t1.drop(4))
+
+    assert(phi_2_node_1.getKey.get == t2.drop(2).head)
+    assert(phi_2_node_1.getChildren.size == 2)
+    assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(3))
+    assert(phi_2_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getKeys(0) == t2.drop(4))
+
+
+
+
   }
 
 
