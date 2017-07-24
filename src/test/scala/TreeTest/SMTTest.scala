@@ -1556,7 +1556,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
-      d.listFiles.filter(_.isFile).toList.filter { file =>
+      d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("Training-Backdoored-Executable") &&
         extensions.exists(file.getName.endsWith(_))
       }
     } else {
@@ -1566,9 +1566,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("SMT - train tree with all training data - benchmark") {
+    val maxDepth = 15
+    val maxPhi = 5
+    val maxSeqCount = 10
     val extensions = List("GHC")
     val files = getListOfFiles(dataHome, extensions)
-    val n1 = new Node[String, String](20, 3, 1)
+    val n1 = new Node[String, String](maxDepth,maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
 
@@ -1585,9 +1588,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
        val lines = try source.getLines mkString "\n" finally source.close()
        val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
        var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-       for (t <- wholeTrace.sliding(15, 1)) {
-         if(t.size == 15)
-           trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
+       for (t <- wholeTrace.sliding(maxDepth, 1)) {
+         if(t.size == maxDepth)
+           trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
        }
 
        for (t <- trainingData_whole) {
@@ -1597,23 +1600,5 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
      }
     }
     println("FINISHED trace length: 200 - tree depth: 15")
-
-
-
-
-
-
-
-
-    val mini = Vector(10)
-
-    for (t <- mini.sliding(6, 1)) {
-      if (t.size == 6) {
-        println("t: " + t)
-      } else
-        println("too short")
-    }
-
-
   }
 }
