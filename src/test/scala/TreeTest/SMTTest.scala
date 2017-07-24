@@ -2,6 +2,8 @@ package TreeTest
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
+import java.util.Calendar
+
 
 /**
   * Created by Case on 20/07/2017.
@@ -851,7 +853,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'") {
     val n1 = new Node[Int, Int](3, 1, 1)
     val condition = Vector(1, 2)
-    //val condition2 = Vector(1,4)
     val condition2 = Vector(3, 4)
     val event = 666
 
@@ -953,7 +954,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](3, 1, 1)
     val condition = Vector(1, 2)
     val condition2 = Vector(1, 4)
-    //val condition2 = Vector(3,4)
     val event = 666
 
     n1.growTree(condition, event)
@@ -1001,7 +1001,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       c match {
         case child: SequenceList[Int, Int] => {
-          for (k <- child.getKeys) println(k)
           assert(child.getKeys(0) == condition.drop(i))
           assert(child.getKeys(1) == condition2.drop(i))
           assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
@@ -1065,8 +1064,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val t3 = Vector(6, 7, 8, 9, 10)
     val t4 = Vector(1, 3, 9, 4, 5)
 
-    /*n1.growTree(shortListTrace, event)
-    n1.growTree(shortListTrace2, event)*/
     n1.growTree(t1, event)
     n1.growTree(t2, event)
 
@@ -1074,30 +1071,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0).size == 2)
     assert(n1.getChildren(1).size == 2)
     assert(n1.getChildren(2).size == 2)
-
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-
-    println("n1.getChildren(2):")
-    println("n1.getChildren(2) size: " + n1.getChildren(2).size)
-    println("n1.getChildren(2)(0): ")
-    println(n1.getChildren(2)(0))
-
-
-    /*  println()
-    for (s <- n1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].sequences){
-      println("sequence key: " + s.getKey)
-    }*/
-
-
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
 
     val phi_0 = n1.getChildren(0)
     val phi_0_node_0 = phi_0(0).asInstanceOf[Node[Int, Int]]
@@ -1340,7 +1313,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getProbability(event2).getOrElse(0.00) == 0.50)
     assert(newNewSeq2.getProbability(event).getOrElse(0.00) == 0.50)
 
-
     //val t4 = Vector(1, 3, 9, 4, 5)
     n1.growTree(t4, event2)
 
@@ -1403,7 +1375,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEvents(event) == 1)
     assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEvents(event2) == 1)
 
-    println("888888888888888888888888888888888888888")
+  /*  println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
@@ -1414,7 +1386,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
+    println("888888888888888888888888888888888888888")*/
   }
 
 
@@ -1476,5 +1448,98 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       count += 1
       n1.growTree(t, t.last)
     }
+  }
+
+
+
+
+  def time[T](block: => T): T = {
+    val start = System.currentTimeMillis
+    val res = block
+    val totalTime = System.currentTimeMillis - start
+    println("Elapsed time: %1d ms".format(totalTime))
+    res
+  }
+
+
+  test("SMT, sliding window test - trace length = 200"){
+
+    val source = scala.io.Source.fromFile("C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC")
+    val lines = try source.getLines mkString "\n" finally source.close()
+
+    println(lines)
+
+    val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+    val trace_200 = wholeTrace.take(200)
+    var trainingData_200: Vector[(Vector[String],String)] = Vector[(Vector[String], String)]()
+    var trainingData_whole: Vector[(Vector[String],String)] = Vector[(Vector[String], String)]()
+
+    for (t <- trace_200.sliding(6, 1)) {
+      trainingData_200 = trainingData_200 :+ (t.take(5), t.takeRight(1)(0))
+    }
+    for(t <- wholeTrace.sliding(6,1)){
+      trainingData_whole = trainingData_whole :+ (t.take(5), t.takeRight(1)(0))
+    }
+    println("trace_200.size: " + trace_200.size)
+    println("wholeTrace.size: " + wholeTrace.size)
+    println("trainingData_200.size: " + trainingData_200.size)
+    println("trainingData_whole.size: " + trainingData_whole.size)
+
+    val n1 = new Node[String, String](5, 3, 1)
+    val n2 = new Node[String, String](5, 3, 1)
+    val n3 = new Node[String, String](15, 5, 1)
+    val n4 = new Node[String, String](15, 5, 1)
+
+/*    println("Training: trace length: 200 - tree depth: 5")
+    time[Unit] {
+      for (t <- trainingData_200) {
+        n1.growTree(t._1, t._2)
+      }
+    }
+    println("FINISHED trace length: 200 - tree depth: 5")
+
+    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 5")
+    time[Unit] {
+      for (t <- trainingData_whole) {
+        n2.growTree(t._1, t._2)
+      }
+    }
+    println("FINISHED trace length: WHOLE - tree depth: 5")
+
+
+    println("\n\n\n\nTraining: trace length: 200 - tree depth: 15")
+    time[Unit] {
+      for (t <- trainingData_200) {
+        n3.growTree(t._1, t._2)
+      }
+    }
+    println("FINISHED trace length: 200 - tree depth: 15")*/
+
+    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 15")
+    time[Unit] {
+      for (t <- trainingData_whole) {
+        n4.growTree(t._1, t._2)
+      }
+    }
+    println("FINISHED trace length: 200 - tree depth: 15")
+
+   /* println("n4: ")
+    println(n4)*/
+
+
+
+
+
+
+
+
+
+/*    Thread.sleep(10000)
+    println("n1 after training: \n")
+    println(n1)*/
+
+
+
+
   }
 }

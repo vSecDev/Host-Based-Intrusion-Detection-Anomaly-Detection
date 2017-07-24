@@ -24,7 +24,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
   require(maxDepth > 0, "Max depth count must be positive!")
   require(maxPhi >= 0, "Max Phi count must be non-negative!")
 
-  private var childrenGroup: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
+  private var children: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
 
   def getKey: Option[A] = key
 
@@ -67,7 +67,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     }
   }
 
-  def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = childrenGroup
+  def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
   def growTree(condition: Vector[A], event: B): Unit = {
 
@@ -77,14 +77,14 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     } {
       val newCondition = condition.drop(i)
 
-      if (childrenGroup.size > i) childrenGroup(i)(0) match {
+      if (children.size > i) children(i)(0) match {
         case sl: SequenceList[A, B] =>
           sl.updateSequences((newCondition, event)) match {
-            case Some(x) => childrenGroup = childrenGroup.updated(i, x)
+            case Some(x) => children = children.updated(i, x)
             case None =>
           }
         case _: Node[A, B] =>
-          val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
+          val nextNode: Option[Node[A, B]] = children(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
 
           nextNode match {
             case Some(x: Node[A, B]) =>
@@ -99,14 +99,14 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
                 case y +: ys => newNode.growTree(y +: ys, event)
                 case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
-              childrenGroup = childrenGroup.updated(i, childrenGroup(i) :+ newNode)
+              children = children.updated(i, children(i) :+ newNode)
           }
       } else {
         val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
 
         newSeqList.updateSequences((newCondition, event)) match {
-          case Some(x) => childrenGroup = childrenGroup :+ x
-          case None => childrenGroup = childrenGroup :+ Vector(newSeqList)
+          case Some(x) => children = children :+ x
+          case None => children = children :+ Vector(newSeqList)
         }
       }
     } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
@@ -114,11 +114,11 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
 
   override def toString: String = {
     val buf = new StringBuilder
-    buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + " - eventCount: " + getEventCount + " - events size: " + getEvents.size + " - predictions size: " + getPredictions.size + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
+    buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + " - eventCount: " + getEventCount + " - events size: " + getEvents.size + " - predictions size: " + getPredictions.size + "\nChildrenGroup size: " + children.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
-      if (childrenGroup.size > i) {
-        buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
-        childrenGroup(i)(0) match {
+      if (children.size > i) {
+        buf ++= "\n-Phi_" + i + ":\nsize: " + children(i).size
+        children(i)(0) match {
           case sl: SequenceList[A, B] =>
             buf ++= " - group type: SequenceList. maxDepth: " + sl.maxDepth + " -  Sequences in list:\n"
             val ss = sl.sequences
@@ -127,7 +127,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
             }
           case _: Node[A, B] =>
             buf ++= " - type: Node list. Nodes in list:\n"
-            val ns = childrenGroup(i)
+            val ns = children(i)
             for (n <- ns) {
               buf ++= n.toString
             }
@@ -154,7 +154,6 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
     * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
     * @return true if the sequence list has been updated, false otherwise.
     */
-  //def updateSequences(newSeq: (Vector[A], B)): Option[Vector[SMT[_ <: A, _ <: B]]] ={
   def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
     case Some(y) =>
       y.updateEvents(newSeq._2)
@@ -171,23 +170,20 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
   //private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
   private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
-  //private def split(newSeq: (Vector[A], B)): Vector[SMT[_ <: A, _ <: B]] = {
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
-    //var newVector: Vector[SMT[_ <: A, _ <: B]] = Vector[SMT[A, B]]()
+
     var newVector = Vector[Node[A, B]]()
 
     sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
     for (s <- sequences) {
       newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
-        case None => {
-          var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
+        case None =>
+          val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
           newNode.setKey(s.getKey(0))
           splitHelper(newNode, s.getKey.tail, s.getEvents)
           newVector = newVector :+ newNode
-        }
-        case Some(x) => {
+        case Some(x) =>
           splitHelper(x, s.getKey.tail, s.getEvents)
-        }
       }
     }
     newVector
@@ -195,7 +191,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
   private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
     for ((event, count) <- events) {
-      for (i <- 1 to count) {  node.growTree(keyTail, event)}
+      for (i <- 1 to count) { node.growTree(keyTail, event) }
     }
   }
 }
