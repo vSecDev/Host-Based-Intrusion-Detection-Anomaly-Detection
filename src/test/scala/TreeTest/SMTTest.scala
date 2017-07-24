@@ -1600,5 +1600,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
      }
     }
     println("FINISHED trace length: 200 - tree depth: 15")
+    println("tree: \n" + n1)
   }
 }
