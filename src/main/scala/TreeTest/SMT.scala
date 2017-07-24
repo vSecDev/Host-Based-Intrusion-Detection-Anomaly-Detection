@@ -71,35 +71,23 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
   def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = childrenGroup
 
   def growTree(condition: Vector[A], event: B): Unit = {
-    println("\n\n-------\ncondition: " + condition)
+
     if (maxDepth > 0) for {
       i <- 0 to maxPhi
       if condition.length > i && maxDepth - i > 0
     } {
       val newCondition = condition.drop(i)
-      println("------------------  i: " + i)
-      println("newCondition: " + newCondition)
 
       if (childrenGroup.size > i) {
-        println("childrenGroup.size > i (i=" + i + ") => true");
         childrenGroup(i)(0) match {
           case sl: SequenceList[A, B] =>{
-            println("childrenGroup(" + i + ")(0) = SequenceList")
             sl.updateSequences((newCondition, event)) match {
-              case Some(x) => println("??? Some, i: " + i + " - newCondition: " + newCondition);childrenGroup = childrenGroup.updated(i, x)
-              case None => println("??? None, i: " + i + " - newCondition: " + newCondition)
+              case Some(x) => childrenGroup = childrenGroup.updated(i, x)
+              case None =>
             }
           }
           case _: Node[A, B] =>{
-            println("childrenGroup(" + i + ")(0) = Node")
-
             val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
-
-            nextNode match{
-              case Some(x: Node[A, B]) => println("found node with key: " + x.getKey.get)
-              case _ => println("did not find node with key: " + newCondition.head)
-            }
-
 
             nextNode match {
               case Some(x: Node[A, B]) =>
@@ -128,23 +116,23 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
             }
           }}
 
-        println("\n\n\n-childrenGroup after update: " + childrenGroup)
+      //  println("\n\n\n-childrenGroup after update: " + childrenGroup)
       } else {
-        println("childrenGroup.size > i (i=" + i + ") => false ==> Creating a new SequenceList under this node.")
-        println("i: " + i + " - newCondition: " + newCondition)
+        //println("childrenGroup.size > i (i=" + i + ") => false ==> Creating a new SequenceList under this node.")
+        //println("i: " + i + " - newCondition: " + newCondition)
 
-        println("\nAfter creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition + " - maxDepth: " + (maxDepth - i - 1))
+        //println("\nAfter creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition + " - maxDepth: " + (maxDepth - i - 1))
         val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
-        println("After creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition)
+        //println("After creating empty SeqList to be added to node at i: " + i + " - newCondition: " + newCondition)
 
 
         newSeqList.updateSequences((newCondition, event)) match {
           case Some(x) => println("newSeqList split. Should never get here."); childrenGroup = childrenGroup :+ x
           case None => {
-            println("newSeqList not split. Printed below: \n" + newSeqList)
-            println("\nupdating childrenGroup with newSeqList. childrenGroup BEFORE: " + childrenGroup)
+          //  println("newSeqList not split. Printed below: \n" + newSeqList)
+           // println("\nupdating childrenGroup with newSeqList. childrenGroup BEFORE: " + childrenGroup)
             childrenGroup = childrenGroup :+ Vector(newSeqList)
-            println("\nupdated childrenGroup with newSeqList. childrenGroup AFTER: " + childrenGroup)
+            //println("\nupdated childrenGroup with newSeqList. childrenGroup AFTER: " + childrenGroup)
           }
         }
       }
@@ -201,17 +189,17 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
     sequences.find(x => x.getKey == newSeq._1) match {
       case Some(y) =>{
-        println("Found stored seq with key: " + y.asInstanceOf[Sequence[A,B]].getKey)
+       // println("Found stored seq with key: " + y.asInstanceOf[Sequence[A,B]].getKey)
         y.updateEvents(newSeq._2)
         None
       }
       case None =>
         if (canSplit){ println("canSplit is: " + canSplit); val sp = Some(split(newSeq)); println("after split returning: " + sp.get.size); sp}
         else {
-          println("canSplit: " + canSplit)
-          println("adding seq with key: " + newSeq._1 + " to current sequencelist")
+         // println("canSplit: " + canSplit)
+          //println("adding seq with key: " + newSeq._1 + " to current sequencelist")
           sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
-          println("added seq with key: " + newSeq._1 + " to current sequencelist. current sequencelist printed below: \n" + sequences)
+          //println("added seq with key: " + newSeq._1 + " to current sequencelist. current sequencelist printed below: \n" + sequences)
 
           None
         }
@@ -228,27 +216,27 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
     //var newVector: Vector[SMT[_ <: A, _ <: B]] = Vector[SMT[A, B]]()
     var newVector = Vector[Node[A, B]]()
-    println("\n in split newVector is emtpy after declaration: " + newVector.isEmpty)
-    println("------- printing out newVector before adding anything:\n " + newVector)
+    //println("\n in split newVector is emtpy after declaration: " + newVector.isEmpty)
+    //println("------- printing out newVector before adding anything:\n " + newVector)
     sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
 
     for (s <- sequences) {
-      println("\nadding sequence " + s.getKey + " to new nodeVector")
+      //println("\nadding sequence " + s.getKey + " to new nodeVector")
       newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
         case None => {
-          println("Didn't find node with head " + s.getKey(0) + " . Creating a new one")
+        //  println("Didn't find node with head " + s.getKey(0) + " . Creating a new one")
           var newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
           newNode.setKey(s.getKey(0))
 
-          println("created newNode with key: " + newNode.getKey.get + " - printing it below:")
-          println(newNode + "\n\n")
+          //println("created newNode with key: " + newNode.getKey.get + " - printing it below:")
+          //println(newNode + "\n\n")
 
 
 
           splitHelper(newNode, s.getKey.tail, s.getEvents)
 
-          println("newNode with key: " + newNode.getKey.get + " - AFTER splitHelper it below:")
-          println(newNode + "\n\n")
+          //println("newNode with key: " + newNode.getKey.get + " - AFTER splitHelper it below:")
+          //println(newNode + "\n\n")
 
 
 
@@ -258,24 +246,24 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
 
 
-          println("Created and updated node with key: " + newNode.getKey.get)
+          /*println("Created and updated node with key: " + newNode.getKey.get)
           println("newVector.size before adding node: " + newVector.size)
-          println("newVector before adding node: " + newVector)
+          println("newVector before adding node: " + newVector)*/
           newVector = newVector :+ newNode
-          println("newVector.size after adding node: " + newVector.size)
-          println("newVector after adding node: " + newVector)
+          /*println("newVector.size after adding node: " + newVector.size)
+          println("newVector after adding node: " + newVector)*/
 
         }
         case Some(x) => {
-          println("Found node with key: " + x.getKey + " . Updating this node.")
-          println("newVector.size before updating node: " + newVector.size)
+          /*println("Found node with key: " + x.getKey + " . Updating this node.")
+          println("newVector.size before updating node: " + newVector.size)*/
           splitHelper(x, s.getKey.tail, s.getEvents)
-          println("newVector.size after updating node: " + newVector.size)
+          //println("newVector.size after updating node: " + newVector.size)
 
         }
       }
     }
-    println("created new vector with split: " + newVector.size + "  -------------------------")
+//    println("created new vector with split: " + newVector.size + "  -------------------------")
     /*println("\nnewVector after adding new node with key: " + newNode.getKey)
     println(newVector.size)
     println("------------- nodes in newVector: ")
@@ -283,19 +271,19 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
       println("node key: " + nx.getKey)
     }*/
 
-    println("returning newVector: " + newVector.size)
+  //  println("returning newVector: " + newVector.size)
     newVector
   }
 
   private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
-    println("????????????????????????????     In splitHelper. Updating node with key " + node.getKey + " . Printing out node below: \n" + node)
+    //println("????????????????????????????     In splitHelper. Updating node with key " + node.getKey + " . Printing out node below: \n" + node)
 
     for ((event, count) <- events) {
       println("Updating node with event " + event)
       for (i <- 1 to count) { println("calling growTree on node with keyTail: " + keyTail + " and event: " + event + " the " + i + "th/st time") ; node.growTree(keyTail, event)}
     }
-    println("\nsplitHelper. called growTree n times which has returned.")
-    println("splitHelper. finished calling growTree on node. printing node below:\nkey:" + node.getKey.get)
+    //println("\nsplitHelper. called growTree n times which has returned.")
+    //println("splitHelper. finished calling growTree on node. printing node below:\nkey:" + node.getKey.get)
   /*  println("children size: " + node.getChildren.size)
     println("children(0): " + node.getChildren(0))
     println("children(0) size: " + node.getChildren(0).size)
@@ -303,7 +291,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
     //println("children(0)(0) sequence list first element key: " + node.getChildren(0)(0).asInstanceOf[SequenceList[A,B]].sequences(0).getKey)
 
-    println("Printing rest of the details of node: " + node)
+    //println("Printing rest of the details of node: " + node)
 
   }
 }
