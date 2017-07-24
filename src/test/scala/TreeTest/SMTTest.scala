@@ -1556,8 +1556,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
-      d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("Training-Backdoored-Executable") &&
-        extensions.exists(file.getName.endsWith(_))
+      d.listFiles.filter(_.isFile).toList.filter { file => (file.getName.contains("Training-Backdoored-Executable") || file.getName.contains("Training-Background")) && extensions.exists(file.getName.endsWith(_))
       }
     } else {
       println("directory not found")
