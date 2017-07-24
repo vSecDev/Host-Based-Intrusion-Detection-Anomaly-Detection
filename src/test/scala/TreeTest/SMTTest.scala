@@ -1,15 +1,21 @@
 package TreeTest
 
+import java.io._
+
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.util.Calendar
+
+import scala.io.Source
 
 
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-
+  val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+  val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
+  val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
   val strTrace = "ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15040 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15fa7 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc"
   val intTrace = "1 2 3 4 5 6 7 8 9 10 11 1 2 3 12 13 4 5 6 7 8 9 10 11 1 2 3 14 13 4 5 6 7 8 9 10 11 1 2 3 15 4 5 6 7 8 9 10 11 1 2 3 15"
   val intListTrace = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
@@ -485,13 +491,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0).size == 2)
     assert(n1.getChildren(1).size == 1)
     n1.getChildren(0)(0) shouldBe a[Node[_, _]]
-    n1.getChildren(1)(0) shouldBe a[SequenceList[_,_]]
+    n1.getChildren(1)(0) shouldBe a[SequenceList[_, _]]
 
     for (i <- n1.getChildren.indices) {
       val c = n1.getChildren(i)(0)
 
       c match {
-        case child: SequenceList[Int,Int] => {
+        case child: SequenceList[Int, Int] => {
           assert(child.getKeys.size == 2)
           assert(child.getKeys(0) == condition.drop(i))
           assert(child.getKeys(1) == condition2.drop(i))
@@ -508,7 +514,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
           assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00)
         }
-        case _: Node[Int,Int] => {
+        case _: Node[Int, Int] => {
           assert(n1.getChildren(i).size == 2)
           n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
 
@@ -561,7 +567,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren.size == 2)
     assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a[Node[Int, Int]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
@@ -659,7 +665,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren.size == 2)
     assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a[Node[Int, Int]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
@@ -763,7 +769,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren.size == 2)
     assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a [Node[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a[Node[Int, Int]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
@@ -1375,7 +1381,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEvents(event) == 1)
     assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEvents(event2) == 1)
 
-  /*  println("888888888888888888888888888888888888888")
+    /*  println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
@@ -1451,8 +1457,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-
-
   def time[T](block: => T): T = {
     val start = System.currentTimeMillis
     val res = block
@@ -1462,24 +1466,39 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  test("SMT, sliding window test - trace length = 200"){
+  test("SMT, sliding window test - trace length = 200") {
 
-    val source = scala.io.Source.fromFile("C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC")
+
+
+    val source = scala.io.Source.fromFile(homeTrainingPath)
+    //val source = scala.io.Source.fromFile(workTrainingPath)
     val lines = try source.getLines mkString "\n" finally source.close()
 
     println(lines)
 
     val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
     val trace_200 = wholeTrace.take(200)
-    var trainingData_200: Vector[(Vector[String],String)] = Vector[(Vector[String], String)]()
-    var trainingData_whole: Vector[(Vector[String],String)] = Vector[(Vector[String], String)]()
+    var trainingData_200: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+    var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
 
-    for (t <- trace_200.sliding(6, 1)) {
+    /*for (t <- trace_200.sliding(6, 1)) {
       trainingData_200 = trainingData_200 :+ (t.take(5), t.takeRight(1)(0))
     }
-    for(t <- wholeTrace.sliding(6,1)){
+    for (t <- wholeTrace.sliding(6, 1)) {
       trainingData_whole = trainingData_whole :+ (t.take(5), t.takeRight(1)(0))
+    }*/
+
+
+    for (t <- trace_200.sliding(15, 1)) {
+      trainingData_200 = trainingData_200 :+ (t.take(14), t.takeRight(1)(0))
     }
+    for (t <- wholeTrace.sliding(15, 1)) {
+      trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
+    }
+
+
+
+
     println("trace_200.size: " + trace_200.size)
     println("wholeTrace.size: " + wholeTrace.size)
     println("trainingData_200.size: " + trainingData_200.size)
@@ -1490,7 +1509,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n3 = new Node[String, String](15, 5, 1)
     val n4 = new Node[String, String](15, 5, 1)
 
-/*    println("Training: trace length: 200 - tree depth: 5")
+    /*    println("Training: trace length: 200 - tree depth: 5")
     time[Unit] {
       for (t <- trainingData_200) {
         n1.growTree(t._1, t._2)
@@ -1523,22 +1542,77 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     println("FINISHED trace length: 200 - tree depth: 15")
 
-   /* println("n4: ")
+    /* println("n4: ")
     println(n4)*/
 
 
-
-
-
-
-
-
-
-/*    Thread.sleep(10000)
+    /*    Thread.sleep(10000)
     println("n1 after training: \n")
     println(n1)*/
 
 
+  }
+
+  def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) {
+      d.listFiles.filter(_.isFile).toList.filter { file =>
+        extensions.exists(file.getName.endsWith(_))
+      }
+    } else {
+      println("directory not found")
+      List[File]()
+    }
+  }
+
+  test("SMT - train tree with all training data - benchmark") {
+    val extensions = List("GHC")
+    val files = getListOfFiles(dataHome, extensions)
+    val n1 = new Node[String, String](20, 3, 1)
+    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+    var counter = 0
+
+
+
+    println("Processing " + files.size + " files.")
+
+    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
+    time[Unit] {
+     for(f <- files){
+       counter += 1
+       println("Processing file " + counter)
+       val source = scala.io.Source.fromFile(f)
+       val lines = try source.getLines mkString "\n" finally source.close()
+       val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+       var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+       for (t <- wholeTrace.sliding(15, 1)) {
+         if(t.size == 15)
+           trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
+       }
+
+       for (t <- trainingData_whole) {
+         n1.growTree(t._1, t._2)
+       }
+
+     }
+    }
+    println("FINISHED trace length: 200 - tree depth: 15")
+
+
+
+
+
+
+
+
+    val mini = Vector(10)
+
+    for (t <- mini.sliding(6, 1)) {
+      if (t.size == 6) {
+        println("t: " + t)
+      } else
+        println("too short")
+    }
 
 
   }
