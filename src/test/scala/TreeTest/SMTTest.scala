@@ -1566,7 +1566,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("SMT - train tree with all training data - benchmark") {
-    val maxDepth = 15
+    val maxDepth = 20
     val maxPhi = 5
     val maxSeqCount = 10
     val extensions = List("GHC")
