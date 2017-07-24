@@ -1,6 +1,5 @@
 package TreeTest
 
-//import scala.collection.mutable
 import scala.collection.mutable.Map
 
 /**
@@ -78,35 +77,30 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     } {
       val newCondition = condition.drop(i)
 
-      if (childrenGroup.size > i) {
-        childrenGroup(i)(0) match {
-          case sl: SequenceList[A, B] =>{
-            sl.updateSequences((newCondition, event)) match {
-              case Some(x) => childrenGroup = childrenGroup.updated(i, x)
-              case None =>
-            }
+      if (childrenGroup.size > i) childrenGroup(i)(0) match {
+        case sl: SequenceList[A, B] =>
+          sl.updateSequences((newCondition, event)) match {
+            case Some(x) => childrenGroup = childrenGroup.updated(i, x)
+            case None =>
           }
-          case _: Node[A, B] =>{
-            val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
+        case _: Node[A, B] =>
+          val nextNode: Option[Node[A, B]] = childrenGroup(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
 
-            nextNode match {
-              case Some(x: Node[A, B]) =>
-                newCondition.tail match {
-                  case y +: ys => x.growTree(y +: ys, event)
-                  case _ => println("should not ever get here with static window size"); updateEvents(event)
-                }
-              case None => {
-                val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount)
-                newNode.setKey(newCondition.head)
-
-                newCondition.tail match {
-                  case y +: ys => newNode.growTree(y +: ys, event)
-                  case _ => println("should not ever get here with static window size"); updateEvents(event)
-                }
-                childrenGroup = childrenGroup.updated(i, childrenGroup(i) :+ newNode)
+          nextNode match {
+            case Some(x: Node[A, B]) =>
+              newCondition.tail match {
+                case y +: ys => x.growTree(y +: ys, event)
+                case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
-            }
-          }}
+            case None =>
+              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount)
+              newNode.setKey(newCondition.head)
+              newCondition.tail match {
+                case y +: ys => newNode.growTree(y +: ys, event)
+                case _ => println("should not ever get here with static window size"); updateEvents(event)
+              }
+              childrenGroup = childrenGroup.updated(i, childrenGroup(i) :+ newNode)
+          }
       } else {
         val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
 
@@ -122,11 +116,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     val buf = new StringBuilder
     buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + " - eventCount: " + getEventCount + " - events size: " + getEvents.size + " - predictions size: " + getPredictions.size + "\nChildrenGroup size: " + childrenGroup.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
-      //if (childrenGroup.nonEmpty && childrenGroup.size > i) {
-        if (childrenGroup.size > i) {
+      if (childrenGroup.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + childrenGroup(i).size
-
-
         childrenGroup(i)(0) match {
           case sl: SequenceList[A, B] =>
             buf ++= " - group type: SequenceList. maxDepth: " + sl.maxDepth + " -  Sequences in list:\n"
@@ -134,7 +125,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
             for (s <- ss) {
               buf ++= s.toString
             }
-          case _: Node[A, B] => buf ++= " - type: Node list. Nodes in list:\n"
+          case _: Node[A, B] =>
+            buf ++= " - type: Node list. Nodes in list:\n"
             val ns = childrenGroup(i)
             for (n <- ns) {
               buf ++= n.toString
@@ -203,7 +195,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
   private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
     for ((event, count) <- events) {
-      for (i <- 1 to count) { println("calling growTree on node with keyTail: " + keyTail + " and event: " + event + " the " + i + "th/st time") ; node.growTree(keyTail, event)}
+      for (i <- 1 to count) {  node.growTree(keyTail, event)}
     }
   }
 }
