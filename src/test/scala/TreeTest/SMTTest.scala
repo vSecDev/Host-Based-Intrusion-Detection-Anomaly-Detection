@@ -1063,6 +1063,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val t1 = Vector(1, 2, 9, 4, 5)
     val t2 = Vector(5, 4, 3, 2, 1)
     val t3 = Vector(6, 7, 8, 9, 10)
+    val t4 = Vector(1, 3, 9, 4, 5)
 
     /*n1.growTree(shortListTrace, event)
     n1.growTree(shortListTrace2, event)*/
@@ -1340,6 +1341,108 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getProbability(event).getOrElse(0.00) == 0.50)
 
 
+    //val t4 = Vector(1, 3, 9, 4, 5)
+    n1.growTree(t4, event2)
+
+/*
+    assert(n1.getChildren.size == 3)
+    assert(n1.getChildren(0).size == 3)
+    assert(n1.getChildren(1).size == 3)
+    assert(n1.getChildren(2).size == 3)
+
+    val newNewPhi_0 = n1.getChildren(0)
+    val newNewPhi_1 = n1.getChildren(1)
+    val newNewPhi_2 = n1.getChildren(2)
+
+    val newPhi_0_node_2 = newNewPhi_0(2).asInstanceOf[Node[Int, Int]]
+    val newPhi_1_node_2 = newNewPhi_1(2).asInstanceOf[Node[Int, Int]]
+    val newPhi_2_node_2 = newNewPhi_2(2).asInstanceOf[Node[Int, Int]]
+
+    assert(phi_0_node_0.getKey.get == t1.head)
+    assert(phi_0_node_0.getChildren.size == 3)
+    assert(phi_0_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(1))
+    assert(phi_0_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(2))
+    assert(phi_0_node_0.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(3))
+    assert(phi_0_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(phi_0_node_1.getKey.get == t2.head)
+    assert(phi_0_node_1.getChildren.size == 3)
+    assert(phi_0_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(1))
+    assert(phi_0_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(2))
+    assert(phi_0_node_1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(3))
+    assert(phi_0_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(newPhi_0_node_2.getKey.get == t3.head)
+    assert(newPhi_0_node_2.getChildren.size == 3)
+    assert(newPhi_0_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(1))
+    assert(newPhi_0_node_2.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(2))
+    assert(newPhi_0_node_2.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(3))
+    assert(newPhi_0_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+    val newNewSeq0 = newPhi_0_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(t3.drop(1)).get
+    assert(newNewSeq0.getKey == t3.drop(1))
+    assert(newNewSeq0.getEventCount == 2)
+    assert(newNewSeq0.getEvents(event2) == 1)
+    assert(newNewSeq0.getEvents(event) == 1)
+    assert(newNewSeq0.getProbability(event2).getOrElse(0.00) == 0.50)
+    assert(newNewSeq0.getProbability(event).getOrElse(0.00) == 0.50)
+
+    assert(phi_1_node_0.getKey.get == t1.drop(1).head)
+    assert(phi_1_node_0.getChildren.size == 3)
+    assert(phi_1_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(2))
+    assert(phi_1_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(3))
+    assert(phi_1_node_0.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(4))
+    assert(phi_1_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(phi_1_node_1.getKey.get == t2.drop(1).head)
+    assert(phi_1_node_1.getChildren.size == 3)
+    assert(phi_1_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(2))
+    assert(phi_1_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(3))
+    assert(phi_1_node_1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(4))
+    assert(phi_1_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(newPhi_1_node_2.getKey.get == t3.drop(1).head)
+    assert(newPhi_1_node_2.getChildren.size == 3)
+    assert(newPhi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(2))
+    assert(newPhi_1_node_2.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(3))
+    assert(newPhi_1_node_2.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(4))
+    assert(newPhi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+    val newNewSeq1 = newPhi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(t3.drop(2)).get
+    assert(newNewSeq1.getKey == t3.drop(2))
+    assert(newNewSeq1.getEventCount == 2)
+    assert(newNewSeq1.getEvents(event2) == 1)
+    assert(newNewSeq1.getEvents(event) == 1)
+    assert(newNewSeq1.getProbability(event2).getOrElse(0.00) == 0.50)
+    assert(newNewSeq1.getProbability(event).getOrElse(0.00) == 0.50)
+
+    assert(phi_2_node_0.getKey.get == t1.drop(2).head)
+    assert(phi_2_node_0.getChildren.size == 2)
+    assert(phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(3))
+    assert(phi_2_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(4))
+    assert(phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(phi_2_node_1.getKey.get == t2.drop(2).head)
+    assert(phi_2_node_1.getChildren.size == 2)
+    assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(3))
+    assert(phi_2_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(4))
+    assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+
+    assert(newPhi_2_node_2.getKey.get == t3.drop(2).head)
+    assert(newPhi_2_node_2.getChildren.size == 2)
+    assert(newPhi_2_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(3))
+    assert(newPhi_2_node_2.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(4))
+    assert(newPhi_2_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
+    val newNewSeq2 = newPhi_2_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(t3.drop(3)).get
+    assert(newNewSeq2.getKey == t3.drop(3))
+    assert(newNewSeq2.getEventCount == 2)
+    assert(newNewSeq2.getEvents(event2) == 1)
+    assert(newNewSeq2.getEvents(event) == 1)
+    assert(newNewSeq2.getProbability(event2).getOrElse(0.00) == 0.50)
+    assert(newNewSeq2.getProbability(event).getOrElse(0.00) == 0.50)
+*/
+
+
+
+
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
@@ -1357,7 +1460,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
 
-    //TODO - CAUSE ONE MORE SPLIT FROM EXISTING NODE
   }
 
 
