@@ -1628,7 +1628,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     println("Processing " + files.size + " files.")
 
-    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
+    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
     time[Unit] {
       for(f <- files){
         counter += 1
@@ -1648,7 +1648,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       }
     }
-/*    println("FINISHED trace length: 200 - tree depth: 15")
+/*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
   }
 }
