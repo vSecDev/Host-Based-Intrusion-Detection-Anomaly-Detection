@@ -242,6 +242,21 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
       else { sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2, count); None }
   }
 
+  def updateSequences(newSeq: Vector[A], events: Map[B, Int]): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq) match {
+    case Some(y) =>
+      y.updateEvents(events)
+      None
+    case None =>
+      if (canSplit) Some(split(newSeq, events))
+      else { sequences = sequences :+ new Sequence[A, B](newSeq, events)  ; None }
+  }
+
+
+
+
+
+
+
   def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
 
   def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
@@ -288,6 +303,27 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
     }
     newVector
   }
+
+  private def split(newSeq: Vector[A], events: Map[B, Int]): Vector[Node[ A, B]] = {
+
+    var newVector = Vector[Node[A, B]]()
+
+    sequences = sequences :+ new Sequence[A, B](newSeq, events)
+    for (s <- sequences) {
+      newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
+        case None =>
+          val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
+          newNode.setKey(s.getKey(0))
+          splitHelper(newNode, s.getKey.tail, s.getEvents)
+          newVector = newVector :+ newNode
+        case Some(x) =>
+          splitHelper(x, s.getKey.tail, s.getEvents)
+      }
+    }
+    newVector
+  }
+
+
 
 
 
