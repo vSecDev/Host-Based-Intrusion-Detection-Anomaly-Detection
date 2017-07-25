@@ -1,6 +1,7 @@
 package TreeTest
 
 import scala.collection.mutable.Map
+import scalaz._
 import scalaz.Scalaz._
 
 /**
@@ -64,7 +65,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
   def updateEvents(newEvent: B): Unit = updateEvents(newEvent, 1)
 
   def updateEvents(newEvents: Map[B, Int]): Unit = {
-    events = events |+| newEvents
+    events = (events /: newEvents) { case (map, (k,v)) =>
+      map + ( k -> (v + map.getOrElse(k, 0)) )}
+
+    //events = events |+| newEvents
     eventCount = events.foldLeft(0)(_+_._2)
     isChanged = true
   }

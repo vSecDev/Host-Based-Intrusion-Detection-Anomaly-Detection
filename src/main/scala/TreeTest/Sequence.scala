@@ -1,6 +1,7 @@
 package TreeTest
 
 import scala.collection.mutable.Map
+import scalaz._
 import scalaz.Scalaz._
 
 /**
@@ -70,10 +71,16 @@ class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
   def updateEvents(newEvent: B): Unit = updateEvents(newEvent, 1)
 
   def updateEvents(newEvents: Map[B, Int]): Unit = {
-    events = events |+| newEvents
+
+
+    events = (events /: newEvents) { case (map, (k,v)) =>
+      map + ( k -> (v + map.getOrElse(k, 0)) )}
+
+    //events = events |+| newEvents
     eventCount = events.foldLeft(0)(_+_._2)
     isChanged = true
   }
+
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
