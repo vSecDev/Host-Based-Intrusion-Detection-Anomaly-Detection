@@ -1567,9 +1567,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("SMT - train tree with all training data - STRING benchmark") {
-    val maxDepth = 20
-    val maxPhi = 5
-    val maxSeqCount = 10
+    val maxDepth = 15
+    val maxPhi = 3
+    val maxSeqCount = 1000
     val extensions = List("GHC")
     val files = getListOfFiles(dataHome, extensions)
     val n1 = new Node[String, String](maxDepth,maxPhi, maxSeqCount)
@@ -1614,12 +1614,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 10
+    val maxDepth = 12
     val maxPhi = 3
-    val maxSeqCount = 50
+    val maxSeqCount = 1000
     val extensions = List("txt")
-    //val files = getListOfLinuxFiles(linuxDataHome, extensions)
-    val files = getListOfLinuxFiles(linuxDataWork, extensions)
+    val files = getListOfLinuxFiles(linuxDataHome, extensions)
+    //val files = getListOfLinuxFiles(linuxDataWork, extensions)
     val n1 = new Node[Int, Int](maxDepth,maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0

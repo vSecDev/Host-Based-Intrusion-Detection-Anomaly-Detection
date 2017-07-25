@@ -80,7 +80,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
       if (children.size > i) children(i)(0) match {
         case sl: SequenceList[A, B] =>
           sl.updateSequences((newCondition, event)) match {
-            case Some(x) => children = children.updated(i, x)
+            case Some(x) =>
+              children = children.updated(i, x)
+              //TODO - DELETE CALL TO GC IF NECESSARY
+              System.gc()
             case None =>
           }
         case _: Node[A, B] =>
