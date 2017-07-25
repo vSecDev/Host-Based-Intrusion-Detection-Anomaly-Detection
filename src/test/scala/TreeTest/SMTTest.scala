@@ -14,6 +14,7 @@ import scala.io.Source
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+  val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
@@ -1613,11 +1614,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 15
-    val maxPhi = 5
-    val maxSeqCount = 10
+    val maxDepth = 10
+    val maxPhi = 3
+    val maxSeqCount = 50
     val extensions = List("txt")
-    val files = getListOfLinuxFiles(linuxDataHome, extensions)
+    //val files = getListOfLinuxFiles(linuxDataHome, extensions)
+    val files = getListOfLinuxFiles(linuxDataWork, extensions)
     val n1 = new Node[Int, Int](maxDepth,maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
@@ -1646,7 +1648,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       }
     }
-    println("FINISHED trace length: 200 - tree depth: 15")
-    println("tree: \n" + n1)
+/*    println("FINISHED trace length: 200 - tree depth: 15")
+    println("tree: \n" + n1)*/
   }
 }
