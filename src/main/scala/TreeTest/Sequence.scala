@@ -21,10 +21,17 @@ class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
     println("In aux constructor.")
   }
 
+  def this(_key: Vector[A], _events: Map[B, Int]){
+    this(_key, _events.head._1, _events.head._2)
+    updateEvents(_events.tail)
+    println("In aux constructor 2.")
+  }
+
   //Constructor argument validation
   require(_key.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
   require(_count >= 1, "Event count must be larger than zero!")
+
   //Initialise Sequence
   setKey(_key)
   updateEvents(_event, _count)
@@ -61,6 +68,12 @@ class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
   }
 
   def updateEvents(newEvent: B): Unit = { updateEvents(newEvent, 1)}
+
+  def updateEvents(newEvents: Map[B, Int]): Unit = {
+    events = events |+| newEvents
+    eventCount = events.foldLeft(0)(_+_._2)
+    isChanged = true
+  }
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
