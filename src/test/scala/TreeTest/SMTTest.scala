@@ -13,6 +13,7 @@ import scala.io.Source
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
+  val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
@@ -1564,7 +1565,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("SMT - train tree with all training data - benchmark") {
+  test("SMT - train tree with all training data - STRING benchmark") {
     val maxDepth = 20
     val maxPhi = 5
     val maxSeqCount = 10
@@ -1597,6 +1598,53 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
        }
 
      }
+    }
+    println("FINISHED trace length: 200 - tree depth: 15")
+    println("tree: \n" + n1)
+  }
+
+  def getListOfLinuxFiles(dir: String, extensions: List[String]):List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("UTD") && extensions.exists(file.getName.endsWith(_))
+    } else {
+      println("directory not found")
+      List[File]()
+    }
+  }
+
+  test("SMT - train tree with all training data - INTEGER benchmark") {
+    val maxDepth = 15
+    val maxPhi = 5
+    val maxSeqCount = 10
+    val extensions = List("txt")
+    val files = getListOfLinuxFiles(linuxDataHome, extensions)
+    val n1 = new Node[Int, Int](maxDepth,maxPhi, maxSeqCount)
+    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+    var counter = 0
+
+
+
+    println("Processing " + files.size + " files.")
+
+    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
+    time[Unit] {
+      for(f <- files){
+        counter += 1
+        println("Processing file " + counter + " - filename: " + f.getName)
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if(t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          n1.growTree(t._1, t._2)
+        }
+
+      }
     }
     println("FINISHED trace length: 200 - tree depth: 15")
     println("tree: \n" + n1)
