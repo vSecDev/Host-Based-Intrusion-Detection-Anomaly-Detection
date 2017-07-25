@@ -19,13 +19,11 @@ class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
 
   def this(_key: Vector[A], _event: B){
     this(_key, _event, 1)
-    println("In aux constructor.")
   }
 
   def this(_key: Vector[A], _events: Map[B, Int]){
     this(_key, _events.head._1, _events.head._2)
     updateEvents(_events.tail)
-    println("In aux constructor 2.")
   }
 
   //Constructor argument validation

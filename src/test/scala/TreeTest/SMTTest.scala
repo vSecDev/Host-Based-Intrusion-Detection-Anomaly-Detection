@@ -2,19 +2,20 @@ package TreeTest
 
 import java.io._
 
+import scala.collection.mutable.Map
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.util.Calendar
-
 import scala.io.Source
 
-import scalaz.Scalaz._
+
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+  val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
@@ -35,7 +36,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   }*/
 
-/*  test("SMT. maxDepth is not zero") {
+  test("SMT. maxDepth is not zero") {
     assertThrows[IllegalArgumentException](Node(0, 1, 3))
     val caught = intercept[IllegalArgumentException](Node(0, 1, 3))
     assert(caught.getMessage == "requirement failed: Max depth count must be positive!")
@@ -357,7 +358,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   //SMT ----------------------------------
   test("SMT, invalid argument to growTree: empty Vector| event") {
     val n1 = new Node[Int, Int](5, 1, 1)
-    n1.growTree(Vector.empty[Int], 666)
+    val events = Map(666 -> 1)
+    n1.growTree(Vector.empty[Int], events)
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
     assert(n1.getPredictions.isEmpty)
@@ -366,8 +368,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, growTree called with Vector size == 1 | event") {
     val n1 = new Node[Int, Int](5, 1, 1)
     val condition = Vector(1)
-    val event = 666
-    n1.growTree(condition, event)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -391,8 +394,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, growTree called with Vector size == 2 | event") {
     val n1 = new Node[Int, Int](5, 1, 1)
     val condition = Vector(1, 2)
-    val event = 666
-    n1.growTree(condition, event)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -422,8 +427,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, growTree called with Vector size == 3 | event") {
     val n1 = new Node[Int, Int](5, 1, 1)
     val condition = Vector(1, 2, 3)
-    val event = 666
-    n1.growTree(condition, event)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -455,8 +461,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](2, 1, 1)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
-    val event = 666
-    n1.growTree(condition, event)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -483,7 +491,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.growTree(condition2, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -553,13 +561,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
-    val event = 666
-    val event2 = 777
-    val event3 = 888
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    val events2 = Map(777 -> 1)
+    val event2 = events2.head._1
+    val events3 = Map(888 -> 1)
+    val event3 = events3.head._1
+
+    n1.growTree(condition, events)
+    n1.growTree(condition2, events2)
+    n1.growTree(condition3, events3)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -647,17 +659,20 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
-    val event = 666
-    val event2 = 777
-    val event3 = 888
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    val events2 = Map(777 -> 1)
+    val event2 = events2.head._1
+    val events3 = Map(888 -> 1)
+    val event3 = events3.head._1
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.growTree(condition, events)
+    n1.growTree(condition2, events2)
+    n1.growTree(condition3, events3)
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.growTree(condition, events)
+    n1.growTree(condition2, events2)
+    n1.growTree(condition3, events3)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -751,17 +766,20 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
-    val event = 666
-    val event2 = 777
-    val event3 = 888
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    val events2 = Map(777 -> 1)
+    val event2 = events2.head._1
+    val events3 = Map(888 -> 1)
+    val event3 = events3.head._1
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.growTree(condition, events)
+    n1.growTree(condition2, events2)
+    n1.growTree(condition3, events3)
 
-    n1.growTree(condition, event3)
-    n1.growTree(condition2, event)
-    n1.growTree(condition3, event2)
+    n1.growTree(condition, events3)
+    n1.growTree(condition2, events)
+    n1.growTree(condition3, events2)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -862,9 +880,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](3, 1, 1)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
-    val event = 666
+    val events = Map(666 -> 1)
+    val event = events.head._1
 
-    n1.growTree(condition, event)
+
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -891,7 +911,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.growTree(condition2, events)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -962,9 +982,14 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](3, 1, 1)
     val condition = Vector(1, 2)
     val condition2 = Vector(1, 4)
-    val event = 666
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    val events2 = Map(777 -> 1)
+    val event2 = events2.head._1
+    val events3 = Map(888 -> 1)
+    val event3 = events3.head._1
 
-    n1.growTree(condition, event)
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -991,7 +1016,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.growTree(condition2, events)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -1063,17 +1088,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
   test("SMT, mD = 5, window size 5") {
     val n1 = new Node[Int, Int](5, 2, 1)
-    val event = 666
-    val event2 = 777
-    val event3 = 888
-
+    val events = Map(666 -> 1)
+    val event = events.head._1
+    val events2 = Map(777 -> 1)
+    val event2 = events2.head._1
+    val events3 = Map(888 -> 1)
+    val event3 = events3.head._1
     val t1 = Vector(1, 2, 9, 4, 5)
     val t2 = Vector(5, 4, 3, 2, 1)
     val t3 = Vector(6, 7, 8, 9, 10)
     val t4 = Vector(1, 3, 9, 4, 5)
 
-    n1.growTree(t1, event)
-    n1.growTree(t2, event)
+    n1.growTree(t1, events)
+    n1.growTree(t2, events)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 2)
@@ -1134,7 +1161,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_2_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(4))
     assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
 
-    n1.growTree(t3, event2)
+    n1.growTree(t3, events2)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 3)
@@ -1225,7 +1252,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq2.getProbability(event2).getOrElse(0.00) == 1.00)
 
 
-    n1.growTree(t3, event)
+    n1.growTree(t3, events)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 3)
@@ -1322,7 +1349,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getProbability(event).getOrElse(0.00) == 0.50)
 
     //val t4 = Vector(1, 3, 9, 4, 5)
-    n1.growTree(t4, event2)
+    n1.growTree(t4, events2)
 
     val node1: Node[Int, Int] = n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[Node[Int, Int]]
     assert(node1.getKey.get == 2)
@@ -1398,44 +1425,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  /* test("asdfsfd"){
-    var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
-    childrenGroup = childrenGroup :+ Vector(SequenceList[Int, Int](11,11,11))
-    println("childrenGroup.size " + childrenGroup.size)
-    println("childreanGroup: " + childrenGroup)
-    println("childrenGroup(0): " + childrenGroup(0))
 
-    val nV = Vector(Node[Int, Int](22,22,22), Node[Int, Int](66,66,66))
-    //childrenGroup = childrenGroup.updated(0, nV)
-    childrenGroup = childrenGroup.updated(0, nV)
-    println("after: ")
-    println("childrenGroup.size " + childrenGroup.size)
-    println("---------------------childrenGroup-------------")
-    println("childreanGroup: " + childrenGroup)
-    /*println("---------------------childrenGroup-------------")
-    println("childrenGroup(0): " + childrenGroup(0))*/
-
-
-    //childrenGroup(0) = childrenGroup(0)
-
-    childrenGroup = childrenGroup :+ Vector(Node[Int, Int](7777777,7777777,7777777))
-
-    println("????????????????????????????????????????????????????? after append: ")
-    println("childrenGroup.size " + childrenGroup.size)
-    println("---------------------childrenGroup-------------")
-    println("childreanGroup: " + childrenGroup)
-    /*println("---------------------childrenGroup-------------")
-    println("childrenGroup(0): " + childrenGroup(0))*/
-
-  }*/
 
 
   test("temp") {
     val n1 = new Node[Int, Int](1, 1, 1)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
-    val event = 666
-    n1.growTree(condition, event)
+    val events = Map(666 -> 1)
+    val event = events.head._1
+
+    n1.growTree(condition, events)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -1449,15 +1449,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
   }
-  test("sliding window test") {
-    val n1 = new Node[Int, Int](5, 3, 1)
-    var count: Int = 0
-    for (t <- intVectorTrace.sliding(5, 1)) {
-      count += 1
-      n1.growTree(t, t.last)
-    }
-  }
-
 
   def time[T](block: => T): T = {
     val start = System.currentTimeMillis
@@ -1466,94 +1457,58 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("Elapsed time: %1d ms".format(totalTime))
     res
   }
+  test("SMT, sliding window test - trace length = 200") {
 
-
-  /*test("SMT, sliding window test - trace length = 200") {
-
-
-
-    val source = scala.io.Source.fromFile(homeTrainingPath)
-    //val source = scala.io.Source.fromFile(workTrainingPath)
+    //val source = scala.io.Source.fromFile(homeTrainingPath)
+    val source = scala.io.Source.fromFile(workTrainingPath)
     val lines = try source.getLines mkString "\n" finally source.close()
+    val maxDepth = 10
+    val maxPhi = 3
+    val maxSeqCount = 50
 
     println(lines)
 
     val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
     val trace_200 = wholeTrace.take(200)
-    var trainingData_200: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-    var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+    var trainingData_200: Vector[(Vector[String], Map[String, Int])] = Vector[(Vector[String], Map[String, Int])]()
+    var trainingData_whole: Vector[(Vector[String], Map[String, Int])] = Vector[(Vector[String], Map[String, Int])]()
 
-    /*for (t <- trace_200.sliding(6, 1)) {
-      trainingData_200 = trainingData_200 :+ (t.take(5), t.takeRight(1)(0))
+    for (t <- trace_200.sliding(maxDepth+1, 1)) {
+      trainingData_200 = trainingData_200 :+ (t.take(maxDepth), Map((t.takeRight(1) map ( str => str -> 1) toMap).toSeq: _*))
     }
-    for (t <- wholeTrace.sliding(6, 1)) {
-      trainingData_whole = trainingData_whole :+ (t.take(5), t.takeRight(1)(0))
-    }*/
-
-
-    for (t <- trace_200.sliding(15, 1)) {
-      trainingData_200 = trainingData_200 :+ (t.take(14), t.takeRight(1)(0))
+    for (t <- wholeTrace.sliding(maxDepth+1, 1)) {
+      trainingData_whole = trainingData_whole :+ (t.take(maxDepth), Map((t.takeRight(1) map ( str => str -> 1) toMap).toSeq: _*))
     }
-    for (t <- wholeTrace.sliding(15, 1)) {
-      trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
-    }
-
-
-
 
     println("trace_200.size: " + trace_200.size)
     println("wholeTrace.size: " + wholeTrace.size)
     println("trainingData_200.size: " + trainingData_200.size)
     println("trainingData_whole.size: " + trainingData_whole.size)
 
-    val n1 = new Node[String, String](5, 3, 1)
-    val n2 = new Node[String, String](5, 3, 1)
-    val n3 = new Node[String, String](15, 5, 1)
-    val n4 = new Node[String, String](15, 5, 1)
+    println("first element of trainingData_200: "+ trainingData_200(0))
 
-    /*    println("Training: trace length: 200 - tree depth: 5")
+    val n1 = new Node[String, String](maxDepth, maxPhi, maxSeqCount)
+    val n2 = new Node[String, String](maxDepth, maxPhi, maxSeqCount)
+    println("Training: trace length: 200 - tree depth: " + maxDepth)
+
     time[Unit] {
       for (t <- trainingData_200) {
         n1.growTree(t._1, t._2)
       }
     }
-    println("FINISHED trace length: 200 - tree depth: 5")
+    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
 
-    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 5")
+    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: " + maxDepth)
     time[Unit] {
       for (t <- trainingData_whole) {
         n2.growTree(t._1, t._2)
       }
     }
-    println("FINISHED trace length: WHOLE - tree depth: 5")
-
-
-    println("\n\n\n\nTraining: trace length: 200 - tree depth: 15")
-    time[Unit] {
-      for (t <- trainingData_200) {
-        n3.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")*/
-
-    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 15")
-    time[Unit] {
-      for (t <- trainingData_whole) {
-        n4.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")
-
-    /* println("n4: ")
-    println(n4)*/
-
-
-    /*    Thread.sleep(10000)
+    println("FINISHED trace length: WHOLE - tree depth: " + maxDepth)
+   /* Thread.sleep(10000)
     println("n1 after training: \n")
     println(n1)*/
-
-
-  }*/
+  }
 
   def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
@@ -1566,21 +1521,20 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
- /* test("SMT - train tree with all training data - STRING benchmark") {
-    val maxDepth = 20
-    val maxPhi = 5
-    val maxSeqCount = 10
+  test("SMT - train tree with all training data - STRING benchmark") {
+    val maxDepth = 10
+    val maxPhi = 3
+    val maxSeqCount = 50
     val extensions = List("GHC")
-    val files = getListOfFiles(dataHome, extensions)
+    //val files = getListOfFiles(dataHome, extensions)
+    val files = getListOfFiles(dataWork, extensions)
     val n1 = new Node[String, String](maxDepth,maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
 
-
-
     println("Processing " + files.size + " files.")
 
-    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
+    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
     time[Unit] {
      for(f <- files){
        counter += 1
@@ -1588,10 +1542,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
        val source = scala.io.Source.fromFile(f)
        val lines = try source.getLines mkString "\n" finally source.close()
        val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-       var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-       for (t <- wholeTrace.sliding(maxDepth, 1)) {
-         if(t.size == maxDepth)
-           trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
+       var trainingData_whole: Vector[(Vector[String], Map[String, Int])] = Vector[(Vector[String], Map[String, Int])]()
+       for (t <- wholeTrace.sliding(maxDepth+1, 1)) {
+         if(t.size == maxDepth+1)
+           trainingData_whole = trainingData_whole :+ (t.take(maxDepth), Map((t.takeRight(1) map ( str => str -> 1) toMap).toSeq: _*))
        }
 
        for (t <- trainingData_whole) {
@@ -1602,7 +1556,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     println("FINISHED trace length: 200 - tree depth: 15")
     println("tree: \n" + n1)
-  }*/
+  }
 
   def getListOfLinuxFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
@@ -1613,8 +1567,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  /*test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 10
+  test("SMT - train tree with all training data - INTEGER benchmark") {
+    val maxDepth = 9
     val maxPhi = 3
     val maxSeqCount = 50
     val extensions = List("txt")
@@ -1628,7 +1582,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     println("Processing " + files.size + " files.")
 
-    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
+    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
     time[Unit] {
       for(f <- files){
         counter += 1
@@ -1636,10 +1590,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
         val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-        for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if(t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
+        var trainingData_whole: Vector[(Vector[Int], Map[Int, Int])] = Vector[(Vector[Int], Map[Int, Int])]()
+        for (t <- wholeTrace.sliding(maxDepth+1, 1)) {
+          if(t.size == maxDepth+1)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth), Map((t.takeRight(1) map ( str => str -> 1) toMap).toSeq: _*))
         }
 
         for (t <- trainingData_whole) {
@@ -1650,17 +1604,5 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     println("FINISHED trace length: 200 - tree depth: 15")
     println("tree: \n" + n1)
-  }*/*/
-  test("merging maps test"){
-    val map1 = Map(1 -> 9 , 2 -> 20)
-    val map2 = Map(1 -> 100, 3 -> 300)
-    val res =  map1 |+| map2
-
-    println("map1: " + map1)
-    println("map2: " + map2)
-    println("Merged: " + res)
-
-
-
   }
 }
