@@ -67,7 +67,7 @@ class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
     isChanged = true
   }
 
-  def updateEvents(newEvent: B): Unit = { updateEvents(newEvent, 1)}
+  def updateEvents(newEvent: B): Unit = updateEvents(newEvent, 1)
 
   def updateEvents(newEvents: Map[B, Int]): Unit = {
     events = events |+| newEvents

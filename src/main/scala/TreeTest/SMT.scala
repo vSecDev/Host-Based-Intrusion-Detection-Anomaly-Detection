@@ -1,6 +1,7 @@
 package TreeTest
 
 import scala.collection.mutable.Map
+import scalaz.Scalaz._
 
 /**
   * Created by Case on 02/07/2017.
@@ -48,17 +49,28 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
 
   def getProbability(input: B): Option[Double] = getPredictions.get(input)
 
-  def updateEvents(newEvent: B): Unit = {
+  def updateEvents(newEvent: B, count: Int): Unit = {
 
     //update events to keep count on how many times this input has been seen
     events.get(newEvent) match {
-      case None => events += (newEvent -> 1)
-      case Some(event) => events.update(newEvent, events(newEvent) + 1)
+      case None => events += (newEvent -> count)
+      case Some(event) => events.update(newEvent, events(newEvent) + count)
     }
     //update event count to keep track of number of overall observations
-    eventCount += 1
+    eventCount += count
     isChanged = true
   }
+
+  def updateEvents(newEvent: B): Unit = updateEvents(newEvent, 1)
+
+  def updateEvents(newEvents: Map[B, Int]): Unit = {
+    events = events |+| newEvents
+    eventCount = events.foldLeft(0)(_+_._2)
+    isChanged = true
+  }
+
+
+
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
@@ -116,7 +128,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
 
 
   def growTree(condition: Vector[A], events: Map[B, Int]): Unit = {
-/*//////////////TODO - PICK IT UP FROM HERE
     if (maxDepth > 0) for {
       i <- 0 to maxPhi
       if condition.length > i && maxDepth - i > 0
@@ -125,7 +136,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
 
       if (children.size > i) children(i)(0) match {
         case sl: SequenceList[A, B] =>
-          sl.updateSequences((newCondition, event)) match {
+          sl.updateSequences(newCondition, events) match {
             case Some(x) => children = children.updated(i, x)
             case None =>
           }
@@ -135,50 +146,28 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
           nextNode match {
             case Some(x: Node[A, B]) =>
               newCondition.tail match {
-                case y +: ys => x.growTree(y +: ys, event)
-                case _ => println("should not ever get here with static window size"); updateEvents(event)
+                case y +: ys => x.growTree(y +: ys, events)
+                case _ => println("should not ever get here with static window size"); updateEvents(events)
               }
             case None =>
               val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount)
               newNode.setKey(newCondition.head)
               newCondition.tail match {
-                case y +: ys => newNode.growTree(y +: ys, event)
-                case _ => println("should not ever get here with static window size"); updateEvents(event)
+                case y +: ys => newNode.growTree(y +: ys, events)
+                case _ => println("should not ever get here with static window size"); updateEvents(events)
               }
               children = children.updated(i, children(i) :+ newNode)
           }
       } else {
         val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
 
-        newSeqList.updateSequences((newCondition, event)) match {
+        newSeqList.updateSequences(newCondition, events) match {
           case Some(x) => children = children :+ x
           case None => children = children :+ Vector(newSeqList)
         }
       }
-    } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")*/
+    } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   override def toString: String = {
     val buf = new StringBuilder
