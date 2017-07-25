@@ -12,6 +12,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 // Need to pull this in for reflective capabilities.
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
 
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.14"
+
 // Exclude some folders associated with IntelliJ
 //ideaExcludeFolders += ".idea"
 

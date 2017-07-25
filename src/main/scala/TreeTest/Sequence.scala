@@ -1,6 +1,7 @@
 package TreeTest
 
 import scala.collection.mutable.Map
+import scalaz.Scalaz._
 
 /**
   * Created by Case on 02/07/2017.

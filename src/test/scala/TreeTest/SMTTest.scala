@@ -8,7 +8,7 @@ import java.util.Calendar
 
 import scala.io.Source
 
-
+import scalaz.Scalaz._
 /**
   * Created by Case on 20/07/2017.
   */
@@ -35,7 +35,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   }*/
 
-  test("SMT. maxDepth is not zero") {
+/*  test("SMT. maxDepth is not zero") {
     assertThrows[IllegalArgumentException](Node(0, 1, 3))
     val caught = intercept[IllegalArgumentException](Node(0, 1, 3))
     assert(caught.getMessage == "requirement failed: Max depth count must be positive!")
@@ -1650,5 +1650,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     println("FINISHED trace length: 200 - tree depth: 15")
     println("tree: \n" + n1)
-  }*/
+  }*/*/
+  test("merging maps test"){
+    val map1 = Map(1 -> 9 , 2 -> 20)
+    val map2 = Map(1 -> 100, 3 -> 300)
+    val res =  map1 |+| map2
+
+    println("map1: " + map1)
+    println("map2: " + map2)
+    println("Merged: " + res)
+
+
+
+  }
 }

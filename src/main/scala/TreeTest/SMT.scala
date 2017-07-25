@@ -69,7 +69,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
 
   def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
-  def growTree(condition: Vector[A], event: B): Unit = {
+/*  def growTree(condition: Vector[A], event: B): Unit = {
 
     if (maxDepth > 0) for {
       i <- 0 to maxPhi
@@ -110,7 +110,75 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
         }
       }
     } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
+  }*/
+
+
+
+
+  def growTree(condition: Vector[A], events: Map[B, Int]): Unit = {
+/*//////////////TODO - PICK IT UP FROM HERE
+    if (maxDepth > 0) for {
+      i <- 0 to maxPhi
+      if condition.length > i && maxDepth - i > 0
+    } {
+      val newCondition = condition.drop(i)
+
+      if (children.size > i) children(i)(0) match {
+        case sl: SequenceList[A, B] =>
+          sl.updateSequences((newCondition, event)) match {
+            case Some(x) => children = children.updated(i, x)
+            case None =>
+          }
+        case _: Node[A, B] =>
+          val nextNode: Option[Node[A, B]] = children(i).asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == newCondition.head)
+
+          nextNode match {
+            case Some(x: Node[A, B]) =>
+              newCondition.tail match {
+                case y +: ys => x.growTree(y +: ys, event)
+                case _ => println("should not ever get here with static window size"); updateEvents(event)
+              }
+            case None =>
+              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount)
+              newNode.setKey(newCondition.head)
+              newCondition.tail match {
+                case y +: ys => newNode.growTree(y +: ys, event)
+                case _ => println("should not ever get here with static window size"); updateEvents(event)
+              }
+              children = children.updated(i, children(i) :+ newNode)
+          }
+      } else {
+        val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
+
+        newSeqList.updateSequences((newCondition, event)) match {
+          case Some(x) => children = children :+ x
+          case None => children = children :+ Vector(newSeqList)
+        }
+      }
+    } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")*/
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   override def toString: String = {
     val buf = new StringBuilder
@@ -154,13 +222,24 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
     * @param newSeq new sequence to add. If newSeq's key is identical to an existing sequence's, that sequence's events and predictions are updated.
     * @return true if the sequence list has been updated, false otherwise.
     */
-  def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
+  /*def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
     case Some(y) =>
       y.updateEvents(newSeq._2)
       None
     case None =>
       if (canSplit) Some(split(newSeq))
       else { sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2); None }
+  }*/
+
+  def updateSequences(newSeq: (Vector[A], B)): Option[Vector[Node[A, B]]] = updateSequences(newSeq, 1)
+
+  def updateSequences(newSeq: (Vector[A], B), count: Int): Option[Vector[Node[A, B]]] = sequences.find(x => x.getKey == newSeq._1) match {
+    case Some(y) =>
+      y.updateEvents(newSeq._2, count)
+      None
+    case None =>
+      if (canSplit) Some(split(newSeq, count))
+      else { sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2, count); None }
   }
 
   def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
@@ -170,7 +249,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
   //private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
   private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
-  private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
+/*  private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
 
     var newVector = Vector[Node[A, B]]()
 
@@ -187,13 +266,46 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
       }
     }
     newVector
+  }*/
+
+  private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = split(newSeq, 1)
+
+  private def split(newSeq: (Vector[A], B), count: Int): Vector[Node[ A, B]] = {
+
+    var newVector = Vector[Node[A, B]]()
+
+    sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2, count)
+    for (s <- sequences) {
+      newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
+        case None =>
+          val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
+          newNode.setKey(s.getKey(0))
+          splitHelper(newNode, s.getKey.tail, s.getEvents)
+          newVector = newVector :+ newNode
+        case Some(x) =>
+          splitHelper(x, s.getKey.tail, s.getEvents)
+      }
+    }
+    newVector
   }
 
-  private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+
+
+
+
+ /* private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
     for ((event, count) <- events) {
       for (i <- 1 to count) { node.growTree(keyTail, event) }
     }
+  }*/
+
+  //TODO - WRITE THIS FOR HANDLING MULTIPLE EVENTS IN ONE CALL
+  private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+    node.growTree(keyTail, events)
   }
+
+
+
 }
 
 
