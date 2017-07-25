@@ -5,7 +5,7 @@ import scala.collection.mutable.Map
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A,B] (_key: Vector[A], _event: B) {
+class Sequence[A,B] (_key: Vector[A], _event: B, _count: Int) {
 
   private var key: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
@@ -15,12 +15,18 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
   //TODO - MODIFY THIS, SO PRIOR COULD BE SET IN CONSTRUCTOR
   //private var prior: Option[Double] = Some(0.00)
 
+  def this(_key: Vector[A], _event: B){
+    this(_key, _event, 1)
+    println("In aux constructor.")
+  }
+
   //Constructor argument validation
   require(_key.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
+  require(_count >= 1, "Event count must be larger than zero!")
   //Initialise Sequence
   setKey(_key)
-  updateEvents(_event)
+  updateEvents(_event, _count)
 
   def getKey: Vector[A] = key
 
@@ -41,17 +47,19 @@ class Sequence[A,B] (_key: Vector[A], _event: B) {
 
   def getProbability(input: B): Option[Double] = getPredictions.get(input)
 
-  def updateEvents(newEvent: B): Unit = {
+  def updateEvents(newEvent: B, count: Int): Unit = {
 
     //update events to keep count on how many times this input has been seen
     events.get(newEvent) match {
-      case None => events += (newEvent -> 1)
-      case Some(event) => events.update(newEvent, events(newEvent) + 1)
+      case None => events += (newEvent -> count)
+      case Some(event) => events.update(newEvent, events(newEvent) + count)
     }
     //update event count to keep track of number of overall observations
-    eventCount += 1
+    eventCount += count
     isChanged = true
   }
+
+  def updateEvents(newEvent: B): Unit = { updateEvents(newEvent, 1)}
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {

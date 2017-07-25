@@ -1468,7 +1468,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  test("SMT, sliding window test - trace length = 200") {
+  /*test("SMT, sliding window test - trace length = 200") {
 
 
 
@@ -1553,7 +1553,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println(n1)*/
 
 
-  }
+  }*/
 
   def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
@@ -1566,7 +1566,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("SMT - train tree with all training data - STRING benchmark") {
+ /* test("SMT - train tree with all training data - STRING benchmark") {
     val maxDepth = 20
     val maxPhi = 5
     val maxSeqCount = 10
@@ -1602,7 +1602,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     println("FINISHED trace length: 200 - tree depth: 15")
     println("tree: \n" + n1)
-  }
+  }*/
 
   def getListOfLinuxFiles(dir: String, extensions: List[String]):List[File] = {
     val d = new File(dir)
@@ -1613,7 +1613,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("SMT - train tree with all training data - INTEGER benchmark") {
+  /*test("SMT - train tree with all training data - INTEGER benchmark") {
     val maxDepth = 10
     val maxPhi = 3
     val maxSeqCount = 50
@@ -1648,7 +1648,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       }
     }
-/*    println("FINISHED trace length: 200 - tree depth: 15")
-    println("tree: \n" + n1)*/
-  }
+    println("FINISHED trace length: 200 - tree depth: 15")
+    println("tree: \n" + n1)
+  }*/
 }
