@@ -4,8 +4,11 @@ import java.io._
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
+
+import scala.collection.mutable.Set
 import java.util.Calendar
 
+import scala.collection.mutable
 import scala.io.Source
 
 
@@ -13,9 +16,12 @@ import scala.io.Source
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
+
+  val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+  val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
   val strTrace = "ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15040 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15fa7 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc"
@@ -1472,8 +1478,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
 
 
-    val source = scala.io.Source.fromFile(homeTrainingPath)
-    //val source = scala.io.Source.fromFile(workTrainingPath)
+    //val source = scala.io.Source.fromFile(homeTrainingPath)
+    val source = scala.io.Source.fromFile(workTrainingPath)
     val lines = try source.getLines mkString "\n" finally source.close()
 
     println(lines)
@@ -1571,7 +1577,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val maxPhi = 3
     val maxSeqCount = 1000
     val extensions = List("GHC")
-    val files = getListOfFiles(dataHome, extensions)
+    //val files = getListOfFiles(dataHome, extensions)
+    val files = getListOfFiles(dataWork, extensions)
     val n1 = new Node[String, String](maxDepth,maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
@@ -1651,4 +1658,71 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
   }
+
+  test("Windows dataset - String to Int"){
+    val source = scala.io.Source.fromFile(workTrainingPath)
+    val lines = try source.getLines mkString "\n" finally source.close()
+    val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+    val trace_5 = wholeTrace.take(5)
+    println("trace_5: \n" + trace_5)
+    val trace_5_wDuplicates = trace_5 :+ "ntdll.dll+0x22d81" :+ "ntdll.dll+0x22d81":+ "ntdll.dll+0x22d81":+ "ntdll.dll+0x22d81"
+    println("trace_5_wDuplicates: \n" + trace_5_wDuplicates)
+    //var trainingData_5: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+    val trace_5_toSet = trace_5_wDuplicates.toSet
+    println("trace_5_toSet: \n" + trace_5_toSet)
+
+    val map_5 = trace_5_toSet.zipWithIndex.map{case (v, i) => (v,i+1)}.toMap
+    println("map_5: \n" + map_5)
+
+    /*for (t <- trace_200.sliding(15, 1)) {
+    trainingData_200 = trainingData_200 :+ (t.take(14), t.takeRight(1)(0))*/
+    println("-------------------------------")
+    println("wholeTrace.size: " + wholeTrace.size)
+    var wholeTraceSet: mutable.Set[String] = Set[String]()
+    wholeTraceSet = wholeTraceSet ++= wholeTrace
+    println("wholeTraceSet.size: " + wholeTraceSet.size)
+    val wholeTraceMap = wholeTraceSet.zipWithIndex.map{case(v,i) => (v,i+1)}.toMap
+    println("wholeTraceMap.size: " + wholeTraceMap.size)
+    println("wholeTraceMap: " + wholeTraceMap)
+  }
+
+
+
+  def fileStreamNoDirs(dir: File): Stream[File] =
+    Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
+      .map { case (dirs, files) =>
+        files.append(dirs.flatMap(fileStreamNoDirs))
+      } getOrElse {
+      println("exception: dir cannot be listed: " + dir.getPath)
+      Stream.empty
+    }
+
+  def fileToSet(f: File, set: mutable.Set[String]): mutable.Set[String] = {
+    println("processing file: " + f.getName)
+    val source = scala.io.Source.fromFile(f)
+    val lines = try source.getLines mkString "\n" finally source.close()
+    val vec: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+    set ++= vec
+  }
+
+
+  test("Pre-process Windows Dataset"){
+
+    var sysCallSet = mutable.Set[String]()
+    var sysCallMap = Map[String, Int]()
+
+    println("sysCallSet.size BEFORE: " + sysCallSet.size)
+    //val testPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\test\\"
+    val path = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\Full_Process_Traces\\"
+    val parentDir = new File(path)
+   // val parentDir = new File(workDataParent)
+    fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
+
+    println("sysCallSet.size AFTER: " + sysCallSet.size)
+    println("first 10 elements: " + sysCallSet.take(10))
+    sysCallMap = sysCallSet.zipWithIndex.map{case(v,i) => (v,i+1)}.toMap
+    println("Final sysCalLMap.size: " + sysCallMap.size)
+    println("Final sysCalLMap: " + sysCallMap)
+  }
 }
+
