@@ -1705,6 +1705,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     set ++= vec
   }
 
+  //https://stackoverflow.com/questions/43400598/replace-multiple-words-on-string-using-map-of-replacements
+  def toIntTrace(f: File, target: File, map: Map[String, Int]): Unit = {
+    val source = scala.io.Source.fromFile(f)
+    val lines = try source.getLines mkString "\n" finally source.close()
+    val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString))
+    val newFile = new File(target, f.getName)
+    val bw = new BufferedWriter(new FileWriter(newFile))
+    bw.write(result)
+    bw.close()
+  }
+
 
   test("Pre-process Windows Dataset"){
 
@@ -1712,9 +1723,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var sysCallMap = Map[String, Int]()
 
     println("sysCallSet.size BEFORE: " + sysCallSet.size)
-    //val testPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\test\\"
-    val path = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\Full_Process_Traces\\"
-    val parentDir = new File(path)
+    val testPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\test\\"
+    //val path = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\Full_Process_Traces\\"
+    val parentDir = new File(testPath)
    // val parentDir = new File(workDataParent)
     fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
 
@@ -1723,6 +1734,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     sysCallMap = sysCallSet.zipWithIndex.map{case(v,i) => (v,i+1)}.toMap
     println("Final sysCalLMap.size: " + sysCallMap.size)
     println("Final sysCalLMap: " + sysCallMap)
+
+
+    //--------------------
+
+
+    val targetDirPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\target\\"
+    val targetDir = new File(targetDirPath)
+    fileStreamNoDirs(parentDir).foreach(f => toIntTrace(f, targetDir, sysCallMap))
+   // fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
+
+
   }
 }
 
