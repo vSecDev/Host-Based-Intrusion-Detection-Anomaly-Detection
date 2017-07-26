@@ -12,13 +12,16 @@ import scala.collection.mutable
 import scala.io.Source
 
 
+
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
 
+
   val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
-  val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+  val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+  val windowsTrainingDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
   val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
@@ -1477,7 +1480,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT, sliding window test - trace length = 200") {
 
 
-
     //val source = scala.io.Source.fromFile(homeTrainingPath)
     val source = scala.io.Source.fromFile(workTrainingPath)
     val lines = try source.getLines mkString "\n" finally source.close()
@@ -1503,8 +1505,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     for (t <- wholeTrace.sliding(15, 1)) {
       trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
     }
-
-
 
 
     println("trace_200.size: " + trace_200.size)
@@ -1561,7 +1561,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   }
 
-  def getListOfFiles(dir: String, extensions: List[String]):List[File] = {
+  def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
       d.listFiles.filter(_.isFile).toList.filter { file => (file.getName.contains("Training-Backdoored-Executable") || file.getName.contains("Training-Background")) && extensions.exists(file.getName.endsWith(_))
@@ -1579,74 +1579,25 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val extensions = List("GHC")
     //val files = getListOfFiles(dataHome, extensions)
     val files = getListOfFiles(dataWork, extensions)
-    val n1 = new Node[String, String](maxDepth,maxPhi, maxSeqCount)
+    val n1 = new Node[String, String](maxDepth, maxPhi, maxSeqCount)
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
-
 
 
     println("Processing " + files.size + " files.")
 
     println("\n\n\n\nTraining using all normal traces - tree depth: 20")
     time[Unit] {
-     for(f <- files){
-       counter += 1
-       println("Processing file " + counter)
-       val source = scala.io.Source.fromFile(f)
-       val lines = try source.getLines mkString "\n" finally source.close()
-       val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-       var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-       for (t <- wholeTrace.sliding(maxDepth, 1)) {
-         if(t.size == maxDepth)
-           trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
-       }
-
-       for (t <- trainingData_whole) {
-         n1.growTree(t._1, t._2)
-       }
-
-     }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")
-    println("tree: \n" + n1)
-  }
-
-  def getListOfLinuxFiles(dir: String, extensions: List[String]):List[File] = {
-    val d = new File(dir)
-    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("UTD") && extensions.exists(file.getName.endsWith(_))
-    } else {
-      println("directory not found")
-      List[File]()
-    }
-  }
-
-  test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 12
-    val maxPhi = 3
-    val maxSeqCount = 1000
-    val extensions = List("txt")
-    val files = getListOfLinuxFiles(linuxDataHome, extensions)
-    //val files = getListOfLinuxFiles(linuxDataWork, extensions)
-    val n1 = new Node[Int, Int](maxDepth,maxPhi, maxSeqCount)
-    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
-    var counter = 0
-
-
-
-    println("Processing " + files.size + " files.")
-
-    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
-    time[Unit] {
-      for(f <- files){
+      for (f <- files) {
         counter += 1
-        println("Processing file " + counter + " - filename: " + f.getName)
+        println("Processing file " + counter)
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+        var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
         for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if(t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth-1), t.takeRight(1)(0))
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
         }
 
         for (t <- trainingData_whole) {
@@ -1655,96 +1606,70 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
       }
     }
-/*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
+    println("FINISHED trace length: 200 - tree depth: 15")
+    println("tree: \n" + n1)
+  }
+
+  def getListOfLinuxFiles(dir: String, extensions: List[String]): List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("UTD") && extensions.exists(file.getName.endsWith(_))
+    } else {
+      println("directory not found")
+      List[File]()
+    }
+  }
+
+
+  def getListOfWindowsFiles(dir: String, extensions: List[String]): List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("INT") && extensions.exists(file.getName.endsWith(_))
+    } else {
+      println("directory not found")
+      List[File]()
+    }
+  }
+
+
+  test("SMT - train tree with all training data - INTEGER benchmark") {
+    val maxDepth = 12
+    val maxPhi = 3
+    val maxSeqCount = 1000
+    val extensions = List("GHC")
+    val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
+    //val files = getListOfLinuxFiles(linuxDataWork, extensions)
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount)
+    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+    var counter = 0
+
+
+    println("Processing " + files.size + " files.")
+
+    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
+    time[Unit] {
+      for (f <- files) {
+        counter += 1
+        println("Processing file " + counter + " - filename: " + f.getName)
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          n1.growTree(t._1, t._2)
+        }
+
+      }
+    }
+    /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
   }
 
-  test("Windows dataset - String to Int"){
-    val source = scala.io.Source.fromFile(workTrainingPath)
-    val lines = try source.getLines mkString "\n" finally source.close()
-    val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-    val trace_5 = wholeTrace.take(5)
-    println("trace_5: \n" + trace_5)
-    val trace_5_wDuplicates = trace_5 :+ "ntdll.dll+0x22d81" :+ "ntdll.dll+0x22d81":+ "ntdll.dll+0x22d81":+ "ntdll.dll+0x22d81"
-    println("trace_5_wDuplicates: \n" + trace_5_wDuplicates)
-    //var trainingData_5: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-    val trace_5_toSet = trace_5_wDuplicates.toSet
-    println("trace_5_toSet: \n" + trace_5_toSet)
-
-    val map_5 = trace_5_toSet.zipWithIndex.map{case (v, i) => (v,i+1)}.toMap
-    println("map_5: \n" + map_5)
-
-    /*for (t <- trace_200.sliding(15, 1)) {
-    trainingData_200 = trainingData_200 :+ (t.take(14), t.takeRight(1)(0))*/
-    println("-------------------------------")
-    println("wholeTrace.size: " + wholeTrace.size)
-    var wholeTraceSet: mutable.Set[String] = Set[String]()
-    wholeTraceSet = wholeTraceSet ++= wholeTrace
-    println("wholeTraceSet.size: " + wholeTraceSet.size)
-    val wholeTraceMap = wholeTraceSet.zipWithIndex.map{case(v,i) => (v,i+1)}.toMap
-    println("wholeTraceMap.size: " + wholeTraceMap.size)
-    println("wholeTraceMap: " + wholeTraceMap)
-  }
 
 
 
-  def fileStreamNoDirs(dir: File): Stream[File] =
-    Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
-      .map { case (dirs, files) =>
-        files.append(dirs.flatMap(fileStreamNoDirs))
-      } getOrElse {
-      println("exception: dir cannot be listed: " + dir.getPath)
-      Stream.empty
-    }
-
-  def fileToSet(f: File, set: mutable.Set[String]): mutable.Set[String] = {
-    println("processing file: " + f.getName)
-    val source = scala.io.Source.fromFile(f)
-    val lines = try source.getLines mkString "\n" finally source.close()
-    val vec: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-    set ++= vec
-  }
-
-  //https://stackoverflow.com/questions/43400598/replace-multiple-words-on-string-using-map-of-replacements
-  def toIntTrace(f: File, target: File, map: Map[String, Int]): Unit = {
-    val source = scala.io.Source.fromFile(f)
-    val lines = try source.getLines mkString "\n" finally source.close()
-    val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString))
-    val newFile = new File(target, f.getName)
-    val bw = new BufferedWriter(new FileWriter(newFile))
-    bw.write(result)
-    bw.close()
-  }
-
-
-  test("Pre-process Windows Dataset"){
-
-    var sysCallSet = mutable.Set[String]()
-    var sysCallMap = Map[String, Int]()
-
-    println("sysCallSet.size BEFORE: " + sysCallSet.size)
-    val testPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\test\\"
-    //val path = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\Full_Process_Traces\\"
-    val parentDir = new File(testPath)
-   // val parentDir = new File(workDataParent)
-    fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
-
-    println("sysCallSet.size AFTER: " + sysCallSet.size)
-    println("first 10 elements: " + sysCallSet.take(10))
-    sysCallMap = sysCallSet.zipWithIndex.map{case(v,i) => (v,i+1)}.toMap
-    println("Final sysCalLMap.size: " + sysCallMap.size)
-    println("Final sysCalLMap: " + sysCallMap)
-
-
-    //--------------------
-
-
-    val targetDirPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\target\\"
-    val targetDir = new File(targetDirPath)
-    fileStreamNoDirs(parentDir).foreach(f => toIntTrace(f, targetDir, sysCallMap))
-   // fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
-
-
-  }
 }
 
