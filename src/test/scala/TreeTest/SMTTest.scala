@@ -1458,14 +1458,14 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
   }
-  test("sliding window test") {
+ /* test("sliding window test") {
     val n1 = new Node[Int, Int](5, 3, 1)
     var count: Int = 0
     for (t <- intVectorTrace.sliding(5, 1)) {
       count += 1
       n1.growTree(t, t.last)
     }
-  }
+  }*/
 
 
   def time[T](block: => T): T = {
@@ -1477,7 +1477,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  test("SMT, sliding window test - trace length = 200") {
+  /*test("SMT, sliding window test - trace length = 200") {
 
 
     //val source = scala.io.Source.fromFile(homeTrainingPath)
@@ -1559,7 +1559,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println(n1)*/
 
 
-  }
+  }*/
 
   def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
     val d = new File(dir)
@@ -1572,7 +1572,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("SMT - train tree with all training data - STRING benchmark") {
+ /* test("SMT - train tree with all training data - STRING benchmark") {
     val maxDepth = 15
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1628,9 +1628,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
+*/
 
-
-  test("SMT - train tree with all training data - INTEGER benchmark") {
+ /* test("SMT - train tree with all training data - INTEGER benchmark") {
     val maxDepth = 12
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1666,7 +1666,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
     /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
-  }
+  }*/
+
+
+
+
+
 
 
 
