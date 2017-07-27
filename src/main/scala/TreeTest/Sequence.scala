@@ -1,5 +1,7 @@
 package TreeTest
 
+import sun.nio.cs.ext.DoubleByteEncoder
+
 import scala.collection.mutable.Map
 
 /**
@@ -7,8 +9,9 @@ import scala.collection.mutable.Map
   */
 class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
 
-  private var condition: Vector[A] = Vector[A]()
+  private var weight: Double = 1.0
   private var smoothing: Double = 0.0
+  private var condition: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
@@ -32,6 +35,8 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
   def getSmoothing: Double = smoothing
 
   def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("Sequence smoothing cannot be reset")
+
+  def getWeight: Double = weight
 
   def getEventCount: Int = eventCount
 
@@ -61,12 +66,15 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
     //update event count to keep track of number of overall observations
     eventCount += 1
     isChanged = true
+    updateWeight(newEvent)
   }
+
+  private def updateWeight(newEvent: B): Unit = weight *= getProbability(newEvent)
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
-      if (predictions.contains(k)) predictions.update(k, v.toDouble + getSmoothing / eventCount)
-      else predictions += (k -> (v.toDouble + getSmoothing / eventCount))
+      if (predictions.contains(k)) predictions.update(k, v.toDouble + smoothing / eventCount)
+      else predictions += (k -> (v.toDouble + smoothing / eventCount))
     }
   }
 
