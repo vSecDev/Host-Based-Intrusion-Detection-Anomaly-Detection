@@ -11,6 +11,19 @@ class NodeTest extends FunSuite{
   val intTrace = "1 2 3 4 5 6 7 8 9 10 11 1 2 3 12 13 4 5 6 7 8 9 10 11 1 2 3 14 13 4 5 6 7 8 9 10 11 1 2 3 15 4 5 6 7 8 9 10 11 1 2 3 15"
   val intListTrace = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
 
+
+  test("Node, smoothing is non-negative"){
+    val caught = intercept[IllegalArgumentException](new Node[Int, Int](1,1,-1.0,1.0))
+    assert(caught.getMessage == "requirement failed: SMT smoothing value must be non-negative!")
+  }
+  test("Node, prior weight is not zero"){
+    val caught = intercept[IllegalArgumentException](new Node[Int, Int](1,1,1.0,0.0))
+    assert(caught.getMessage == "requirement failed: SMT prior weight must be larger than zero!")
+  }
+  test("Node, prior weight is not negative"){
+    val caught = intercept[IllegalArgumentException](new Node[Int, Int](1,1,1.0,-1.0))
+    assert(caught.getMessage == "requirement failed: SMT prior weight must be larger than zero!")
+  }
   test("Node with 'None' predictions returns None for getProbability") {
     val n = new Node[Int, Int](1, 1, 1)
     val num = 1

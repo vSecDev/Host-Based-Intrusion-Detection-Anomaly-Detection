@@ -9,9 +9,37 @@ import scala.collection.mutable.Map
   * @param maxDepth the maximum depth of the tree
   * @param maxPhi the maximum number of wildcards in the tree
   */
-abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int)
+abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double){
 
-case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount) {
+  require(maxPhi >= 0, "SMT max Phi count must be non-negative!")
+  require(maxSeqCount > 0, "SMT max sequence count must be positive!")
+  require(_smoothing >= 0, "SMT smoothing value must be non-negative!")
+  require(_prior > 0, "SMT prior weight must be larger than zero!")
+
+  private var prior = 1.0
+  private var smoothing: Double = 0.0
+  private var weight: Double = 1.0
+
+
+  setSmoothing(_smoothing)
+  //root prior is 1.0
+  setPrior(_prior)
+  setWeight(prior)
+
+  def getSmoothing: Double = smoothing
+
+  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
+
+  def getPrior: Double = prior
+
+  def setPrior(aPrior: Double): Unit = if (aPrior > 0.0) prior = aPrior else throw new IllegalStateException("SMT weight cannot be negative")
+
+  def getWeight: Double = weight
+
+  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
+}
+
+case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
   //A root node has no key. Root.getKey = None
   private var key: Option[A] = None
@@ -19,12 +47,9 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
   private var isChanged: Boolean = false
-
-  require(maxSeqCount > 0, "Max sequence count must be positive!")
-  require(maxDepth > 0, "Max depth count must be positive!")
-  require(maxPhi >= 0, "Max Phi count must be non-negative!")
-
   private var children: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
+
+  require(maxDepth > 0, "Max depth count must be positive!")
 
   def getKey: Option[A] = key
 
@@ -46,29 +71,37 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
     predictions
   }
 
-  def getProbability(input: B): Option[Double] = getPredictions.get(input)
+  def getProbability(input: B): Double = getPredictions.get(input) match {
+    case Some(x) => x
+    case None => _smoothing / eventCount
+  }
 
   def updateEvents(newEvent: B): Unit = {
 
     //update events to keep count on how many times this input has been seen
     events.get(newEvent) match {
-      case None => events += (newEvent -> 1)
       case Some(event) => events.update(newEvent, events(newEvent) + 1)
+      case None => events += (newEvent -> 1)
     }
     //update event count to keep track of number of overall observations
     eventCount += 1
     isChanged = true
+    updateWeight(newEvent)
   }
+
+  private def updateWeight(newEvent: B): Unit = weight *= getProbability(newEvent)
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
-      if (predictions.contains(k)) predictions.update(k, v.toDouble / eventCount)
-      else predictions += (k -> (v.toDouble / eventCount))
+      if (predictions.contains(k)) predictions.update(k, v.toDouble + smoothing / eventCount)
+      else predictions += (k -> (v.toDouble + smoothing / eventCount))
     }
   }
 
   def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
+
+  //TODO - CHECK IF  WEIGHT PRIORS ARE CORRECT!
   def growTree(condition: Vector[A], event: B): Unit = {
 
     if (maxDepth > 0) for {
@@ -96,7 +129,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
                 case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
             case None =>
-              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount)
+              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, )
               newNode.setKey(newCondition.head)
               newCondition.tail match {
                 case y +: ys => newNode.growTree(y +: ys, event)
@@ -141,14 +174,9 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(m
   }
 }
 
-case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) extends SMT(maxDepth, maxPhi, maxSeqCount) {
+case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
   var sequences: Vector[Sequence[A, B]] = Vector[Sequence[A, B]]()
-
-  //Constructor arg validation
-  require(maxSeqCount > 0, "Max sequence count must be positive!")
-  require(maxDepth >= 0, "Max depth count must be non-negative!")
-  require(maxPhi >= 0, "Max Phi count must be non-negative!")
 
   /**
     * Updates the sequence list with a new sequence.
@@ -163,7 +191,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
       None
     case None =>
       if (canSplit) Some(split(newSeq))
-      else { sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2); None }
+      else { sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2, _smoothing, _prior); None }
   }
 
   def getSequence(key: Vector[A]): Option[Sequence[A, B]] = sequences.find(x => x.getKey == key)
@@ -177,11 +205,11 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int) exten
 
     var newVector = Vector[Node[A, B]]()
 
-    sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2)
+    sequences = sequences :+ new Sequence[A, B](newSeq._1, newSeq._2, _smoothing, _prior)
     for (s <- sequences) {
       newVector.find(p = x => x.getKey.get == s.getKey(0)) match {
         case None =>
-          val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount)
+          val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount, _smoothing, _prior)
           newNode.setKey(s.getKey(0))
           splitHelper(newNode, s.getKey.tail, s.getEvents)
           newVector = newVector :+ newNode

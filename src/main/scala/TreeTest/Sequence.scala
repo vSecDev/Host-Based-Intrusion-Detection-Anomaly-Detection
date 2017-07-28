@@ -7,7 +7,7 @@ import scala.collection.mutable.Map
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
+class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) {
 
   private var weight: Double = 1.0
   private var smoothing: Double = 0.0
@@ -16,16 +16,15 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
   private var isChanged: Boolean = false
-  //TODO - MODIFY THIS, SO PRIOR COULD BE SET IN CONSTRUCTOR
-  //private var prior: Option[Double] = Some(0.00)
 
   //Constructor argument validation
   require(_condition.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
-  require(_smoothing > 0, "Smoothing value must be larger than zero!")
+  require(_smoothing >= 0, "Sequence smoothing value must be non-negative!")
   //Initialise Sequence
   setKey(_condition)
   setSmoothing(_smoothing)
+  setWeight(_prior)
   updateEvents(_event)
 
   def getKey: Vector[A] = condition
@@ -37,6 +36,8 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double) {
   def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("Sequence smoothing cannot be reset")
 
   def getWeight: Double = weight
+
+  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("Sequence weight cannot be negative")
 
   def getEventCount: Int = eventCount
 
