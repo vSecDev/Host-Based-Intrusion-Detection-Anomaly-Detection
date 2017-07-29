@@ -286,12 +286,32 @@ class SequenceTest extends FunSuite{
     assert(s1.getProbability("ntdll.dll+0xeac7") == (2.0 + smoothing) / 6)
     assert(s1.getProbability("kernel32.dll+0x15568") == (1.0 + smoothing) / 6)
   }
+  test("Sequence getWeightedProbability"){
+    val smoothing = 0.0
+    val s1 = new Sequence[String, String](shortStringListTrace, "ntdll.dll+0x2173e", smoothing, 1.0)
 
+    assert(s1.getWeightedProbability("Nonexistent event") == smoothing)
+    assert(s1.getWeightedProbability("ntdll.dll+0x2173e") == 1.0)
+    assert(s1.getWeight == 1.0)
 
+    s1.updateEvents("ntdll.dll+0x21639")
+    assert(s1.getWeight == 0.5)
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (1.0 + smoothing) / 2)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 2)
 
+    assert(s1.getWeightedProbability("Nonexistent event") == smoothing)
+    assert(s1.getWeightedProbability("ntdll.dll+0x2173e") == 0.5 * (1.0 + smoothing) / 2)
+    assert(s1.getWeightedProbability("ntdll.dll+0x21639") == 0.5 * (1.0 + smoothing) / 2)
 
-
-
+    val prevWeight = s1.getWeight
+    s1.updateEvents("ntdll.dll+0xeac7")
+    val p = s1.getProbability("ntdll.dll+0xeac7")
+    assert(s1.getWeightedProbability("Nonexistent event") == smoothing)
+    assert(s1.getWeightedProbability("ntdll.dll+0x2173e") == 0.5 * 1.0/3 * (1.0 + smoothing) / 3)
+    assert(s1.getWeightedProbability("ntdll.dll+0x2173e") == prevWeight * p * (1.0 + smoothing) / 3)
+    assert(s1.getWeightedProbability("ntdll.dll+0x21639") == 0.5 * 1.0/3 * (1.0 + smoothing) / 3)
+    assert(s1.getWeightedProbability("ntdll.dll+0xeac7") == 0.5 * 1.0/3 * (1.0 + smoothing) / 3)
+  }
   test("Sequence eventCount == events sum in events"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666, 0.0, 1.0)
     assert(s1.getEventCount == 1)
