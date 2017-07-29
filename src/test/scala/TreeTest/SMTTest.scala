@@ -57,17 +57,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   test("SMT. maxPhi is non-negative") {
     assertThrows[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
-    assert(caught.getMessage == "requirement failed: Max Phi count must be non-negative!")
+    assert(caught.getMessage == "requirement failed: Node max Phi count must be non-negative!")
   }
   test("SMT. maxSeqCount is not zero") {
     assertThrows[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
-    assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
+    assert(caught.getMessage == "requirement failed: Node max sequence count must be positive!")
   }
   test("SMT. maxSeqCount is not negative") {
     assertThrows[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
-    assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
+    assert(caught.getMessage == "requirement failed: Node max sequence count must be positive!")
   }
   test("SMT. Default key is None") {
     val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)

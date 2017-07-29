@@ -41,10 +41,7 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   def getPrior: Double = prior
 
-  def setPrior(aPrior: Double): Unit = {
-    println("Sequence setting prior")
-    if (prior == -1.0) prior = aPrior else throw new IllegalStateException("Sequence - prior cannot be changed after initialisation!")
-  }
+  def setPrior(aPrior: Double): Unit = if (prior == -1.0) prior = aPrior else throw new IllegalStateException("Sequence - prior cannot be changed after initialisation!")
 
   def getWeight: Double = weight
 
@@ -87,8 +84,8 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
-      if (predictions.contains(k)) predictions.update(k, v.toDouble + smoothing / eventCount)
-      else predictions += (k -> (v.toDouble + smoothing / eventCount))
+      if (predictions.contains(k)) predictions.update(k, (v.toDouble + smoothing) / eventCount)
+      else predictions += (k -> ((v.toDouble + smoothing) / eventCount))
     }
   }
 

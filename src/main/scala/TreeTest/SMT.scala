@@ -17,24 +17,15 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing
 
   def getSmoothing: Double = smoothing
 
-  def setSmoothing(aSmoothing: Double): Unit = {
-    println("SMT setting smoothing")
-    if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
-  }
+  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
 
   def getPrior: Double = prior
 
-  def setPrior(aPrior: Double): Unit = {
-    println("SMT setting prior")
-    if (prior == -1.0) prior = aPrior else throw new IllegalStateException("SMT - prior cannot be changed after initialisation!")
-  }
+  def setPrior(aPrior: Double): Unit = if (prior == -1.0) prior = aPrior else throw new IllegalStateException("SMT - prior cannot be changed after initialisation!")
 
   def getWeight: Double = weight
 
-  def setWeight(aWeight: Double): Unit = {
-    println("SMT setting weight")
-    if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
-  }
+  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
 }
 
 case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
@@ -103,8 +94,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
-      if (predictions.contains(k)) predictions.update(k, v.toDouble + smoothing / eventCount)
-      else predictions += (k -> (v.toDouble + smoothing / eventCount))
+      if (predictions.contains(k)) predictions.update(k, (v.toDouble + smoothing) / eventCount)
+      else predictions += (k -> ((v.toDouble + smoothing) / eventCount))
     }
   }
 
