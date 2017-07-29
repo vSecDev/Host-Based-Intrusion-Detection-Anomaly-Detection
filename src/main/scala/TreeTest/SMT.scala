@@ -11,36 +11,37 @@ import scala.collection.mutable.Map
   */
 abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double){
 
-  require(maxPhi >= 0, "SMT max Phi count must be non-negative!")
-  require(maxSeqCount > 0, "SMT max sequence count must be positive!")
-  require(_smoothing >= 0, "SMT smoothing value must be non-negative!")
-  require(_prior > 0, "SMT prior weight must be larger than zero!")
-
-  private var prior = 1.0
-  private var smoothing: Double = 0.0
-  private var weight: Double = 1.0
-
-
-  setSmoothing(_smoothing)
-  //root prior is 1.0
-  setPrior(_prior)
-  setWeight(prior)
+  var smoothing: Double
+  var prior: Double
+  var weight: Double
 
   def getSmoothing: Double = smoothing
 
-  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
+  def setSmoothing(aSmoothing: Double): Unit = {
+    println("SMT setting smoothing")
+    if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
+  }
 
   def getPrior: Double = prior
 
-  def setPrior(aPrior: Double): Unit = if (aPrior > 0.0) prior = aPrior else throw new IllegalStateException("SMT weight cannot be negative")
+  def setPrior(aPrior: Double): Unit = {
+    println("SMT setting prior")
+    if (prior == -1.0) prior = aPrior else throw new IllegalStateException("SMT - prior cannot be changed after initialisation!")
+  }
 
   def getWeight: Double = weight
 
-  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
+  def setWeight(aWeight: Double): Unit = {
+    println("SMT setting weight")
+    if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
+  }
 }
 
 case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
+  var smoothing: Double = 0.0
+  var prior = -1.0
+  var weight: Double = 1.0
   //A root node has no key. Root.getKey = None
   private var key: Option[A] = None
   private var eventCount = 0
@@ -49,7 +50,16 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
   private var isChanged: Boolean = false
   private var children: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
 
-  require(maxDepth > 0, "Max depth count must be positive!")
+  require(maxDepth > 0, "Node max depth count must be positive!")
+  require(maxPhi >= 0, "Node max Phi count must be non-negative!")
+  require(maxSeqCount > 0, "Node max sequence count must be positive!")
+  require(_smoothing >= 0, "Node smoothing value must be non-negative!")
+  require(_prior > 0, "Node prior weight must be larger than zero!")
+
+  setSmoothing(_smoothing)
+  //root prior is 1.0
+  setPrior(_prior)
+  setWeight(prior)
 
   def getKey: Option[A] = key
 
@@ -176,7 +186,20 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
 case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
+  var smoothing: Double = 0.0
+  var prior = -1.0
+  var weight: Double = 1.0
   var sequences: Vector[Sequence[A, B]] = Vector[Sequence[A, B]]()
+
+  require(maxDepth >= 0, "SequenceList max depth count must be non-negative!")
+  require(maxPhi >= 0, "SequenceList max Phi count must be non-negative!")
+  require(maxSeqCount > 0, "SequenceList max sequence count must be positive!")
+  require(_smoothing >= 0, "SequenceList smoothing value must be non-negative!")
+  require(_prior > 0, "SequenceList prior weight must be larger than zero!")
+
+  setSmoothing(_smoothing)
+  setPrior(_prior)
+  setWeight(prior)
 
   /**
     * Updates the sequence list with a new sequence.

@@ -9,8 +9,9 @@ import scala.collection.mutable.Map
   */
 class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) {
 
-  private var weight: Double = 1.0
-  private var smoothing: Double = 0.0
+  var smoothing: Double = 0.0
+  var prior = -1.0
+  var weight: Double = 1.0
   private var condition: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
   private var events: Map[B, Int] = Map[B, Int]()
@@ -21,10 +22,13 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
   require(_condition.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
   require(_smoothing >= 0, "Sequence smoothing value must be non-negative!")
+  require(_prior > 0, "Sequence prior weight must be larger than zero!")
+
   //Initialise Sequence
   setKey(_condition)
   setSmoothing(_smoothing)
-  setWeight(_prior)
+  setPrior(_prior)
+  setWeight(prior)
   updateEvents(_event)
 
   def getKey: Vector[A] = condition
@@ -34,6 +38,13 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
   def getSmoothing: Double = smoothing
 
   def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("Sequence smoothing cannot be reset")
+
+  def getPrior: Double = prior
+
+  def setPrior(aPrior: Double): Unit = {
+    println("Sequence setting prior")
+    if (prior == -1.0) prior = aPrior else throw new IllegalStateException("Sequence - prior cannot be changed after initialisation!")
+  }
 
   def getWeight: Double = weight
 
@@ -56,6 +67,8 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
     case Some(x) => x
     case None => _smoothing / eventCount
   }
+
+  def getWeightedProbability(input: B): Double = weight * getProbability(input)
 
   def updateEvents(newEvent: B): Unit = {
 
