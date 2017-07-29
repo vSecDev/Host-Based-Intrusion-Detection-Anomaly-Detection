@@ -110,6 +110,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
   def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
+  private def getNewPrior: Double = if(maxDepth > maxPhi) 1.0 / (maxPhi+1) else 1.0 / maxDepth
 
   //TODO - CHECK IF  WEIGHT PRIORS ARE CORRECT!
   def growTree(condition: Vector[A], event: B): Unit = {
@@ -139,7 +140,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
                 case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
             case None =>
-              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, )
+              val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, getNewPrior)
               newNode.setKey(newCondition.head)
               newCondition.tail match {
                 case y +: ys => newNode.growTree(y +: ys, event)
@@ -148,7 +149,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
               children = children.updated(i, children(i) :+ newNode)
           }
       } else {
-        val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount)
+        val newSeqList = new SequenceList[A, B](maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, getNewPrior)
 
         newSeqList.updateSequences((newCondition, event)) match {
           case Some(x) => children = children :+ x
