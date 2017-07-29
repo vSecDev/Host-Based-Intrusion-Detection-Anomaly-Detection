@@ -83,7 +83,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
   def getProbability(input: B): Double = getPredictions.get(input) match {
     case Some(x) => x
-    case None => _smoothing / eventCount
+    case None => if(eventCount == 0) smoothing else  smoothing / eventCount
   }
 
   def updateEvents(newEvent: B): Unit = {

@@ -45,50 +45,50 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }*/
 
   test("SMT. maxDepth is not zero") {
-    assertThrows[IllegalArgumentException](Node(0, 1, 3))
-    val caught = intercept[IllegalArgumentException](Node(0, 1, 3))
-    assert(caught.getMessage == "requirement failed: Max depth count must be positive!")
+    assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0 , 1.0))
+    val caught = intercept[IllegalArgumentException](Node(0, 1, 3, 0.0 , 1.0))
+    assert(caught.getMessage == "requirement failed: Node max depth count must be positive!")
   }
   test("SMT. maxDepth is not negative") {
-    assertThrows[IllegalArgumentException](Node(-1, 1, 3))
-    val caught = intercept[IllegalArgumentException](Node(-1, 1, 3))
-    assert(caught.getMessage == "requirement failed: Max depth count must be positive!")
+    assertThrows[IllegalArgumentException](Node(-1, 1, 3, 0.0, 1.0))
+    val caught = intercept[IllegalArgumentException](Node(-1, 1, 3, 0.0, 1.0))
+    assert(caught.getMessage == "requirement failed: Node max depth count must be positive!")
   }
   test("SMT. maxPhi is non-negative") {
-    assertThrows[IllegalArgumentException](Node(1, -1, 3))
-    val caught = intercept[IllegalArgumentException](Node(1, -1, 3))
+    assertThrows[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
+    val caught = intercept[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Max Phi count must be non-negative!")
   }
   test("SMT. maxSeqCount is not zero") {
-    assertThrows[IllegalArgumentException](Node(1, 1, 0))
-    val caught = intercept[IllegalArgumentException](Node(1, 1, 0))
+    assertThrows[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
+    val caught = intercept[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
   test("SMT. maxSeqCount is not negative") {
-    assertThrows[IllegalArgumentException](Node(1, 1, -1))
-    val caught = intercept[IllegalArgumentException](Node(1, 1, -1))
+    assertThrows[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
+    val caught = intercept[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Max sequence count must be positive!")
   }
   test("SMT. Default key is None") {
-    val root: Node[Int, Int] = Node(5, 1, 3)
+    val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
   }
   test("SMT. setKey sets correct Int key") {
-    val root: Node[Int, Int] = Node(5, 1, 3)
+    val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
     root.setKey(0)
     root.getKey shouldBe 'defined
     assert(root.getKey.get == 0)
   }
   test("SMT. setKey sets correct String key") {
-    val root: Node[String, Int] = Node(5, 1, 3)
+    val root: Node[String, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
     root.setKey("TestKey")
     root.getKey shouldBe 'defined
     assert(root.getKey.get equals "TestKey")
   }
   test("SMT. setKey fails if called multiple times - String key") {
-    val root: Node[String, Int] = Node(5, 1, 3)
+    val root: Node[String, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.setKey("TestKey")
     root.getKey shouldBe 'defined
     assert(root.getKey.get equals "TestKey")
@@ -97,7 +97,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(caught.getMessage == "Node key cannot be reset!")
   }
   test("SMT. setKey fails if called multiple times - Int key") {
-    val root: Node[Int, Int] = Node(5, 1, 3)
+    val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.setKey(0)
     root.getKey shouldBe 'defined
     assert(root.getKey.get == 0)
@@ -106,7 +106,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(caught.getMessage equals "Node key cannot be reset!")
   }
   test("SMT eventCount is correct") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     assert(n1.getEventCount == 0)
     n1.updateEvents(666)
     assert(n1.getEventCount == 1)
@@ -116,12 +116,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getEventCount == 3)
   }
   test("SMT, events initialised empty") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     assertThrows[NoSuchElementException](n1.getEvents(666))
     assert(n1.getEvents.isEmpty)
   }
   test("SMT 'events' is correct after updates with same event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -129,20 +129,20 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(666)
     assert(n1.getEventCount == 1)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
 
     n1.updateEvents(666)
     assert(n1.getEventCount == 2)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
 
     n1.updateEvents(666)
     assert(n1.getEventCount == 3)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
   }
   test("SMT events is correct after updates with different events") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -150,33 +150,33 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(666)
     assert(n1.getEventCount == 1)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
 
     n1.updateEvents(666)
     assert(n1.getEventCount == 2)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
 
     n1.updateEvents(666)
     assert(n1.getEventCount == 3)
     assert(n1.getEvents.size == 1)
-    assert(n1.getProbability(666).get == 1.00)
+    assert(n1.getProbability(666) == 1.00)
 
     n1.updateEvents(777)
     assert(n1.getEventCount == 4)
     assert(n1.getEvents.size == 2)
     assert(n1.getEvents.get(666).get == 3)
     assert(n1.getEvents.get(777).get == 1)
-    assert(n1.getProbability(666).get == 3.00 / 4)
-    assert(n1.getProbability(777).get == 1.00 / 4)
+    assert(n1.getProbability(666) == 3.00 / 4)
+    assert(n1.getProbability(777) == 1.00 / 4)
 
     n1.updateEvents(777)
     assert(n1.getEventCount == 5)
     assert(n1.getEvents.size == 2)
     assert(n1.getEvents.get(666).get == 3)
     assert(n1.getEvents.get(777).get == 2)
-    assert(n1.getProbability(666).get == 3.00 / 5)
-    assert(n1.getProbability(777).get == 2.00 / 5)
+    assert(n1.getProbability(666) == 3.00 / 5)
+    assert(n1.getProbability(777) == 2.00 / 5)
 
     n1.updateEvents(888)
     assert(n1.getEventCount == 6)
@@ -184,17 +184,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getEvents.get(666).get == 3)
     assert(n1.getEvents.get(777).get == 2)
     assert(n1.getEvents.get(888).get == 1)
-    assert(n1.getProbability(666).get == 3.00 / 6)
-    assert(n1.getProbability(777).get == 2.00 / 6)
-    assert(n1.getProbability(888).get == 1.00 / 6)
+    assert(n1.getProbability(666) == 3.00 / 6)
+    assert(n1.getProbability(777) == 2.00 / 6)
+    assert(n1.getProbability(888) == 1.00 / 6)
   }
   test("SMT predictions has single element after first event update") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
   }
   test("SMT predictions has two elements after two different event key updates") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
@@ -202,7 +202,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.size == 2)
   }
   test("SMT predictions has one element after the same event key is updated twice") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
     n1.updateEvents(666)
@@ -211,7 +211,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.size == 1)
   }
   test("SMT predictions has two elements after adding three events, two the same") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
     n1.updateEvents(666)
@@ -220,7 +220,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.size == 2)
   }
   test("SMT predictions are correct") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions(666) == 1.0)
     n1.updateEvents(666)
@@ -240,91 +240,91 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions(999) == 1.0 / 6)
   }
   test("SMT getProbability for single event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
-    assert(n1.getProbability(666).get == 1.0)
+    assert(n1.getProbability(666) == 1.0)
   }
   test("SMT getProbability for events after multiple updates") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
-    assert(n1.getProbability(666).get == 1.0)
+    assert(n1.getProbability(666) == 1.0)
     n1.updateEvents(777)
-    assert(n1.getProbability(666).get == 0.5)
-    assert(n1.getProbability(777).get == 0.5)
+    assert(n1.getProbability(666) == 0.5)
+    assert(n1.getProbability(777) == 0.5)
 
     n1.updateEvents(888)
-    assert(n1.getProbability(666).get == 1.0 / 3)
-    assert(n1.getProbability(777).get == 1.0 / 3)
-    assert(n1.getProbability(888).get == 1.0 / 3)
+    assert(n1.getProbability(666) == 1.0 / 3)
+    assert(n1.getProbability(777) == 1.0 / 3)
+    assert(n1.getProbability(888) == 1.0 / 3)
     n1.updateEvents(888)
-    assert(n1.getProbability(666).get == 1.0 / 4)
-    assert(n1.getProbability(777).get == 1.0 / 4)
-    assert(n1.getProbability(888).get == 2.0 / 4)
+    assert(n1.getProbability(666) == 1.0 / 4)
+    assert(n1.getProbability(777) == 1.0 / 4)
+    assert(n1.getProbability(888) == 2.0 / 4)
     n1.updateEvents(999)
-    assert(n1.getProbability(666).get == 1.0 / 5)
-    assert(n1.getProbability(777).get == 1.0 / 5)
-    assert(n1.getProbability(888).get == 2.0 / 5)
-    assert(n1.getProbability(999).get == 1.0 / 5)
+    assert(n1.getProbability(666) == 1.0 / 5)
+    assert(n1.getProbability(777) == 1.0 / 5)
+    assert(n1.getProbability(888) == 2.0 / 5)
+    assert(n1.getProbability(999) == 1.0 / 5)
     n1.updateEvents(666)
-    assert(n1.getProbability(666).get == 2.0 / 6)
-    assert(n1.getProbability(777).get == 1.0 / 6)
-    assert(n1.getProbability(888).get == 2.0 / 6)
-    assert(n1.getProbability(999).get == 1.0 / 6)
+    assert(n1.getProbability(666) == 2.0 / 6)
+    assert(n1.getProbability(777) == 1.0 / 6)
+    assert(n1.getProbability(888) == 2.0 / 6)
+    assert(n1.getProbability(999) == 1.0 / 6)
   }
   test("SMT getProbability for String events after multiple updates. (String key)") {
-    val n1 = new Node[Int, String](5, 1, 1)
+    val n1 = new Node[Int, String](5, 1, 1, 0.0, 1.0)
     n1.updateEvents("ntdll.dll+0x2173e")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0)
     n1.updateEvents("ntdll.dll+0x21639")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 0.5)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 0.5)
     n1.updateEvents("ntdll.dll+0xeac7")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 3)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 3)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 1.0 / 3)
     n1.updateEvents("ntdll.dll+0xeac7")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 4)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 4)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 4)
     n1.updateEvents("kernel32.dll+0x15568")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 5)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 5)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 5)
-    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 5)
+    assert(n1.getProbability("kernel32.dll+0x15568") == 1.0 / 5)
     n1.updateEvents("ntdll.dll+0x2173e")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 2.0 / 6)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 6)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 6)
-    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 2.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 6)
+    assert(n1.getProbability("kernel32.dll+0x15568") == 1.0 / 6)
   }
   test("Sequence getProbability for String events after multiple updates. (Int key)") {
-    val n1 = new Node[Int, String](5, 1, 1)
+    val n1 = new Node[Int, String](5, 1, 1, 0.0, 1.0)
     n1.updateEvents("ntdll.dll+0x2173e")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0)
     n1.updateEvents("ntdll.dll+0x21639")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 0.5)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 0.5)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 0.5)
     n1.updateEvents("ntdll.dll+0xeac7")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 3)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 3)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 3)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 1.0 / 3)
     n1.updateEvents("ntdll.dll+0xeac7")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 4)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 4)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 4)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 4)
     n1.updateEvents("kernel32.dll+0x15568")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 1.0 / 5)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 5)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 5)
-    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 5)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 5)
+    assert(n1.getProbability("kernel32.dll+0x15568") == 1.0 / 5)
     n1.updateEvents("ntdll.dll+0x2173e")
-    assert(n1.getProbability("ntdll.dll+0x2173e").get == 2.0 / 6)
-    assert(n1.getProbability("ntdll.dll+0x21639").get == 1.0 / 6)
-    assert(n1.getProbability("ntdll.dll+0xeac7").get == 2.0 / 6)
-    assert(n1.getProbability("kernel32.dll+0x15568").get == 1.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0x2173e") == 2.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0x21639") == 1.0 / 6)
+    assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 6)
+    assert(n1.getProbability("kernel32.dll+0x15568") == 1.0 / 6)
   }
   test("SMT eventCount == events sum in events") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getEventCount == 1)
     var eventNum = 0
@@ -365,7 +365,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
   //SMT ----------------------------------
   test("SMT, invalid argument to growTree: empty Vector| event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.growTree(Vector.empty[Int], 666)
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -373,7 +373,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren.isEmpty)
   }
   test("SMT, growTree called with Vector size == 1 | event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     val condition = Vector(1)
     val event = 666
     n1.growTree(condition, event)
@@ -398,7 +398,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(child.getSequence(condition).get.getPredictions(event) == 1.00)
   }
   test("SMT, growTree called with Vector size == 2 | event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val event = 666
     n1.growTree(condition, event)
@@ -429,7 +429,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, growTree called with Vector size == 3 | event") {
-    val n1 = new Node[Int, Int](5, 1, 1)
+    val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2, 3)
     val event = 666
     n1.growTree(condition, event)
@@ -461,7 +461,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   }
   test("SMT, growTree called with two 'Vector size == 2 | event' sequences") {
-    val n1 = new Node[Int, Int](2, 1, 1)
+    val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val event = 666
@@ -539,8 +539,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 2)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -549,8 +549,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
           }
         }
@@ -558,7 +558,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences") {
-    val n1 = new Node[Int, Int](2, 1, 1)
+    val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
@@ -623,8 +623,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 2)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -633,8 +633,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(777).get == 1.00)
-              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(777) == 1.00)
+              assert(currSeq(0).getProbability(666) == 0.00)
             }
             else if (j == 2) {
               assert(curr.getKey.get == condition3.drop(i)(0))
@@ -643,8 +643,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 6)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(888).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(888) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
           }
         }
@@ -652,7 +652,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each") {
-    val n1 = new Node[Int, Int](2, 1, 1)
+    val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
@@ -723,8 +723,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getEventCount == 2)
               assert(currSeq(0).getEvents.size == 1)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -735,8 +735,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getEventCount == 2)
               assert(currSeq(0).getEvents.size == 1)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(777).get == 1.00)
-              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(777) == 1.00)
+              assert(currSeq(0).getProbability(666) == 0.00)
             }
             else if (j == 2) {
               assert(curr.getKey.get == condition3.drop(i)(0))
@@ -747,8 +747,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getEventCount == 2)
               assert(currSeq(0).getEvents.size == 1)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(888).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(888) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
           }
         }
@@ -756,7 +756,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each with different events for each") {
-    val n1 = new Node[Int, Int](2, 1, 1)
+    val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val condition3 = Vector(5, 6)
@@ -833,9 +833,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getEventCount == 2)
               assert(currSeq(0).getEvents.size == 2)
               assert(currSeq(0).getPredictions.size == 2)
-              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(888).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 0.50)
+              assert(currSeq(0).getProbability(888) == 0.50)
+              assert(currSeq(0).getProbability(999)== 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -846,9 +846,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getEventCount == 2)
               assert(currSeq(0).getEvents.size == 2)
               assert(currSeq(0).getPredictions.size == 2)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(666).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(777) == 0.50)
+              assert(currSeq(0).getProbability(666) == 0.50)
+              assert(currSeq(0).getProbability(999)== 0.00)
             }
             else if (j == 2) {
               assert(curr.getKey.get == condition3.drop(i)(0))
@@ -858,9 +858,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getKey(0) == 6)
               assert(currSeq(0).getEvents.size == 2)
               assert(currSeq(0).getPredictions.size == 2)
-              assert(currSeq(0).getProbability(888).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.50)
-              assert(currSeq(0).getProbability(999).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(888) == 0.50)
+              assert(currSeq(0).getProbability(777) == 0.50)
+              assert(currSeq(0).getProbability(999)== 0.00)
             }
           }
         }
@@ -868,7 +868,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'") {
-    val n1 = new Node[Int, Int](3, 1, 1)
+    val n1 = new Node[Int, Int](3, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val event = 666
@@ -948,8 +948,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 2)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -958,8 +958,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
           }
 
@@ -968,7 +968,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event' - first element same") {
-    val n1 = new Node[Int, Int](3, 1, 1)
+    val n1 = new Node[Int, Int](3, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(1, 4)
     val event = 666
@@ -1050,10 +1050,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(1).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
               assert(currSeq(1).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(1).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
-              assert(currSeq(1).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(1).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
+              assert(currSeq(1).getProbability(777) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -1062,8 +1062,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
-              assert(currSeq(0).getProbability(666).get == 1.00)
-              assert(currSeq(0).getProbability(777).getOrElse(0.00) == 0.00)
+              assert(currSeq(0).getProbability(666) == 1.00)
+              assert(currSeq(0).getProbability(777) == 0.00)
             }
           }
         }
@@ -1071,7 +1071,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
   test("SMT, mD = 5, window size 5") {
-    val n1 = new Node[Int, Int](5, 2, 1)
+    val n1 = new Node[Int, Int](5, 2, 1, 0.0, 1.0)
     val event = 666
     val event2 = 777
     val event3 = 888
@@ -1182,7 +1182,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq0.getKey == t3.drop(1))
     assert(newSeq0.getEventCount == 1)
     assert(newSeq0.getEvents(event2) == 1)
-    assert(newSeq0.getProbability(event2).getOrElse(0.00) == 1.00)
+    assert(newSeq0.getProbability(event2) == 1.00)
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
     assert(phi_1_node_0.getChildren.size == 3)
@@ -1208,7 +1208,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq1.getKey == t3.drop(2))
     assert(newSeq1.getEventCount == 1)
     assert(newSeq1.getEvents(event2) == 1)
-    assert(newSeq1.getProbability(event2).getOrElse(0.00) == 1.00)
+    assert(newSeq1.getProbability(event2) == 1.00)
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1231,7 +1231,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq2.getKey == t3.drop(3))
     assert(newSeq2.getEventCount == 1)
     assert(newSeq2.getEvents(event2) == 1)
-    assert(newSeq2.getProbability(event2).getOrElse(0.00) == 1.00)
+    assert(newSeq2.getProbability(event2) == 1.00)
 
 
     n1.growTree(t3, event)
@@ -1274,8 +1274,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq0.getEventCount == 2)
     assert(newNewSeq0.getEvents(event2) == 1)
     assert(newNewSeq0.getEvents(event) == 1)
-    assert(newNewSeq0.getProbability(event2).getOrElse(0.00) == 0.50)
-    assert(newNewSeq0.getProbability(event).getOrElse(0.00) == 0.50)
+    assert(newNewSeq0.getProbability(event2) == 0.50)
+    assert(newNewSeq0.getProbability(event) == 0.50)
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
     assert(phi_1_node_0.getChildren.size == 3)
@@ -1302,8 +1302,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq1.getEventCount == 2)
     assert(newNewSeq1.getEvents(event2) == 1)
     assert(newNewSeq1.getEvents(event) == 1)
-    assert(newNewSeq1.getProbability(event2).getOrElse(0.00) == 0.50)
-    assert(newNewSeq1.getProbability(event).getOrElse(0.00) == 0.50)
+    assert(newNewSeq1.getProbability(event2) == 0.50)
+    assert(newNewSeq1.getProbability(event) == 0.50)
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1327,8 +1327,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getEventCount == 2)
     assert(newNewSeq2.getEvents(event2) == 1)
     assert(newNewSeq2.getEvents(event) == 1)
-    assert(newNewSeq2.getProbability(event2).getOrElse(0.00) == 0.50)
-    assert(newNewSeq2.getProbability(event).getOrElse(0.00) == 0.50)
+    assert(newNewSeq2.getProbability(event2) == 0.50)
+    assert(newNewSeq2.getProbability(event) == 0.50)
 
     //val t4 = Vector(1, 3, 9, 4, 5)
     n1.growTree(t4, event2)
@@ -1341,7 +1341,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList1.maxDepth == 2)
     assert(newSplitSeqList1.getKeys.size == 1)
     newSplitSeqList1.getSequence(t1.drop(2)) shouldBe defined
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getProbability(event).getOrElse(0.00) == 1.00)
+    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getProbability(event) == 1.00)
     assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getPredictions.size == 1)
     assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getPredictions(event) == 1.00)
     assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getEventCount == 1)
@@ -1357,7 +1357,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList2.maxDepth == 0)
     assert(newSplitSeqList2.getKeys.size == 1)
     newSplitSeqList2.getSequence(t4.drop(4)) shouldBe defined
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getProbability(event2).getOrElse(0.00) == 1.00)
+    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getProbability(event2) == 1.00)
     assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getPredictions.size == 1)
     assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getPredictions(event2) == 1.00)
     assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getEventCount == 1)
@@ -1375,8 +1375,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     newSplitSeqList3.getSequence(t1.drop(3)) shouldBe defined
     newSplitSeqList3.getSequence(t4.drop(3)) shouldBe defined
 
-    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event).getOrElse(0.00) == 0.50)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getProbability(event2).getOrElse(0.00) == 0.50)
+    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == 0.50)
+    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getProbability(event2) == 0.50)
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions.size == 2)
     assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions.size == 2)
 
@@ -1440,7 +1440,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
 
   test("temp") {
-    val n1 = new Node[Int, Int](1, 1, 1)
+    val n1 = new Node[Int, Int](1, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val event = 666
