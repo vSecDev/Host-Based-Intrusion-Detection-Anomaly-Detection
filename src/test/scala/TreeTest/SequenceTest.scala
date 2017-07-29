@@ -42,6 +42,28 @@ class SequenceTest extends FunSuite{
     val caught = intercept[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, None, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Sequence event cannot be Nil or None!")
   }
+  test("Sequence constructor arg validation. Correct error message if prior is smaller than zero!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, Some(666), 0.0, -1.0))
+    assert(caught.getMessage == "requirement failed: Sequence prior weight must be larger than zero!")
+  }
+  test("Sequence constructor arg validation. Correct error message if prior is zero!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, Some(666), 0.0, 0.0))
+    assert(caught.getMessage == "requirement failed: Sequence prior weight must be larger than zero!")
+  }
+  test("Sequence constructor arg validation. Correct error message if smoothing is smaller than zero!"){
+    val caught = intercept[IllegalArgumentException](new Sequence[Int, Option[Int]](shortListTrace, Some(666), -1.0, 0.0))
+    assert(caught.getMessage == "requirement failed: Sequence smoothing value must be non-negative!")
+  }
+  test("Sequence correct error message if trying to reset smoothing"){
+    val s1 = new Sequence[Int, Int](shortListTrace, 666, 0.0, 1.0)
+    val caught = intercept[IllegalStateException](s1.setSmoothing(5.0))
+    assert(caught.getMessage == "Sequence smoothing cannot be reset")
+  }
+  test("Sequence correct error message if trying to reset prior"){
+    val s1 = new Sequence[Int, Int](shortListTrace, 666, 0.0, 1.0)
+    val caught = intercept[IllegalStateException](s1.setPrior(5.0))
+    assert(caught.getMessage == "Sequence prior cannot be changed after initialisation")
+  }
   test("Sequence returns probability for input"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666, 0.0, 1.0)
 
@@ -331,7 +353,6 @@ class SequenceTest extends FunSuite{
     assert(eventNum2 == s1.getEventCount)
     assert(eventNum2 == 2)
     assert(2 == s1.getEventCount)
-
 
     s1.updateEvents(777)
     assert(s1.getEventCount == 3)
