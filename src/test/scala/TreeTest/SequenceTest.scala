@@ -256,6 +256,42 @@ class SequenceTest extends FunSuite{
     assert(s1.getProbability("ntdll.dll+0xeac7") == 2.0/6)
     assert(s1.getProbability("kernel32.dll+0x15568") == 1.0/6)
   }
+
+
+  test("Sequence getProbability for String events after multiple updates. With smoothing!"){
+    val smoothing = 0.1
+    val s1 = new Sequence[String, String](shortStringListTrace, "ntdll.dll+0x2173e", smoothing, 1.0)
+
+    assert(s1.getProbability("Nonexistent event") == smoothing)
+    assert(s1.getProbability("ntdll.dll+0x2173e") == 1.1)
+    s1.updateEvents("ntdll.dll+0x21639")
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (1.0 + smoothing) / 2)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 2)
+    s1.updateEvents("ntdll.dll+0xeac7")
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (1.0 + smoothing) / 3)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 3)
+    assert(s1.getProbability("ntdll.dll+0xeac7") == (1.0 + smoothing) / 3)
+    s1.updateEvents("ntdll.dll+0xeac7")
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (1.0 + smoothing) / 4)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 4)
+    assert(s1.getProbability("ntdll.dll+0xeac7") == (2.0 + smoothing) / 4)
+    s1.updateEvents("kernel32.dll+0x15568")
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (1.0 + smoothing) / 5)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 5)
+    assert(s1.getProbability("ntdll.dll+0xeac7") == (2.0 + smoothing) / 5)
+    assert(s1.getProbability("kernel32.dll+0x15568") == (1.0 + smoothing) / 5)
+    s1.updateEvents("ntdll.dll+0x2173e")
+    assert(s1.getProbability("ntdll.dll+0x2173e") == (2.0 + smoothing) / 6)
+    assert(s1.getProbability("ntdll.dll+0x21639") == (1.0 + smoothing) / 6)
+    assert(s1.getProbability("ntdll.dll+0xeac7") == (2.0 + smoothing) / 6)
+    assert(s1.getProbability("kernel32.dll+0x15568") == (1.0 + smoothing) / 6)
+  }
+
+
+
+
+
+
   test("Sequence eventCount == events sum in events"){
     val s1 = new Sequence[Int, Int](shortListTrace, 666, 0.0, 1.0)
     assert(s1.getEventCount == 1)
