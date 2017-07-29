@@ -9,7 +9,7 @@ import scala.collection.mutable.Map
   */
 class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) {
 
-  var smoothing: Double = 0.0
+  var smoothing: Double = -1.0
   var prior = -1.0
   var weight: Double = 1.0
   private var condition: Vector[A] = Vector[A]()
@@ -37,7 +37,7 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   def getSmoothing: Double = smoothing
 
-  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("Sequence smoothing cannot be reset")
+  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("Sequence smoothing cannot be reset")
 
   def getPrior: Double = prior
 

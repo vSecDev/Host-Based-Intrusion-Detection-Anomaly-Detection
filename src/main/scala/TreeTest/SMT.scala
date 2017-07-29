@@ -19,7 +19,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing
 
   def setSmoothing(aSmoothing: Double): Unit = {
     println("SMT setting smoothing")
-    if (smoothing == 0.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
+    if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
   }
 
   def getPrior: Double = prior
@@ -39,7 +39,7 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing
 
 case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
-  var smoothing: Double = 0.0
+  var smoothing: Double = -1.0
   var prior = -1.0
   var weight: Double = 1.0
   //A root node has no key. Root.getKey = None
@@ -110,7 +110,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
   def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
-  private def getNewPrior: Double = if(maxDepth > maxPhi) 1.0 / (maxPhi+1) else 1.0 / maxDepth
+  //TODO REVISE THIS - MIGHT NOT HAVE TO MULTIPLY THE RESULT BY THE CURRENT PRIOR!!!
+  private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
 
   //TODO - CHECK IF  WEIGHT PRIORS ARE CORRECT!
   def growTree(condition: Vector[A], event: B): Unit = {
@@ -187,7 +188,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
 case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
-  var smoothing: Double = 0.0
+  var smoothing: Double = -1.0
   var prior = -1.0
   var weight: Double = 1.0
   var sequences: Vector[Sequence[A, B]] = Vector[Sequence[A, B]]()
