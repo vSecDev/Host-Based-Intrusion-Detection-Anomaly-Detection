@@ -1533,22 +1533,30 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     newSplitSeqList3.getSequence(t1.drop(3)) shouldBe defined
     newSplitSeqList3.getSequence(t4.drop(3)) shouldBe defined
 
+    val splitSeq3 = newSplitSeqList3.getSequence(t4.drop(3)).get
+    val newSplitSeqListPrior3 = splitSeq3.getPrior
+    val newSplitSeqListWeight3 = splitSeq3.getWeight
+    assert(newSplitSeqListPrior3 == prior * 1.0/3 * 1.0/2)
+    assert(newSplitSeqListPrior3 == 1.0/3 * 1.0/2)
+    assert(newSplitSeqListWeight3 == (prior * 1.0/3 * 1.0/2 * (1.0 + smoothing) * (1.0 + smoothing)/2))
+    assert(splitSeq3.getWeightedProbability(event2) == ( newSplitSeqListPrior3 * (1.0 + smoothing) * (1.0 + smoothing)/2 * (1.0 + smoothing)/2))
+
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == (1.0 + smoothing)/2)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getProbability(event2) == (1.0 + smoothing)/2)
+    assert(splitSeq3.getProbability(event2) == (1.0 + smoothing)/2)
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions.size == 2)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions.size == 2)
+    assert(splitSeq3.getPredictions.size == 2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions(event) == (1.0 + smoothing)/2)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions(event2) == (1.0 + smoothing)/2)
+    assert(splitSeq3.getPredictions(event2) == (1.0 + smoothing)/2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEventCount == 2)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEventCount == 2)
+    assert(splitSeq3.getEventCount == 2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEvents.size == 2)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEvents.size == 2)
+    assert(splitSeq3.getEvents.size == 2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEvents(event) == 1)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEvents(event2) == 1)
+    assert(splitSeq3.getEvents(event2) == 1)
 
     /*  println("888888888888888888888888888888888888888")
     println("888888888888888888888888888888888888888")
