@@ -1289,13 +1289,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq0.getEvents(event2) == 1)
     val newSeq0Prior = newSeq0.getPrior
     val newSeqWeight = newSeq0.getWeight
-    println("newSeqPrior: " + newSeq0Prior + " - should be " + (prior * 1/3 * 1/3))
-    println("newSeqPrior: " + newSeq0Prior + " - should be " + (prior * 1/3 * 1/3))
-    println("newSeqweight: " + newSeqWeight + " - should be same as newSeqPrior" + newSeq0Prior)
     assert(newSeq0Prior == prior * 1/3 * 1/3)
+    assert(newSeq0Prior == 1.0/3 * 1/3)
+    assert(newSeqWeight == (1.0/3 *1.0/3 * (1.0 + smoothing)))
 
-   // assert(newSeq0.getWeightedProbability(event2) == (1.0 + smoothing) * newSeq0Prior)
-   // assert(newSeq0.getWeightedProbability(event2) == (1.0 + 0.1) * 1/3 * 1/3)
+    assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
+    assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
+    assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
+    assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
+
+    assert(newSeq0.getWeightedProbability(event2) == (1.0/3 * 1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)))
+    assert(newSeq0.getWeightedProbability(event2) == prior * 1.0/3 * 1.0/3 * (1.0 + 0.1) * (1.0 + 0.1))
+    assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + newSeq0.getSmoothing)
     println("got here")
