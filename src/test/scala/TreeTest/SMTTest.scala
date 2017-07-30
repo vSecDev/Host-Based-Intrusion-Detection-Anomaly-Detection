@@ -1402,8 +1402,15 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq0.getEventCount == 2)
     assert(newNewSeq0.getEvents(event2) == 1)
     assert(newNewSeq0.getEvents(event) == 1)
-    assert(newNewSeq0.getProbability(event2) == 0.50)
-    assert(newNewSeq0.getProbability(event) == 0.50)
+    val newSeq0Prior2 = newNewSeq0.getPrior
+    val newSeqWeight2 = newNewSeq0.getWeight
+    assert(newSeq0Prior2 == prior * 1/3 * 1/3)
+    assert(newSeq0Prior2 == 1.0/3 * 1/3)
+    assert(newSeqWeight2 == (prior * 1.0/3 *1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)/2))
+    assert(newNewSeq0.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeqWeight2))
+    assert(newNewSeq0.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeqWeight2))
+    assert(newNewSeq0.getProbability(event2) == (1.0 + smoothing)/2)
+    assert(newNewSeq0.getProbability(event) == (1.0 + smoothing)/2)
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
     assert(phi_1_node_0.getChildren.size == 3)
@@ -1430,8 +1437,15 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq1.getEventCount == 2)
     assert(newNewSeq1.getEvents(event2) == 1)
     assert(newNewSeq1.getEvents(event) == 1)
-    assert(newNewSeq1.getProbability(event2) == 0.50)
-    assert(newNewSeq1.getProbability(event) == 0.50)
+    val newSeq1Prior2 = newNewSeq1.getPrior
+    val newSeq1Weight2 = newNewSeq1.getWeight
+    assert(newSeq1Prior2 == prior * 1/3 * 1/3)
+    assert(newSeq1Prior2 == 1.0/3 * 1/3)
+    assert(newSeq1Weight2 == (prior * 1.0/3 *1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)/2))
+    assert(newNewSeq1.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeq1Weight2))
+    assert(newNewSeq1.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeq1Weight2))
+    assert(newNewSeq1.getProbability(event2) == (1.0 + smoothing)/2)
+    assert(newNewSeq1.getProbability(event) == (1.0 + smoothing)/2)
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1455,8 +1469,15 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getEventCount == 2)
     assert(newNewSeq2.getEvents(event2) == 1)
     assert(newNewSeq2.getEvents(event) == 1)
-    assert(newNewSeq2.getProbability(event2) == 0.50)
-    assert(newNewSeq2.getProbability(event) == 0.50)
+    val newSeq2Prior2 = newNewSeq2.getPrior
+    val newSeq2Weight2 = newNewSeq2.getWeight
+    assert(newSeq2Prior2 == prior * 1.0/3 * 1.0/2)
+    assert(newSeq2Prior2 == 1.0/3 * 1.0/2)
+    assert(newSeq2Weight2 == (prior * 1.0/3 *1.0/2 * (1.0 + smoothing) * (1.0 + smoothing)/2))
+    assert(newNewSeq2.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeq2Weight2))
+    assert(newNewSeq2.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeq2Weight2))
+    assert(newNewSeq2.getProbability(event2) == (1.0 + smoothing)/2)
+    assert(newNewSeq2.getProbability(event) == (1.0 + smoothing)/2)
 
     //val t4 = Vector(1, 3, 9, 4, 5)
     n1.growTree(t4, event2)
@@ -1469,12 +1490,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList1.maxDepth == 2)
     assert(newSplitSeqList1.getKeys.size == 1)
     newSplitSeqList1.getSequence(t1.drop(2)) shouldBe defined
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getProbability(event) == 1.00)
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getPredictions.size == 1)
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getPredictions(event) == 1.00)
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getEventCount == 1)
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getEvents.size == 1)
-    assert(newSplitSeqList1.getSequence(t1.drop(2)).get.getEvents(event) == 1)
 
 
     val node2: Node[Int, Int] = n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(1).asInstanceOf[Node[Int, Int]]
@@ -1485,13 +1500,28 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSplitSeqList2.maxDepth == 0)
     assert(newSplitSeqList2.getKeys.size == 1)
     newSplitSeqList2.getSequence(t4.drop(4)) shouldBe defined
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getProbability(event2) == 1.00)
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getPredictions.size == 1)
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getPredictions(event2) == 1.00)
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getEventCount == 1)
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getEvents.size == 1)
-    assert(newSplitSeqList2.getSequence(t4.drop(4)).get.getEvents(event2) == 1)
 
+    val splitSeq2 = newSplitSeqList2.getSequence(t4.drop(4)).get
+    val newSplitSeqListPrior2 = splitSeq2.getPrior
+    val newSplitSeqListWeight2 = splitSeq2.getWeight
+    assert(newSplitSeqListPrior2 == prior * 1.0/3 * 1.0/3 * 1.0/3)
+    assert(newSplitSeqListPrior2 == 1.0/3 * 1.0/3 * 1.0/3)
+    assert(newSplitSeqListWeight2 == (prior * 1.0/3 *1.0/3 * 1.0/3 * (1.0 + smoothing)))
+    assert(splitSeq2.getWeightedProbability(event2) == ((1.0 + smoothing) * newSplitSeqListWeight2))
+    assert(splitSeq2.getProbability(event2) == (1.0 + smoothing))
+    assert(splitSeq2.getProbability(event2) == 1.0 + smoothing)
+    assert(splitSeq2.getPredictions.size == 1)
+    assert(splitSeq2.getPredictions(event2) == 1.00 + smoothing)
+    assert(splitSeq2.getEventCount == 1)
+    assert(splitSeq2.getEvents.size == 1)
+    assert(splitSeq2.getEvents(event2) == 1)
+
+    assert(splitSeq2.getProbability(event2) == 1.00 + smoothing)
+    assert(splitSeq2.getPredictions.size == 1)
+    assert(splitSeq2.getPredictions(event2) == 1.00 + smoothing)
+    assert(splitSeq2.getEventCount == 1)
+    assert(splitSeq2.getEvents.size == 1)
+    assert(splitSeq2.getEvents(event2) == 1)
 
     val node3: Node[Int, Int] = n1.getChildren(2)(0).asInstanceOf[Node[Int, Int]]
     assert(node3.getKey.get == 9)
@@ -1503,13 +1533,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     newSplitSeqList3.getSequence(t1.drop(3)) shouldBe defined
     newSplitSeqList3.getSequence(t4.drop(3)) shouldBe defined
 
-    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == 0.50)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getProbability(event2) == 0.50)
+    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == (1.0 + smoothing)/2)
+    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getProbability(event2) == (1.0 + smoothing)/2)
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions.size == 2)
     assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions.size == 2)
 
-    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions(event) == 0.50)
-    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions(event2) == 0.50)
+    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions(event) == (1.0 + smoothing)/2)
+    assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getPredictions(event2) == (1.0 + smoothing)/2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEventCount == 2)
     assert(newSplitSeqList3.getSequence(t4.drop(3)).get.getEventCount == 2)
