@@ -1303,8 +1303,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + newSeq0.getSmoothing)
-    println("got here")
-
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
     assert(phi_1_node_0.getChildren.size == 3)
@@ -1326,11 +1324,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_1_node_2.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(3))
     assert(phi_1_node_2.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(4))
     assert(phi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
-    val newSeq1 = phi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(t3.drop(2)).get
+    val seqlist = phi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
+    val newSeq1 = seqlist.getSequence(t3.drop(2)).get
+    assert(seqlist.maxDepth == 2)
+    assert(seqlist.getPrior == 1.0/3 * 1.0/3)
     assert(newSeq1.getKey == t3.drop(2))
+    assert(newSeq1.getPrior == 1.0/3 * 1.0/3)
+    assert(newSeq1.getWeight == 1.0/3 * 1.0/3 * (1.0 + smoothing))
+    assert(newSeq1.getWeight == prior * 1.0/3 * 1.0/3 *(1.0 + smoothing))
     assert(newSeq1.getEventCount == 1)
     assert(newSeq1.getEvents(event2) == 1)
-    assert(newSeq1.getProbability(event2) == 1.00)
+    assert(newSeq1.getProbability(event2) == 1.1)
+    assert(newSeq1.getProbability(event2) == 1.0 + smoothing)
+    assert(newSeq1.getWeightedProbability(event2) == prior * 1.0/3 * 1.0/3 * (1.0 + smoothing)* (1.0 + smoothing) )
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1353,7 +1359,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq2.getKey == t3.drop(3))
     assert(newSeq2.getEventCount == 1)
     assert(newSeq2.getEvents(event2) == 1)
-    assert(newSeq2.getProbability(event2) == 1.00)
+    assert(newSeq2.getProbability(event2) == 1.1)
 
 
     n1.growTree(t3, event)
