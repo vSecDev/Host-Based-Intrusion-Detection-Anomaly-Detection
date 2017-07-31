@@ -82,7 +82,7 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   private def updateWeight(newEvent: B): Unit = weight *= getProbability(newEvent)
 
-  def updatePredictions(): Unit = {
+  private def updatePredictions(): Unit = {
     for ((k, v) <- events) {
       if (predictions.contains(k)) predictions.update(k, (v.toDouble + smoothing) / eventCount)
       else predictions += (k -> ((v.toDouble + smoothing) / eventCount))
