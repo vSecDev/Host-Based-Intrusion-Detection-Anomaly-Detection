@@ -241,7 +241,10 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
     newVector
   }
 
-
+  def getPredictionWithWeight(seq: (Vector[A], B)): (Double, Double) = getSequence(seq._1) match {
+    case None => (0.0, 0.0)
+    case Some(x) => (x.getWeightedProbability(seq._2), x.getWeight)
+  }
 }
 
 

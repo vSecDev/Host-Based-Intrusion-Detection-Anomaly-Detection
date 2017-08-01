@@ -62,7 +62,7 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   def getProbability(input: B): Double = getPredictions.get(input) match {
     case Some(x) => x
-    case None => _smoothing / eventCount
+    case None => smoothing / eventCount
   }
 
   def getWeightedProbability(input: B): Double = weight * getProbability(input)
