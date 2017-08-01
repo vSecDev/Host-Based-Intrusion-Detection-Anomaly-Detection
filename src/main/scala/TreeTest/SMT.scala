@@ -218,6 +218,11 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
   private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
+    def helper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
+      for ((event, count) <- events) {
+        for (i <- 1 to count) { node.growTree(keyTail, event) }
+      }
+    }
 
     var newVector = Vector[Node[A, B]]()
 
@@ -227,20 +232,16 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
         case None =>
           val newNode: Node[A, B] = Node[A, B](maxDepth, maxPhi, maxSeqCount, _smoothing, _prior)
           newNode.setKey(s.getKey(0))
-          splitHelper(newNode, s.getKey.tail, s.getEvents)
+          helper(newNode, s.getKey.tail, s.getEvents)
           newVector = newVector :+ newNode
         case Some(x) =>
-          splitHelper(x, s.getKey.tail, s.getEvents)
+          helper(x, s.getKey.tail, s.getEvents)
       }
     }
     newVector
   }
 
-  private def splitHelper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
-    for ((event, count) <- events) {
-      for (i <- 1 to count) { node.growTree(keyTail, event) }
-    }
-  }
+
 }
 
 
