@@ -1984,13 +1984,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var r2 = n1.predict(condition1, event2)
     assert(r1._1 == 4.0 && r1._2 == 2.0)
     assert(r2._1 == 2.0 && r2._2 == 2.0)
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0/3)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
 
     n1.learn(condition1, event2)
     r1 = n1.predict(condition1, event1)
     r2 = n1.predict(condition1, event2)
     var r3 = n1.predict(condition1, event3)
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0/3)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
     assert(r1._1 == 2.0 && r1._2 == 2.0)
     assert(r2._1 == 2.0 && r2._2 == 2.0)
     assert(r3._1 == 1.0 && r3._2 == 2.0)
@@ -2003,23 +2003,22 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var r5 = n1.predict(condition2, event2)
     var r6 = n1.predict(condition2, event3)
 
-    assert(n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(1)).get.getWeight == 1.0/3)
-    assert(r1._1 == 2.0 && r1._2 == 1.0)
-    /*assert(r2._1 == 2.0 && r2._2 == 2.0)
-    assert(r3._1 == 1.0 && r3._2 == 2.0)*/
+    assert(n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 1.0 / 3)
+    assert(r1._1 == 2.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(r3._1 == 1.0 && r3._2 == 2.0)
+    assert(r4._1 == 4.0 && r4._2 == 2.0)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
 
+    n1.learn(condition3, event2)
+    var r7 = n1.predict(condition3, event2)
+    assert(r7._1 == 4.0 && r7._2 == 2.0)
 
-
-    println("Node n1:\n" + n1)
-    println("n1 Seq0 weight: " + n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight)
-    println("n1 Seq1 weight: " + n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight)
-    println("n1 Seq2 weight: " + n1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(2)).get.getWeight)
-    println("Classification. Condition: " + condition1 + " - event: " + event1 + " ---- r1: " + r1)
-    println("Classification. Condition: " + condition1 + " - event: " + event2 + " ---- r1: " + r2)
-    println("Classification. Condition: " + condition1 + " - event: " + event3 + " ---- r1: " + r3)
-
-
-
+    val condition4 = Vector(1, 3, 4)
+    n1.learn(condition4, event1)
+    var r8 = n1.predict(condition4, event1)
+    assert(r8._1 == 4.0 && r8._2 == 2.0)
   }
 }
 
