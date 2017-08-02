@@ -1965,8 +1965,36 @@ test("Deserialisation") {
   println("n1 deserialised:\n" + n1)
   println("n1 children: " + n1.getChildren.size)
 }
+  test("SMT classify explores whole structure"){
+     val maxDepth = 3
+    val maxPhi = 2
+    val maxSeqCount = 1
+    val smoothing = 1.0
+    val prior = 1.0
+    val condition1 = Vector(1,2,3)
+    val condition2 = Vector(4,5,6)
+    val condition3 = Vector(7,8,9)
+    val event1 = 666
+    val event2 = 777
+    val event3 = 888
+
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.growTree(condition1, event1)
+    n1.growTree(condition1, event2)
+    val r1 = n1.classify(condition1, event1)
+    val r2 = n1.classify(condition1, event2)
+    val r3 = n1.classify(condition1, event3)
+    println("Node n1:\n" + n1)
+    println("n1 Seq0 weight: " + n1.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1).get.getWeight)
+    println("n1 Seq1 weight: " + n1.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(1)).get.getWeight)
+    println("n1 Seq2 weight: " + n1.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(2)).get.getWeight)
+    println("Classification. Condition: " + condition1 + " - event: " + event1 + " ---- r1: " + r1)
+    println("Classification. Condition: " + condition1 + " - event: " + event2 + " ---- r1: " + r2)
+    println("Classification. Condition: " + condition1 + " - event: " + event3 + " ---- r1: " + r3)
 
 
+
+  }
 
 
 }
