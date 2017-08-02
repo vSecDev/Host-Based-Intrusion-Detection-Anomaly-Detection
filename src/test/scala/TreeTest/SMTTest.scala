@@ -19,7 +19,7 @@ import scala.io.Source
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
 
-
+  val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
   val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
@@ -1910,9 +1910,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("tree: \n" + n1)*/
   }*/
 
-  /* test("Create tree models") {
+   test("Create tree models") {
     val extensions = List("GHC")
-    val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
+    //val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
+    val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
     var maxSeqCount = 100
 
 
@@ -1945,7 +1946,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               }
             }
             System.gc
-            serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePath + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+            serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePathHome + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
             System.gc
           } catch {
             case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
@@ -1956,7 +1957,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       System.gc
     }
     System.gc
-  }*/
+  }
 
 
   /*test("Deserialisation") {
