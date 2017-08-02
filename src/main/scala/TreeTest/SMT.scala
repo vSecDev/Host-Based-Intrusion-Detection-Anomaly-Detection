@@ -108,7 +108,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
   private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
 
   //TODO - CHECK IF  WEIGHT PRIORS ARE CORRECT!
-  def growTree(condition: Vector[A], event: B): Unit = {
+  def learn(condition: Vector[A], event: B): Unit = {
 
     if (maxDepth > 0) for {
       i <- 0 to maxPhi
@@ -131,14 +131,14 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
           nextNode match {
             case Some(x: Node[A, B]) =>
               newCondition.tail match {
-                case y +: ys => x.growTree(y +: ys, event)
+                case y +: ys => x.learn(y +: ys, event)
                 case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
             case None =>
               val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, getNewPrior)
               newNode.setKey(newCondition.head)
               newCondition.tail match {
-                case y +: ys => newNode.growTree(y +: ys, event)
+                case y +: ys => newNode.learn(y +: ys, event)
                 case _ => println("should not ever get here with static window size"); updateEvents(event)
               }
               children = children.updated(i, children(i) :+ newNode)
@@ -154,7 +154,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
     } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
   }
 
-  def classify(condition: Vector[A], event: B): (Double, Double) = {
+  def predict(condition: Vector[A], event: B): (Double, Double) = {
     outer(condition, event, getChildren)
   }
 
@@ -162,49 +162,44 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
     @tailrec
     def innerHelper(condition: Vector[A], event: B, children: Vector[SMT[_ <: A, _ <: B]], acc: (Double, Double)): (Double, Double) = {
       children match {
-        case x+:xs => x match {
-          case sl: SequenceList[A,B] => {
+        case x +: xs => x match {
+          case sl: SequenceList[A, B] => {
             val res: (Double, Double) = sl.getPredictionWithWeight(condition, event)
             innerHelper(condition, event, xs, (acc._1 + res._1, acc._2 + res._2))
           }
 
-          case _: Node[A,B] => {
+          case _: Node[A, B] => {
             val nextNode: Option[Node[A, B]] = children.asInstanceOf[Vector[Node[A, B]]].find(x => x.getKey.get == condition.head)
-           // (x:xs hasNodeWith key = condition.head) match {
+            // (x:xs hasNodeWith key = condition.head) match {
             nextNode match {
               case None => acc
-              case Some(x: Node[A,B]) => {
+              case Some(x: Node[A, B]) => {
                 val newCondition = condition.drop(1)
                 outer(newCondition, event, x.getChildren)
 
               }
             }
           }
-
         }
         case _ => acc
       }
     }
+
     innerHelper(condition, event, children, (0.0, 0.0))
   }
 
   private def outer(condition: Vector[A], event: B, children: Vector[Vector[SMT[_ <: A, _ <: B]]]): (Double, Double) = {
     @tailrec
     def outerHelper(condition: Vector[A], event: B, children: Vector[Vector[SMT[_ <: A, _ <: B]]], acc: (Double, Double)): (Double, Double) = children match {
-      case x+:xs => {
+      case x +: xs => {
         val sub = inner(condition, event, x)
         outerHelper(condition.drop(1), event, xs, (acc._1 + sub._1, acc._2 + sub._2))
       }
       case _ => acc
-
     }
-    outerHelper(condition, event, children, (0.0,0.0))
+
+    outerHelper(condition, event, children, (0.0, 0.0))
   }
-
-
-
-
-
 
   override def toString: String = {
     val buf = new StringBuilder
@@ -275,7 +270,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
     def helper(node: Node[A, B], keyTail: Vector[A], events: Map[B, Int]) = {
       for ((event, count) <- events) {
-        for (i <- 1 to count) { node.growTree(keyTail, event) }
+        for (i <- 1 to count) { node.learn(keyTail, event) }
       }
     }
 

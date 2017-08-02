@@ -48,8 +48,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }*/
 
   test("SMT. maxDepth is not zero") {
-    assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0 , 1.0))
-    val caught = intercept[IllegalArgumentException](Node(0, 1, 3, 0.0 , 1.0))
+    assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
+    val caught = intercept[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max depth count must be positive!")
   }
   test("SMT. maxDepth is not negative") {
@@ -369,7 +369,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   //SMT ----------------------------------
   test("SMT, invalid argument to growTree: empty Vector| event") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
-    n1.growTree(Vector.empty[Int], 666)
+    n1.learn(Vector.empty[Int], 666)
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
     assert(n1.getPredictions.isEmpty)
@@ -379,7 +379,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     val condition = Vector(1)
     val event = 666
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -409,7 +409,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val condition = Vector(1, 2)
     val event = 666
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -427,8 +427,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     for (i <- n1.getChildren.indices) {
       val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
       assert(child.getSmoothing == smoothing)
-      assert(child.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-      assert(child.getPrior == 1.0 * 1/2)
+      assert(child.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+      assert(child.getPrior == 1.0 * 1 / 2)
       assert(child.getKeys.size == 1)
       assert(child.getKeys(0) == condition.drop(i))
       assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
@@ -448,7 +448,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val condition = Vector(1, 2, 3)
     val event = 666
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -466,8 +466,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     for (i <- n1.getChildren.indices) {
       val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
       assert(child.getSmoothing == smoothing)
-      assert(child.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-      assert(child.getPrior == 1.0 * 1/2)
+      assert(child.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+      assert(child.getPrior == 1.0 * 1 / 2)
       assert(child.getKeys.size == 1)
       assert(child.getKeys(0) == condition.drop(i))
       assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
@@ -489,7 +489,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val event = 666
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -507,8 +507,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     for (i <- n1.getChildren.indices) {
       val child = n1.getChildren(i)(0).asInstanceOf[SequenceList[Int, Int]]
       assert(child.getSmoothing == smoothing)
-      assert(child.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-      assert(child.getPrior == 1.0 * 1/2)
+      assert(child.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+      assert(child.getPrior == 1.0 * 1 / 2)
       assert(child.getKeys.size == 1)
       assert(child.getKeys(0) == condition.drop(i))
       assert(child.getSequence(condition.drop(i)).get.getKey == condition.drop(i))
@@ -519,7 +519,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.learn(condition2, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -537,8 +537,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       c match {
         case child: SequenceList[Int, Int] => {
           assert(child.getSmoothing == smoothing)
-          assert(child.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-          assert(child.getPrior == 1.0 * 1/2)
+          assert(child.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+          assert(child.getPrior == 1.0 * 1 / 2)
           assert(child.getKeys.size == 2)
           assert(child.getKeys(0) == condition.drop(i))
           assert(child.getKeys(1) == condition2.drop(i))
@@ -563,18 +563,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
             assert(curr.maxDepth == 1)
             assert(curr.getSmoothing == smoothing)
-            assert(curr.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-            assert(curr.getPrior == 1.0 * 1/2)
+            assert(curr.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+            assert(curr.getPrior == 1.0 * 1 / 2)
             if (j == 0) {
               assert(curr.getKey.get == condition.drop(i)(0))
               assert(curr.getChildren.size == 1)
               assert(curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].maxDepth == 0)
               assert(curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].maxPhi == maxPhi)
-              assert(curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
+              assert(curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
               val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
               assert(currSeq(0).getSmoothing == smoothing)
-              assert(currSeq(0).getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-              assert(currSeq(0).getPrior == 1.0 * 1/2)
+              assert(currSeq(0).getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+              assert(currSeq(0).getPrior == 1.0 * 1 / 2)
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 2)
               assert(currSeq(0).getPredictions.size == 1)
@@ -610,9 +610,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val event2 = 777
     val event3 = 888
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.learn(condition, event)
+    n1.learn(condition2, event2)
+    n1.learn(condition3, event3)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -631,8 +631,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       c match {
         case child: SequenceList[Int, Int] => {
           assert(child.getSmoothing == smoothing)
-          assert(child.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-          assert(child.getPrior == 1.0 * 1/2)
+          assert(child.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+          assert(child.getPrior == 1.0 * 1 / 2)
           assert(child.getKeys.size == 3)
           assert(child.getKeys(0) == condition.drop(i))
           assert(child.getKeys(1) == condition2.drop(i))
@@ -663,16 +663,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           for (j <- n1.getChildren(i).indices) {
             val curr = n1.getChildren(i)(j).asInstanceOf[Node[_, _]]
             assert(curr.getSmoothing == smoothing)
-            assert(curr.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-            assert(curr.getPrior == 1.0 * 1/2)
+            assert(curr.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+            assert(curr.getPrior == 1.0 * 1 / 2)
 
             if (j == 0) {
               assert(curr.getKey.get == condition.drop(i)(0))
               assert(curr.getChildren.size == 1)
               val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
               assert(currSeq(0).getSmoothing == smoothing)
-              assert(currSeq(0).getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-              assert(currSeq(0).getPrior == 1.0 * 1/2)
+              assert(currSeq(0).getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+              assert(currSeq(0).getPrior == 1.0 * 1 / 2)
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 2)
               assert(currSeq(0).getPredictions.size == 1)
@@ -684,8 +684,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(curr.getChildren.size == 1)
               val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
               assert(currSeq(0).getSmoothing == smoothing)
-              assert(currSeq(0).getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-              assert(currSeq(0).getPrior == 1.0 * 1/2)
+              assert(currSeq(0).getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+              assert(currSeq(0).getPrior == 1.0 * 1 / 2)
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 4)
               assert(currSeq(0).getPredictions.size == 1)
@@ -697,8 +697,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(curr.getChildren.size == 1)
               val currSeq = curr.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences
               assert(currSeq(0).getSmoothing == smoothing)
-              assert(currSeq(0).getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-              assert(currSeq(0).getPrior == 1.0 * 1/2)
+              assert(currSeq(0).getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+              assert(currSeq(0).getPrior == 1.0 * 1 / 2)
               assert(currSeq.size == 1)
               assert(currSeq(0).getKey(0) == 6)
               assert(currSeq(0).getPredictions.size == 1)
@@ -719,13 +719,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val event2 = 777
     val event3 = 888
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.learn(condition, event)
+    n1.learn(condition2, event2)
+    n1.learn(condition3, event3)
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.learn(condition, event)
+    n1.learn(condition2, event2)
+    n1.learn(condition3, event3)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -823,13 +823,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val event2 = 777
     val event3 = 888
 
-    n1.growTree(condition, event)
-    n1.growTree(condition2, event2)
-    n1.growTree(condition3, event3)
+    n1.learn(condition, event)
+    n1.learn(condition2, event2)
+    n1.learn(condition3, event3)
 
-    n1.growTree(condition, event3)
-    n1.growTree(condition2, event)
-    n1.growTree(condition3, event2)
+    n1.learn(condition, event3)
+    n1.learn(condition2, event)
+    n1.learn(condition3, event2)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -894,7 +894,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getPredictions.size == 2)
               assert(currSeq(0).getProbability(666) == 0.50)
               assert(currSeq(0).getProbability(888) == 0.50)
-              assert(currSeq(0).getProbability(999)== 0.00)
+              assert(currSeq(0).getProbability(999) == 0.00)
             }
             else if (j == 1) {
               assert(curr.getKey.get == condition2.drop(i)(0))
@@ -907,7 +907,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getPredictions.size == 2)
               assert(currSeq(0).getProbability(777) == 0.50)
               assert(currSeq(0).getProbability(666) == 0.50)
-              assert(currSeq(0).getProbability(999)== 0.00)
+              assert(currSeq(0).getProbability(999) == 0.00)
             }
             else if (j == 2) {
               assert(curr.getKey.get == condition3.drop(i)(0))
@@ -919,7 +919,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               assert(currSeq(0).getPredictions.size == 2)
               assert(currSeq(0).getProbability(888) == 0.50)
               assert(currSeq(0).getProbability(777) == 0.50)
-              assert(currSeq(0).getProbability(999)== 0.00)
+              assert(currSeq(0).getProbability(999) == 0.00)
             }
           }
         }
@@ -932,7 +932,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition2 = Vector(3, 4)
     val event = 666
 
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -959,7 +959,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.learn(condition2, event)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -1032,7 +1032,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition2 = Vector(1, 4)
     val event = 666
 
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -1059,7 +1059,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
 
-    n1.growTree(condition2, event)
+    n1.learn(condition2, event)
 
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
@@ -1146,8 +1146,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val t3 = Vector(6, 7, 8, 9, 10)
     val t4 = Vector(1, 3, 9, 4, 5)
 
-    n1.growTree(t1, event)
-    n1.growTree(t2, event)
+    n1.learn(t1, event)
+    n1.learn(t2, event)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 2)
@@ -1167,10 +1167,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val phi_2_node_1 = phi_2(1).asInstanceOf[Node[Int, Int]]
 
     assert(phi_0_node_0.getKey.get == t1.head)
-    assert(phi_0_node_0.maxDepth == n1.maxDepth-1)
+    assert(phi_0_node_0.maxDepth == n1.maxDepth - 1)
     assert(phi_0_node_0.getSmoothing == smoothing)
-    assert(phi_0_node_0.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_0_node_0.getPrior == 1.0 * 1/3)
+    assert(phi_0_node_0.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_0_node_0.getPrior == 1.0 * 1 / 3)
     assert(phi_0_node_0.getChildren.size == 3)
     assert(phi_0_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(1))
     assert(phi_0_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(2))
@@ -1181,16 +1181,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val seq1 = phi_0_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
     val seq2 = phi_0_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
     val seq3 = phi_0_node_0.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
-    assert(seq1.getPrior == phi_0_node_0.getPrior * 1/3)
-    assert(seq2.getPrior == phi_0_node_0.getPrior * 1/3)
-    assert(seq3.getPrior == phi_0_node_0.getPrior * 1/3)
+    assert(seq1.getPrior == phi_0_node_0.getPrior * 1 / 3)
+    assert(seq2.getPrior == phi_0_node_0.getPrior * 1 / 3)
+    assert(seq3.getPrior == phi_0_node_0.getPrior * 1 / 3)
 
 
     assert(phi_0_node_1.getKey.get == t2.head)
-    assert(phi_0_node_1.maxDepth == n1.maxDepth-1)
+    assert(phi_0_node_1.maxDepth == n1.maxDepth - 1)
     assert(phi_0_node_1.getSmoothing == smoothing)
-    assert(phi_0_node_1.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_0_node_1.getPrior == 1.0 * 1/3)
+    assert(phi_0_node_1.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_0_node_1.getPrior == 1.0 * 1 / 3)
     assert(phi_0_node_1.getChildren.size == 3)
     assert(phi_0_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(1))
     assert(phi_0_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(2))
@@ -1200,10 +1200,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_0_node_1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
-    assert(phi_1_node_0.maxDepth == n1.maxDepth-2)
+    assert(phi_1_node_0.maxDepth == n1.maxDepth - 2)
     assert(phi_1_node_0.getSmoothing == smoothing)
-    assert(phi_1_node_0.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_1_node_0.getPrior == 1.0 * 1/3)
+    assert(phi_1_node_0.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_1_node_0.getPrior == 1.0 * 1 / 3)
     assert(phi_1_node_0.getChildren.size == 3)
     assert(phi_1_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(2))
     assert(phi_1_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(3))
@@ -1211,10 +1211,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_1_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
 
     assert(phi_1_node_1.getKey.get == t2.drop(1).head)
-    assert(phi_1_node_1.maxDepth == n1.maxDepth-2)
+    assert(phi_1_node_1.maxDepth == n1.maxDepth - 2)
     assert(phi_1_node_1.getSmoothing == smoothing)
-    assert(phi_1_node_1.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_1_node_1.getPrior == 1.0 * 1/3)
+    assert(phi_1_node_1.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_1_node_1.getPrior == 1.0 * 1 / 3)
     assert(phi_1_node_1.getChildren.size == 3)
     assert(phi_1_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(2))
     assert(phi_1_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(3))
@@ -1222,34 +1222,34 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_1_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
-    assert(phi_2_node_0.maxDepth == n1.maxDepth-3)
+    assert(phi_2_node_0.maxDepth == n1.maxDepth - 3)
     assert(phi_2_node_0.getSmoothing == smoothing)
-    assert(phi_2_node_0.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_2_node_0.getPrior == 1.0 * 1/3)
+    assert(phi_2_node_0.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_2_node_0.getPrior == 1.0 * 1 / 3)
     assert(phi_2_node_0.getChildren.size == 2)
     assert(phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(3))
     assert(phi_2_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t1.drop(4))
     assert(phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     val seq4 = phi_2_node_0.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
     val seq5 = phi_2_node_0.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
-    assert(seq4.getPrior == phi_2_node_0.getPrior * 1/2)
-    assert(seq5.getPrior == phi_2_node_0.getPrior * 1/2)
+    assert(seq4.getPrior == phi_2_node_0.getPrior * 1 / 2)
+    assert(seq5.getPrior == phi_2_node_0.getPrior * 1 / 2)
 
     assert(phi_2_node_1.getKey.get == t2.drop(2).head)
-    assert(phi_2_node_1.maxDepth == n1.maxDepth-3)
+    assert(phi_2_node_1.maxDepth == n1.maxDepth - 3)
     assert(phi_2_node_1.getSmoothing == smoothing)
-    assert(phi_2_node_1.getPrior == n1.getPrior * (1.0/(n1.maxPhi+1)))
-    assert(phi_2_node_1.getPrior == 1.0 * 1/3)
+    assert(phi_2_node_1.getPrior == n1.getPrior * (1.0 / (n1.maxPhi + 1)))
+    assert(phi_2_node_1.getPrior == 1.0 * 1 / 3)
     assert(phi_2_node_1.getChildren.size == 2)
     assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(3))
     assert(phi_2_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t2.drop(4))
     assert(phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     val seq6 = phi_2_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
     val seq7 = phi_2_node_1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0)
-    assert(seq6.getPrior == phi_2_node_1.getPrior * 1/2)
-    assert(seq7.getPrior == phi_2_node_1.getPrior * 1/2)
+    assert(seq6.getPrior == phi_2_node_1.getPrior * 1 / 2)
+    assert(seq7.getPrior == phi_2_node_1.getPrior * 1 / 2)
 
-    n1.growTree(t3, event2)
+    n1.learn(t3, event2)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 3)
@@ -1279,7 +1279,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(phi_0_node_1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
 
     assert(phi_0_node_2.getKey.get == t3.head)
-    assert(phi_0_node_2.maxDepth == n1.maxDepth-1)
+    assert(phi_0_node_2.maxDepth == n1.maxDepth - 1)
     assert(phi_0_node_2.maxDepth == 4)
     assert(phi_0_node_2.getChildren.size == 3)
     assert(phi_0_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys(0) == t3.drop(1))
@@ -1292,17 +1292,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq0.getEvents(event2) == 1)
     val newSeq0Prior = newSeq0.getPrior
     val newSeqWeight = newSeq0.getWeight
-    assert(newSeq0Prior == prior * 1/3 * 1/3)
-    assert(newSeq0Prior == 1.0/3 * 1/3)
-    assert(newSeqWeight == (1.0/3 *1.0/3 * (1.0 + smoothing)))
+    assert(newSeq0Prior == prior * 1 / 3 * 1 / 3)
+    assert(newSeq0Prior == 1.0 / 3 * 1 / 3)
+    assert(newSeqWeight == (1.0 / 3 * 1.0 / 3 * (1.0 + smoothing)))
 
     assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
     assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
     assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
     assert(newSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) * newSeqWeight))
 
-    assert(newSeq0.getWeightedProbability(event2) == (1.0/3 * 1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)))
-    assert(newSeq0.getWeightedProbability(event2) == prior * 1.0/3 * 1.0/3 * (1.0 + 0.1) * (1.0 + 0.1))
+    assert(newSeq0.getWeightedProbability(event2) == (1.0 / 3 * 1.0 / 3 * (1.0 + smoothing) * (1.0 + smoothing)))
+    assert(newSeq0.getWeightedProbability(event2) == prior * 1.0 / 3 * 1.0 / 3 * (1.0 + 0.1) * (1.0 + 0.1))
     assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + smoothing)
     assert(newSeq0.getProbability(event2) == 1.00 + newSeq0.getSmoothing)
@@ -1330,16 +1330,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val seqlist = phi_1_node_2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]]
     val newSeq1 = seqlist.getSequence(t3.drop(2)).get
     assert(seqlist.maxDepth == 2)
-    assert(seqlist.getPrior == 1.0/3 * 1.0/3)
+    assert(seqlist.getPrior == 1.0 / 3 * 1.0 / 3)
     assert(newSeq1.getKey == t3.drop(2))
-    assert(newSeq1.getPrior == 1.0/3 * 1.0/3)
-    assert(newSeq1.getWeight == 1.0/3 * 1.0/3 * (1.0 + smoothing))
-    assert(newSeq1.getWeight == prior * 1.0/3 * 1.0/3 *(1.0 + smoothing))
+    assert(newSeq1.getPrior == 1.0 / 3 * 1.0 / 3)
+    assert(newSeq1.getWeight == 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing))
+    assert(newSeq1.getWeight == prior * 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing))
     assert(newSeq1.getEventCount == 1)
     assert(newSeq1.getEvents(event2) == 1)
     assert(newSeq1.getProbability(event2) == 1.1)
     assert(newSeq1.getProbability(event2) == 1.0 + smoothing)
-    assert(newSeq1.getWeightedProbability(event2) == prior * 1.0/3 * 1.0/3 * (1.0 + smoothing)* (1.0 + smoothing) )
+    assert(newSeq1.getWeightedProbability(event2) == prior * 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing) * (1.0 + smoothing))
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1365,7 +1365,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newSeq2.getProbability(event2) == 1.1)
 
 
-    n1.growTree(t3, event)
+    n1.learn(t3, event)
 
     assert(n1.getChildren.size == 3)
     assert(n1.getChildren(0).size == 3)
@@ -1407,13 +1407,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq0.getEvents(event) == 1)
     val newSeq0Prior2 = newNewSeq0.getPrior
     val newSeqWeight2 = newNewSeq0.getWeight
-    assert(newSeq0Prior2 == prior * 1/3 * 1/3)
-    assert(newSeq0Prior2 == 1.0/3 * 1/3)
-    assert(newSeqWeight2 == (prior * 1.0/3 *1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)/2))
-    assert(newNewSeq0.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeqWeight2))
-    assert(newNewSeq0.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeqWeight2))
-    assert(newNewSeq0.getProbability(event2) == (1.0 + smoothing)/2)
-    assert(newNewSeq0.getProbability(event) == (1.0 + smoothing)/2)
+    assert(newSeq0Prior2 == prior * 1 / 3 * 1 / 3)
+    assert(newSeq0Prior2 == 1.0 / 3 * 1 / 3)
+    assert(newSeqWeight2 == (prior * 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing) * (1.0 + smoothing) / 2))
+    assert(newNewSeq0.getWeightedProbability(event2) == ((1.0 + smoothing) / 2 * newSeqWeight2))
+    assert(newNewSeq0.getWeightedProbability(event) == ((1.0 + smoothing) / 2 * newSeqWeight2))
+    assert(newNewSeq0.getProbability(event2) == (1.0 + smoothing) / 2)
+    assert(newNewSeq0.getProbability(event) == (1.0 + smoothing) / 2)
 
     assert(phi_1_node_0.getKey.get == t1.drop(1).head)
     assert(phi_1_node_0.getChildren.size == 3)
@@ -1442,13 +1442,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq1.getEvents(event) == 1)
     val newSeq1Prior2 = newNewSeq1.getPrior
     val newSeq1Weight2 = newNewSeq1.getWeight
-    assert(newSeq1Prior2 == prior * 1/3 * 1/3)
-    assert(newSeq1Prior2 == 1.0/3 * 1/3)
-    assert(newSeq1Weight2 == (prior * 1.0/3 *1.0/3 * (1.0 + smoothing) * (1.0 + smoothing)/2))
-    assert(newNewSeq1.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeq1Weight2))
-    assert(newNewSeq1.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeq1Weight2))
-    assert(newNewSeq1.getProbability(event2) == (1.0 + smoothing)/2)
-    assert(newNewSeq1.getProbability(event) == (1.0 + smoothing)/2)
+    assert(newSeq1Prior2 == prior * 1 / 3 * 1 / 3)
+    assert(newSeq1Prior2 == 1.0 / 3 * 1 / 3)
+    assert(newSeq1Weight2 == (prior * 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing) * (1.0 + smoothing) / 2))
+    assert(newNewSeq1.getWeightedProbability(event2) == ((1.0 + smoothing) / 2 * newSeq1Weight2))
+    assert(newNewSeq1.getWeightedProbability(event) == ((1.0 + smoothing) / 2 * newSeq1Weight2))
+    assert(newNewSeq1.getProbability(event2) == (1.0 + smoothing) / 2)
+    assert(newNewSeq1.getProbability(event) == (1.0 + smoothing) / 2)
 
     assert(phi_2_node_0.getKey.get == t1.drop(2).head)
     assert(phi_2_node_0.getChildren.size == 2)
@@ -1474,16 +1474,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(newNewSeq2.getEvents(event) == 1)
     val newSeq2Prior2 = newNewSeq2.getPrior
     val newSeq2Weight2 = newNewSeq2.getWeight
-    assert(newSeq2Prior2 == prior * 1.0/3 * 1.0/2)
-    assert(newSeq2Prior2 == 1.0/3 * 1.0/2)
-    assert(newSeq2Weight2 == (prior * 1.0/3 *1.0/2 * (1.0 + smoothing) * (1.0 + smoothing)/2))
-    assert(newNewSeq2.getWeightedProbability(event2) == ((1.0 + smoothing)/2 * newSeq2Weight2))
-    assert(newNewSeq2.getWeightedProbability(event) == ((1.0 + smoothing)/2 * newSeq2Weight2))
-    assert(newNewSeq2.getProbability(event2) == (1.0 + smoothing)/2)
-    assert(newNewSeq2.getProbability(event) == (1.0 + smoothing)/2)
+    assert(newSeq2Prior2 == prior * 1.0 / 3 * 1.0 / 2)
+    assert(newSeq2Prior2 == 1.0 / 3 * 1.0 / 2)
+    assert(newSeq2Weight2 == (prior * 1.0 / 3 * 1.0 / 2 * (1.0 + smoothing) * (1.0 + smoothing) / 2))
+    assert(newNewSeq2.getWeightedProbability(event2) == ((1.0 + smoothing) / 2 * newSeq2Weight2))
+    assert(newNewSeq2.getWeightedProbability(event) == ((1.0 + smoothing) / 2 * newSeq2Weight2))
+    assert(newNewSeq2.getProbability(event2) == (1.0 + smoothing) / 2)
+    assert(newNewSeq2.getProbability(event) == (1.0 + smoothing) / 2)
 
     //val t4 = Vector(1, 3, 9, 4, 5)
-    n1.growTree(t4, event2)
+    n1.learn(t4, event2)
 
     val node1: Node[Int, Int] = n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[Node[Int, Int]]
     assert(node1.getKey.get == 2)
@@ -1507,9 +1507,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val splitSeq2 = newSplitSeqList2.getSequence(t4.drop(4)).get
     val newSplitSeqListPrior2 = splitSeq2.getPrior
     val newSplitSeqListWeight2 = splitSeq2.getWeight
-    assert(newSplitSeqListPrior2 == prior * 1.0/3 * 1.0/3 * 1.0/3)
-    assert(newSplitSeqListPrior2 == 1.0/3 * 1.0/3 * 1.0/3)
-    assert(newSplitSeqListWeight2 == (prior * 1.0/3 *1.0/3 * 1.0/3 * (1.0 + smoothing)))
+    assert(newSplitSeqListPrior2 == prior * 1.0 / 3 * 1.0 / 3 * 1.0 / 3)
+    assert(newSplitSeqListPrior2 == 1.0 / 3 * 1.0 / 3 * 1.0 / 3)
+    assert(newSplitSeqListWeight2 == (prior * 1.0 / 3 * 1.0 / 3 * 1.0 / 3 * (1.0 + smoothing)))
     assert(splitSeq2.getWeightedProbability(event2) == ((1.0 + smoothing) * newSplitSeqListWeight2))
     assert(splitSeq2.getProbability(event2) == (1.0 + smoothing))
     assert(splitSeq2.getProbability(event2) == 1.0 + smoothing)
@@ -1539,18 +1539,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val splitSeq3 = newSplitSeqList3.getSequence(t4.drop(3)).get
     val newSplitSeqListPrior3 = splitSeq3.getPrior
     val newSplitSeqListWeight3 = splitSeq3.getWeight
-    assert(newSplitSeqListPrior3 == prior * 1.0/3 * 1.0/2)
-    assert(newSplitSeqListPrior3 == 1.0/3 * 1.0/2)
-    assert(newSplitSeqListWeight3 == (prior * 1.0/3 * 1.0/2 * (1.0 + smoothing) * (1.0 + smoothing)/2))
-    assert(splitSeq3.getWeightedProbability(event2) == ( newSplitSeqListPrior3 * (1.0 + smoothing) * (1.0 + smoothing)/2 * (1.0 + smoothing)/2))
+    assert(newSplitSeqListPrior3 == prior * 1.0 / 3 * 1.0 / 2)
+    assert(newSplitSeqListPrior3 == 1.0 / 3 * 1.0 / 2)
+    assert(newSplitSeqListWeight3 == (prior * 1.0 / 3 * 1.0 / 2 * (1.0 + smoothing) * (1.0 + smoothing) / 2))
+    assert(splitSeq3.getWeightedProbability(event2) == (newSplitSeqListPrior3 * (1.0 + smoothing) * (1.0 + smoothing) / 2 * (1.0 + smoothing) / 2))
 
-    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == (1.0 + smoothing)/2)
-    assert(splitSeq3.getProbability(event2) == (1.0 + smoothing)/2)
+    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getProbability(event) == (1.0 + smoothing) / 2)
+    assert(splitSeq3.getProbability(event2) == (1.0 + smoothing) / 2)
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions.size == 2)
     assert(splitSeq3.getPredictions.size == 2)
 
-    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions(event) == (1.0 + smoothing)/2)
-    assert(splitSeq3.getPredictions(event2) == (1.0 + smoothing)/2)
+    assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getPredictions(event) == (1.0 + smoothing) / 2)
+    assert(splitSeq3.getPredictions(event2) == (1.0 + smoothing) / 2)
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEventCount == 2)
     assert(splitSeq3.getEventCount == 2)
@@ -1613,7 +1613,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
     val event = 666
-    n1.growTree(condition, event)
+    n1.learn(condition, event)
     n1.getKey shouldBe None
     assert(n1.getEventCount == 0)
     assert(n1.getEvents.isEmpty)
@@ -1627,7 +1627,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
     assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
   }
- /* test("sliding window test") {
+  /* test("sliding window test") {
     val n1 = new Node[Int, Int](5, 3, 1)
     var count: Int = 0
     for (t <- intVectorTrace.sliding(5, 1)) {
@@ -1741,7 +1741,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
- /* test("SMT - train tree with all training data - STRING benchmark") {
+  /* test("SMT - train tree with all training data - STRING benchmark") {
     val maxDepth = 15
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1805,9 +1805,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     try {
       oos.writeObject(smt)
       oos.close
-    }catch{
+    } catch {
       case e: Exception => println(e.getStackTrace)
-    }finally {
+    } finally {
       fos.close
       oos.close
     }
@@ -1820,9 +1820,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       val smt = ois.readObject
       ois.close
       Some(smt.asInstanceOf[SMT[Int, Int]])
-    }catch{
+    } catch {
       case e: Exception => println(e.getStackTrace); None
-    }finally {
+    } finally {
       fis.close
       ois.close
     }
@@ -1842,7 +1842,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-/*  test("SMT - train tree with all training data - INTEGER benchmark") {
+  /*  test("SMT - train tree with all training data - INTEGER benchmark") {
     val maxDepth = 15
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1910,7 +1910,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("tree: \n" + n1)*/
   }*/
 
-  test("Create tree models") {
+  /* test("Create tree models") {
     val extensions = List("GHC")
     val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
     var maxSeqCount = 100
@@ -1941,7 +1941,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               }
 
               for (t <- trainingData_whole) {
-                n1.growTree(t._1, t._2)
+                n1.learn(t._1, t._2)
               }
             }
             System.gc
@@ -1956,38 +1956,64 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       System.gc
     }
     System.gc
-  }
+  }*/
 
 
-test("Deserialisation") {
+  /*test("Deserialisation") {
   val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_2_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
   //val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_4_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
   println("n1 deserialised:\n" + n1)
   println("n1 children: " + n1.getChildren.size)
-}
-  test("SMT classify explores whole structure"){
-     val maxDepth = 3
+}*/
+  test("SMT predict explores whole structure") {
+    val maxDepth = 3
     val maxPhi = 2
     val maxSeqCount = 1
     val smoothing = 1.0
     val prior = 1.0
-    val condition1 = Vector(1,2,3)
-    val condition2 = Vector(4,5,6)
-    val condition3 = Vector(7,8,9)
+    val condition1 = Vector(1, 2, 3)
+    val condition2 = Vector(4, 5, 6)
+    val condition3 = Vector(7, 8, 9)
     val event1 = 666
     val event2 = 777
     val event3 = 888
 
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-    n1.growTree(condition1, event1)
-    n1.growTree(condition1, event2)
-    val r1 = n1.classify(condition1, event1)
-    val r2 = n1.classify(condition1, event2)
-    val r3 = n1.classify(condition1, event3)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0/3)
+
+    n1.learn(condition1, event2)
+    r1 = n1.predict(condition1, event1)
+    r2 = n1.predict(condition1, event2)
+    var r3 = n1.predict(condition1, event3)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0/3)
+    assert(r1._1 == 2.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(r3._1 == 1.0 && r3._2 == 2.0)
+
+    n1.learn(condition2, event1)
+    r1 = n1.predict(condition1, event1)
+    r2 = n1.predict(condition1, event2)
+    r3 = n1.predict(condition1, event3)
+    var r4 = n1.predict(condition2, event1)
+    var r5 = n1.predict(condition2, event2)
+    var r6 = n1.predict(condition2, event3)
+
+    assert(n1.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(1)).get.getWeight == 1.0/3)
+    assert(r1._1 == 2.0 && r1._2 == 1.0)
+    /*assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(r3._1 == 1.0 && r3._2 == 2.0)*/
+
+
+
     println("Node n1:\n" + n1)
-    println("n1 Seq0 weight: " + n1.getChildren(0)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1).get.getWeight)
-    println("n1 Seq1 weight: " + n1.getChildren(1)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(1)).get.getWeight)
-    println("n1 Seq2 weight: " + n1.getChildren(2)(0).asInstanceOf[SequenceList[Int,Int]].getSequence(condition1.drop(2)).get.getWeight)
+    println("n1 Seq0 weight: " + n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight)
+    println("n1 Seq1 weight: " + n1.getChildren(1)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight)
+    println("n1 Seq2 weight: " + n1.getChildren(2)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(2)).get.getWeight)
     println("Classification. Condition: " + condition1 + " - event: " + event1 + " ---- r1: " + r1)
     println("Classification. Condition: " + condition1 + " - event: " + event2 + " ---- r1: " + r2)
     println("Classification. Condition: " + condition1 + " - event: " + event3 + " ---- r1: " + r3)
@@ -1995,7 +2021,5 @@ test("Deserialisation") {
 
 
   }
-
-
 }
 
