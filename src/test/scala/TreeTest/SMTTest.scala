@@ -1783,7 +1783,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       println("directory not found")
       List[File]()
     }
-  }
+  }*/
 
 
   def getListOfWindowsFiles(dir: String, extensions: List[String]): List[File] = {
@@ -1794,19 +1794,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
-*/
 
- /* test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 12
-    val maxPhi = 3
+
+  test("SMT - train tree with all training data - INTEGER benchmark") {
+    val maxDepth = 5
+    val maxPhi = 1
     val maxSeqCount = 1000
     val extensions = List("GHC")
     val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
     //val files = getListOfLinuxFiles(linuxDataWork, extensions)
-    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount)
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, 1.0, 1.0 )
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
     var counter = 0
-
+    var trainingData_whole_out: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
 
     println("Processing " + files.size + " files.")
 
@@ -1824,15 +1824,32 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
         }
 
+        trainingData_whole_out = trainingData_whole
+
         for (t <- trainingData_whole) {
           n1.growTree(t._1, t._2)
         }
-
       }
     }
+
+
+
+    for(i <- 1 to 200){
+      println("\n\n---\nClassify: " + trainingData_whole_out(i))
+      println(n1.classify(trainingData_whole_out(i)._1, trainingData_whole_out(i)._2))
+
+    }
+
+
+    println("\n\n---\nClassify " + (Vector(227, 994, 682, 652),815))
+    println(n1.classify(Vector(227, 994, 682, 652), 815))
+
+    println("\n\n---\nClassify " + (Vector(2000, 2000, 2000, 2000),815))
+    println(n1.classify(Vector(2000, 2000, 2000, 2000), 815))
+
     /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
-  }*/
+  }
 
 
 
