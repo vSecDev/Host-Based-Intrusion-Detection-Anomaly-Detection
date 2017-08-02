@@ -2,6 +2,7 @@ package TreeTest
 
 import scala.annotation.tailrec
 import scala.collection.mutable.Map
+import java.io._
 
 /**
   * Created by Case on 02/07/2017.
@@ -10,7 +11,8 @@ import scala.collection.mutable.Map
   * @param maxDepth the maximum depth of the tree
   * @param maxPhi the maximum number of wildcards in the tree
   */
-abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double){
+@SerialVersionUID(667L)
+abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends Serializable {
 
   var smoothing: Double
   var prior: Double

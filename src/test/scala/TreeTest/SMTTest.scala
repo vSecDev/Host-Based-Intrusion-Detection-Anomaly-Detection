@@ -4,6 +4,7 @@ import java.io._
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
+import java.io._
 
 import scala.collection.mutable.Set
 import java.util.Calendar
@@ -19,8 +20,10 @@ import scala.io.Source
 class SMTTest extends FunSuite with BeforeAndAfterAll {
 
 
+  val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
   val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+  val windowsTrainingDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data"
   val windowsTrainingDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
   val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
   val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
@@ -1796,12 +1799,58 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  test("SMT - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 5
-    val maxPhi = 1
+  def serializeTree(smt: SMT[Int, Int], target: File): Unit = {
+    val fos = new FileOutputStream(target)
+    val oos = new ObjectOutputStream(fos)
+    try {
+      oos.writeObject(smt)
+      oos.close
+    }catch{
+      case e: Exception => println(e.getStackTrace)
+    }finally {
+      fos.close
+      oos.close
+    }
+  }
+
+  def deserializeTree(source: File): Option[SMT[Int, Int]] = {
+    val fis = new FileInputStream(source)
+    val ois = new ObjectInputStreamWithCustomClassLoader(fis)
+    try {
+      val smt = ois.readObject
+      ois.close
+      Some(smt.asInstanceOf[SMT[Int, Int]])
+    }catch{
+      case e: Exception => println(e.getStackTrace); None
+    }finally {
+      fis.close
+      ois.close
+    }
+  }
+
+
+  class ObjectInputStreamWithCustomClassLoader(
+                                                fileInputStream: FileInputStream
+                                              ) extends ObjectInputStream(fileInputStream) {
+    override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
+      try {
+        Class.forName(desc.getName, false, getClass.getClassLoader)
+      }
+      catch {
+        case ex: ClassNotFoundException => super.resolveClass(desc)
+      }
+    }
+  }
+
+/*  test("SMT - train tree with all training data - INTEGER benchmark") {
+    val maxDepth = 15
+    val maxPhi = 3
     val maxSeqCount = 1000
     val extensions = List("GHC")
-    val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
+    //val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
+    val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
+
+
     //val files = getListOfLinuxFiles(linuxDataWork, extensions)
     val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, 1.0, 1.0 )
     var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
@@ -1824,7 +1873,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
         }
 
-        trainingData_whole_out = trainingData_whole
+        trainingData_whole_out = trainingData_whole_out ++ trainingData_whole
 
         for (t <- trainingData_whole) {
           n1.growTree(t._1, t._2)
@@ -1832,26 +1881,79 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
 
+    serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePath + "SMT_Large.tmp"))
 
 
-    for(i <- 1 to 200){
+    val n2 = deserializeTree(new File(serializePath + "SMT_Large.tmp")).get.asInstanceOf[Node[Int, Int]]
+
+    println("After deserialization. maxDepth: " + n2.maxDepth)
+
+
+    /*var cs: Vector[Double] = Vector()
+    println("TrainingData_whole_out size: " + trainingData_whole_out.size)
+    for(i <- 0 to 100){
       println("\n\n---\nClassify: " + trainingData_whole_out(i))
-      println(n1.classify(trainingData_whole_out(i)._1, trainingData_whole_out(i)._2))
-
+      val c = n1.classify(trainingData_whole_out(i)._1, trainingData_whole_out(i)._2)
+      println(c + " - classification res: " + c._1/c._2)
+      cs = cs :+ c._1/c._2
     }
+    val cs2 = cs.filter(!_.isNaN)
+    println("Average of classification results: " + cs2.foldLeft(0.0)(_+_) / cs2.foldLeft(0.0)((r,c) => r+1))*/
 
-
-    println("\n\n---\nClassify " + (Vector(227, 994, 682, 652),815))
+   /* println("\n\n---\nClassify " + (Vector(227, 994, 682, 652),815))
     println(n1.classify(Vector(227, 994, 682, 652), 815))
 
     println("\n\n---\nClassify " + (Vector(2000, 2000, 2000, 2000),815))
     println(n1.classify(Vector(2000, 2000, 2000, 2000), 815))
-
+*/
     /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
     println("tree: \n" + n1)*/
+  }*/
+
+  test("Create tree models"){
+    val extensions = List("GHC")
+    val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
+    var maxSeqCount = 1000
+
+
+/*    for(i <- 5 to 20){
+      for(j <- 0 to 5){
+        for(k <- 1 to 10){*/
+    for(i <- 2 to 5){
+      for(j <- 0 to 2){
+        for(k <- 1 to 2){
+          var maxDepth = i
+          var maxPhi = j
+          var smoothing = k.toDouble
+          try{
+            val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, 1.0 )
+            var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+            var counter = 0
+
+            for (f <- files) {
+              counter += 1
+              println("Processing file " + counter + " - filename: " + f.getName)
+              val source = scala.io.Source.fromFile(f)
+              val lines = try source.getLines mkString "\n" finally source.close()
+              val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+              var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+              for (t <- wholeTrace.sliding(maxDepth, 1)) {
+                if (t.size == maxDepth)
+                  trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+              }
+
+              for (t <- trainingData_whole) {
+                n1.growTree(t._1, t._2)
+              }
+            }
+            serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePath + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+          }catch{
+            case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+          }
+        }
+      }
+    }
   }
-
-
 
 
 

@@ -3,11 +3,13 @@ package TreeTest
 import sun.nio.cs.ext.DoubleByteEncoder
 
 import scala.collection.mutable.Map
+import java.io._
 
 /**
   * Created by Case on 02/07/2017.
   */
-class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) {
+@SerialVersionUID(666L)
+class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) extends Serializable {
 
   var smoothing: Double = -1.0
   var prior = -1.0
