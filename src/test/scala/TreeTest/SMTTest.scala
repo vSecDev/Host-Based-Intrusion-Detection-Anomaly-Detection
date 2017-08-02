@@ -1910,23 +1910,21 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("tree: \n" + n1)*/
   }*/
 
-  test("Create tree models"){
+  test("Create tree models") {
     val extensions = List("GHC")
     val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
-    var maxSeqCount = 1000
+    var maxSeqCount = 100
 
 
-/*    for(i <- 5 to 20){
-      for(j <- 0 to 5){
-        for(k <- 1 to 10){*/
-    for(i <- 2 to 5){
-      for(j <- 0 to 2){
-        for(k <- 1 to 2){
+    for (i <- 5 to 15) {
+      for (j <- 0 to 5) {
+        for (k <- 1 to 10) {
+
           var maxDepth = i
           var maxPhi = j
           var smoothing = k.toDouble
-          try{
-            val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, 1.0 )
+          try {
+            val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, 1.0)
             var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
             var counter = 0
 
@@ -1946,17 +1944,27 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
                 n1.growTree(t._1, t._2)
               }
             }
+            System.gc
             serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePath + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
-          }catch{
+            System.gc
+          } catch {
             case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
           }
         }
+        System.gc
       }
+      System.gc
     }
+    System.gc
   }
 
 
-
+test("Deserialisation") {
+  val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_2_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+  //val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_4_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+  println("n1 deserialised:\n" + n1)
+  println("n1 children: " + n1.getChildren.size)
+}
 
 
 
