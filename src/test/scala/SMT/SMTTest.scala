@@ -3,12 +3,6 @@ package SMT
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.io._
-import scala.collection.mutable.Set
-import java.util.Calendar
-import scala.collection.mutable
-import scala.io.Source
-
-
 
 /**
   * Created by Case on 20/07/2017.
@@ -1733,7 +1727,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var maxSeqCount = 100
 
 
-    for (i <- 8 to 15) {
+    for (i <- 9 to 15) {
       for (j <- 0 to 5) {
         for (k <- 1 to 10) {
 
