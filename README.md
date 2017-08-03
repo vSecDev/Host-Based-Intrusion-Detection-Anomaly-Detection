@@ -1,1 +1,2 @@
-# ProjectTest
+#MSc Computer Science Final Project 
+- Implementation of Sparse Markov Transducers ( https://noble.gs.washington.edu/papers/smt.pdf ) for establishing a baseline for normal system behaviour and classification of previously unseen call traces. The SMT forms part of the Decision Engine module of a basic  "proof of concept" host-based intrusion detection app. 
