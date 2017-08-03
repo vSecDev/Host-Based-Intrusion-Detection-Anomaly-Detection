@@ -1,14 +1,10 @@
-package TreeTest
-
-import java.io._
+package SMT
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.io._
-
 import scala.collection.mutable.Set
 import java.util.Calendar
-
 import scala.collection.mutable
 import scala.io.Source
 
@@ -30,67 +26,51 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
-  val strTrace = "ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15040 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15fa7 kernel32.dll+0x15c8b kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc kernel32.dll+0x15568 comctl32.dll+0x8ac2d comctl32.dll+0x8ac5f comctl32.dll+0x8ac77 comctl32.dll+0x4216 comctl32.dll+0x42d4 ntdll.dll+0x11a7 ntdll.dll+0x1cbab ntdll.dll+0x2173e ntdll.dll+0x21639 ntdll.dll+0xeac7 kernel32.dll+0x15cfc"
-  val intTrace = "1 2 3 4 5 6 7 8 9 10 11 1 2 3 12 13 4 5 6 7 8 9 10 11 1 2 3 14 13 4 5 6 7 8 9 10 11 1 2 3 15 4 5 6 7 8 9 10 11 1 2 3 15"
-  val intListTrace = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
-  val intVectorTrace = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 14, 13, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 15)
-  val shortListTrace = Vector(1, 2, 3, 4, 5)
-  val shortListTrace2 = Vector(5, 4, 3, 2, 1)
-  val shortListTrace3 = Vector(1, 2, 3)
-  val shortListTrace4 = Vector(4, 5, 6)
-  val shortMap = Map(1 -> 0.1, 2 -> 0.2, 3 -> 0.3)
-  val shortStringListTrace = Vector("ntdll.dll+0x2173e, ntdll.dll+0x21639, ntdll.dll+0xeac7, kernel32.dll+0x15568, comctl32.dll+0x8ac2d")
-  val shortStringMap = Map("ntdll.dll+0x2173e" -> 0.1, "ntdll.dll+0x21639" -> 0.2, "ntdll.dll+0xeac7" -> 0.3)
 
-
-  /*override def beforeAll(): Unit = {
-
-  }*/
-
-  test("SMT. maxDepth is not zero") {
+  test("SparseMarkovTree. maxDepth is not zero") {
     assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max depth count must be positive!")
   }
-  test("SMT. maxDepth is not negative") {
+  test("SparseMarkovTree. maxDepth is not negative") {
     assertThrows[IllegalArgumentException](Node(-1, 1, 3, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(-1, 1, 3, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max depth count must be positive!")
   }
-  test("SMT. maxPhi is non-negative") {
+  test("SparseMarkovTree. maxPhi is non-negative") {
     assertThrows[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, -1, 3, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max Phi count must be non-negative!")
   }
-  test("SMT. maxSeqCount is not zero") {
+  test("SparseMarkovTree. maxSeqCount is not zero") {
     assertThrows[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, 1, 0, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max sequence count must be positive!")
   }
-  test("SMT. maxSeqCount is not negative") {
+  test("SparseMarkovTree. maxSeqCount is not negative") {
     assertThrows[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(1, 1, -1, 0.0, 1.0))
     assert(caught.getMessage == "requirement failed: Node max sequence count must be positive!")
   }
-  test("SMT. Default key is None") {
+  test("SparseMarkovTree. Default key is None") {
     val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
   }
-  test("SMT. setKey sets correct Int key") {
+  test("SparseMarkovTree. setKey sets correct Int key") {
     val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
     root.setKey(0)
     root.getKey shouldBe 'defined
     assert(root.getKey.get == 0)
   }
-  test("SMT. setKey sets correct String key") {
+  test("SparseMarkovTree. setKey sets correct String key") {
     val root: Node[String, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.getKey shouldBe None
     root.setKey("TestKey")
     root.getKey shouldBe 'defined
     assert(root.getKey.get equals "TestKey")
   }
-  test("SMT. setKey fails if called multiple times - String key") {
+  test("SparseMarkovTree. setKey fails if called multiple times - String key") {
     val root: Node[String, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.setKey("TestKey")
     root.getKey shouldBe 'defined
@@ -99,7 +79,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val caught = intercept[IllegalStateException](root.setKey("NewTestKey"))
     assert(caught.getMessage == "Node key cannot be reset!")
   }
-  test("SMT. setKey fails if called multiple times - Int key") {
+  test("SparseMarkovTree. setKey fails if called multiple times - Int key") {
     val root: Node[Int, Int] = Node(5, 1, 3, 0.0, 1.0)
     root.setKey(0)
     root.getKey shouldBe 'defined
@@ -108,7 +88,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val caught = intercept[IllegalStateException](root.setKey(222))
     assert(caught.getMessage equals "Node key cannot be reset!")
   }
-  test("SMT eventCount is correct") {
+  test("SparseMarkovTree eventCount is correct") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     assert(n1.getEventCount == 0)
     n1.updateEvents(666)
@@ -118,12 +98,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(777)
     assert(n1.getEventCount == 3)
   }
-  test("SMT, events initialised empty") {
+  test("SparseMarkovTree, events initialised empty") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     assertThrows[NoSuchElementException](n1.getEvents(666))
     assert(n1.getEvents.isEmpty)
   }
-  test("SMT 'events' is correct after updates with same event") {
+  test("SparseMarkovTree 'events' is correct after updates with same event") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     assert(n1.getEventCount == 0)
@@ -144,7 +124,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getEvents.size == 1)
     assert(n1.getProbability(666) == 1.00)
   }
-  test("SMT events is correct after updates with different events") {
+  test("SparseMarkovTree events is correct after updates with different events") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     assert(n1.getEventCount == 0)
@@ -191,12 +171,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getProbability(777) == 2.00 / 6)
     assert(n1.getProbability(888) == 1.00 / 6)
   }
-  test("SMT predictions has single element after first event update") {
+  test("SparseMarkovTree predictions has single element after first event update") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
   }
-  test("SMT predictions has two elements after two different event key updates") {
+  test("SparseMarkovTree predictions has two elements after two different event key updates") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
 
     n1.updateEvents(666)
@@ -204,7 +184,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(777)
     assert(n1.getPredictions.size == 2)
   }
-  test("SMT predictions has one element after the same event key is updated twice") {
+  test("SparseMarkovTree predictions has one element after the same event key is updated twice") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
@@ -213,7 +193,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
   }
-  test("SMT predictions has two elements after adding three events, two the same") {
+  test("SparseMarkovTree predictions has two elements after adding three events, two the same") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions.size == 1)
@@ -222,7 +202,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     n1.updateEvents(777)
     assert(n1.getPredictions.size == 2)
   }
-  test("SMT predictions are correct") {
+  test("SparseMarkovTree predictions are correct") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getPredictions(666) == 1.0)
@@ -242,12 +222,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions(888) == 1.0 / 6)
     assert(n1.getPredictions(999) == 1.0 / 6)
   }
-  test("SMT getProbability for single event") {
+  test("SparseMarkovTree getProbability for single event") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getProbability(666) == 1.0)
   }
-  test("SMT getProbability for events after multiple updates") {
+  test("SparseMarkovTree getProbability for events after multiple updates") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getProbability(666) == 1.0)
@@ -274,7 +254,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getProbability(888) == 2.0 / 6)
     assert(n1.getProbability(999) == 1.0 / 6)
   }
-  test("SMT getProbability for String events after multiple updates. (String key)") {
+  test("SparseMarkovTree getProbability for String events after multiple updates. (String key)") {
     val n1 = new Node[Int, String](5, 1, 1, 0.0, 1.0)
     n1.updateEvents("ntdll.dll+0x2173e")
     assert(n1.getProbability("ntdll.dll+0x2173e") == 1.0)
@@ -326,7 +306,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getProbability("ntdll.dll+0xeac7") == 2.0 / 6)
     assert(n1.getProbability("kernel32.dll+0x15568") == 1.0 / 6)
   }
-  test("SMT eventCount == events sum in events") {
+  test("SparseMarkovTree eventCount == events sum in events") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.updateEvents(666)
     assert(n1.getEventCount == 1)
@@ -366,8 +346,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(eventNum4 == 4)
     assert(4 == n1.getEventCount)
   }
-  //SMT ----------------------------------
-  test("SMT, invalid argument to growTree: empty Vector| event") {
+  test("SparseMarkovTree, invalid argument to learn: empty Vector| event") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     n1.learn(Vector.empty[Int], 666)
     assert(n1.getEventCount == 0)
@@ -375,7 +354,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getPredictions.isEmpty)
     assert(n1.getChildren.isEmpty)
   }
-  test("SMT, growTree called with Vector size == 1 | event") {
+  test("SparseMarkovTree, learn called with Vector size == 1 | event") {
     val n1 = new Node[Int, Int](5, 1, 1, 0.0, 1.0)
     val condition = Vector(1)
     val event = 666
@@ -400,7 +379,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(child.getSequence(condition).get.getPredictions.size == 1)
     assert(child.getSequence(condition).get.getPredictions(event) == 1.00)
   }
-  test("SMT, growTree called with Vector size == 2 | event") {
+  test("SparseMarkovTree, learn called with Vector size == 2 | event") {
     val maxDepth = 5
     val maxPhi = 1
     val maxSeqCount = 1
@@ -439,7 +418,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
     }
   }
-  test("SMT, growTree called with Vector size == 3 | event") {
+  test("SparseMarkovTree, learn called with Vector size == 3 | event") {
     val maxDepth = 5
     val maxPhi = 1
     val maxSeqCount = 1
@@ -479,7 +458,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
 
   }
-  test("SMT, growTree called with two 'Vector size == 2 | event' sequences") {
+  test("SparseMarkovTree, learn called with two 'Vector size == 2 | event' sequences") {
     val maxDepth = 2
     val maxPhi = 1
     val maxSeqCount = 1
@@ -555,7 +534,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
           assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00)
         }
-        case _: Node[Int, Int] => {
+        case _: Node[_, _] => {
           assert(n1.getChildren(i).size == 2)
           n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
 
@@ -596,7 +575,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, growTree called with three 'Vector size == 2 | three events' sequences") {
+  test("SparseMarkovTree, learn called with three 'Vector size == 2 | three events' sequences") {
     val maxDepth = 2
     val maxPhi = 1
     val maxSeqCount = 1
@@ -622,7 +601,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(n1.getChildren.size == 2)
     assert(n1.getChildren(0).size == 3)
     assert(n1.getChildren(1).size == 1)
-    n1.getChildren(0)(0) shouldBe a[Node[Int, Int]]
+    n1.getChildren(0)(0) shouldBe a[Node[_, _]]
     n1.getChildren(1)(0) shouldBe a[SequenceList[Int, Int]]
 
     for (i <- n1.getChildren.indices) {
@@ -710,7 +689,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each") {
+  test("SparseMarkovTree, learn called with three 'Vector size == 2 | three events' sequences twice each") {
     val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
@@ -814,7 +793,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, growTree called with three 'Vector size == 2 | three events' sequences twice each with different events for each") {
+  test("SparseMarkovTree, learn called with three 'Vector size == 2 | three events' sequences twice each with different events for each") {
     val n1 = new Node[Int, Int](2, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
@@ -926,7 +905,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event'") {
+  test("SparseMarkovTree, maxDepth 3 - learn called with two 'Vector size == 2 | event'") {
     val n1 = new Node[Int, Int](3, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(3, 4)
@@ -1026,7 +1005,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, maxDepth 3 - growTree called with two 'Vector size == 2 | event' - first element same") {
+  test("SparseMarkovTree, maxDepth 3 - learn called with two 'Vector size == 2 | event' - first element same") {
     val n1 = new Node[Int, Int](3, 1, 1, 0.0, 1.0)
     val condition = Vector(1, 2)
     val condition2 = Vector(1, 4)
@@ -1092,7 +1071,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           assert(child.getSequence(condition.drop(i)).get.getPredictions(event) == 1.00)
           assert(child.getSequence(condition2.drop(i)).get.getPredictions(event) == 1.00)
         }
-        case _: Node[Int, Int] => {
+        case _: Node[_, _] => {
           assert(n1.getChildren(i).size == 1)
           n1.getChildren(i) shouldBe a[Vector[Node[_, _]]]
 
@@ -1129,7 +1108,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  test("SMT, mD = 5, window size 5") {
+  test("SparseMarkovTree, mD = 5, window size 5") {
     val maxDepth = 5
     val maxPhi = 2
     val maxSeqCount = 1
@@ -1560,82 +1539,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     assert(newSplitSeqList3.getSequence(t1.drop(3)).get.getEvents(event) == 1)
     assert(splitSeq3.getEvents(event2) == 1)
-
-    /*  println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("n1:")
-    println(n1)
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")
-    println("888888888888888888888888888888888888888")*/
   }
-
-
-  /* test("asdfsfd"){
-    var childrenGroup: Vector[Vector[SMT[_ <: Int, _ <: Int]]] = Vector[Vector[SMT[Int, Int]]]()
-    childrenGroup = childrenGroup :+ Vector(SequenceList[Int, Int](11,11,11))
-    println("childrenGroup.size " + childrenGroup.size)
-    println("childreanGroup: " + childrenGroup)
-    println("childrenGroup(0): " + childrenGroup(0))
-
-    val nV = Vector(Node[Int, Int](22,22,22), Node[Int, Int](66,66,66))
-    //childrenGroup = childrenGroup.updated(0, nV)
-    childrenGroup = childrenGroup.updated(0, nV)
-    println("after: ")
-    println("childrenGroup.size " + childrenGroup.size)
-    println("---------------------childrenGroup-------------")
-    println("childreanGroup: " + childrenGroup)
-    /*println("---------------------childrenGroup-------------")
-    println("childrenGroup(0): " + childrenGroup(0))*/
-
-
-    //childrenGroup(0) = childrenGroup(0)
-
-    childrenGroup = childrenGroup :+ Vector(Node[Int, Int](7777777,7777777,7777777))
-
-    println("????????????????????????????????????????????????????? after append: ")
-    println("childrenGroup.size " + childrenGroup.size)
-    println("---------------------childrenGroup-------------")
-    println("childreanGroup: " + childrenGroup)
-    /*println("---------------------childrenGroup-------------")
-    println("childrenGroup(0): " + childrenGroup(0))*/
-
-  }*/
-
-
-  test("temp") {
-    val n1 = new Node[Int, Int](1, 1, 1, 0.0, 1.0)
-    val condition = Vector(1, 2)
-    val condition2 = Vector(3, 4)
-    val event = 666
-    n1.learn(condition, event)
-    n1.getKey shouldBe None
-    assert(n1.getEventCount == 0)
-    assert(n1.getEvents.isEmpty)
-    assert(n1.getPredictions.isEmpty)
-    n1.getPredictions.get(event) shouldBe None
-    assert(n1.getChildren.size == 1)
-    assert(n1.getChildren(0).size == 1)
-    n1.getChildren(0)(0) shouldBe a[SequenceList[_, _]]
-
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getKeys.size == 1)
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences.size == 1)
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].sequences(0).getKey == condition)
-  }
-  /* test("sliding window test") {
-    val n1 = new Node[Int, Int](5, 3, 1)
-    var count: Int = 0
-    for (t <- intVectorTrace.sliding(5, 1)) {
-      count += 1
-      n1.growTree(t, t.last)
-    }
-  }*/
-
 
   def time[T](block: => T): T = {
     val start = System.currentTimeMillis
@@ -1644,92 +1548,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("Elapsed time: %1d ms".format(totalTime))
     res
   }
-
-
-  /*test("SMT, sliding window test - trace length = 200") {
-
-
-    //val source = scala.io.Source.fromFile(homeTrainingPath)
-    val source = scala.io.Source.fromFile(workTrainingPath)
-    val lines = try source.getLines mkString "\n" finally source.close()
-
-    println(lines)
-
-    val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-    val trace_200 = wholeTrace.take(200)
-    var trainingData_200: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-    var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-
-    /*for (t <- trace_200.sliding(6, 1)) {
-      trainingData_200 = trainingData_200 :+ (t.take(5), t.takeRight(1)(0))
-    }
-    for (t <- wholeTrace.sliding(6, 1)) {
-      trainingData_whole = trainingData_whole :+ (t.take(5), t.takeRight(1)(0))
-    }*/
-
-
-    for (t <- trace_200.sliding(15, 1)) {
-      trainingData_200 = trainingData_200 :+ (t.take(14), t.takeRight(1)(0))
-    }
-    for (t <- wholeTrace.sliding(15, 1)) {
-      trainingData_whole = trainingData_whole :+ (t.take(14), t.takeRight(1)(0))
-    }
-
-
-    println("trace_200.size: " + trace_200.size)
-    println("wholeTrace.size: " + wholeTrace.size)
-    println("trainingData_200.size: " + trainingData_200.size)
-    println("trainingData_whole.size: " + trainingData_whole.size)
-
-    val n1 = new Node[String, String](5, 3, 1)
-    val n2 = new Node[String, String](5, 3, 1)
-    val n3 = new Node[String, String](15, 5, 1)
-    val n4 = new Node[String, String](15, 5, 1)
-
-    /*    println("Training: trace length: 200 - tree depth: 5")
-    time[Unit] {
-      for (t <- trainingData_200) {
-        n1.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 5")
-
-    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 5")
-    time[Unit] {
-      for (t <- trainingData_whole) {
-        n2.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: WHOLE - tree depth: 5")
-
-
-    println("\n\n\n\nTraining: trace length: 200 - tree depth: 15")
-    time[Unit] {
-      for (t <- trainingData_200) {
-        n3.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")*/
-
-    println("\n\n\n\nTraining: trace length: WHOLE - tree depth: 15")
-    time[Unit] {
-      for (t <- trainingData_whole) {
-        n4.growTree(t._1, t._2)
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")
-
-    /* println("n4: ")
-    println(n4)*/
-
-
-    /*    Thread.sleep(10000)
-    println("n1 after training: \n")
-    println(n1)*/
-
-
-  }*/
-
   def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
@@ -1741,7 +1559,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  /* test("SMT - train tree with all training data - STRING benchmark") {
+  /* test("SparseMarkovTree - train tree with all training data - STRING benchmark") {
     val maxDepth = 15
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1770,7 +1588,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
 
         for (t <- trainingData_whole) {
-          n1.growTree(t._1, t._2)
+          n1.learn(t._1, t._2)
         }
 
       }
@@ -1797,9 +1615,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
-
-
-  def serializeTree(smt: SMT[Int, Int], target: File): Unit = {
+  
+  def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
     val fos = new FileOutputStream(target)
     val oos = new ObjectOutputStream(fos)
     try {
@@ -1813,13 +1630,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  def deserializeTree(source: File): Option[SMT[Int, Int]] = {
+  def deserializeTree(source: File): Option[SparseMarkovTree[Int, Int]] = {
     val fis = new FileInputStream(source)
     val ois = new ObjectInputStreamWithCustomClassLoader(fis)
     try {
       val smt = ois.readObject
       ois.close
-      Some(smt.asInstanceOf[SMT[Int, Int]])
+      Some(smt.asInstanceOf[SparseMarkovTree[Int, Int]])
     } catch {
       case e: Exception => println(e.getStackTrace); None
     } finally {
@@ -1827,7 +1644,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       ois.close
     }
   }
-
 
   class ObjectInputStreamWithCustomClassLoader(
                                                 fileInputStream: FileInputStream
@@ -1842,7 +1658,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  /*  test("SMT - train tree with all training data - INTEGER benchmark") {
+  /*  test("SparseMarkovTree - train tree with all training data - INTEGER benchmark") {
     val maxDepth = 15
     val maxPhi = 3
     val maxSeqCount = 1000
@@ -1876,12 +1692,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         trainingData_whole_out = trainingData_whole_out ++ trainingData_whole
 
         for (t <- trainingData_whole) {
-          n1.growTree(t._1, t._2)
+          n1.learn(t._1, t._2)
         }
       }
     }
 
-    serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePath + "SMT_Large.tmp"))
+    serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serializePath + "SMT_Large.tmp"))
 
 
     val n2 = deserializeTree(new File(serializePath + "SMT_Large.tmp")).get.asInstanceOf[Node[Int, Int]]
@@ -1910,14 +1726,14 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("tree: \n" + n1)*/
   }*/
 
-   test("Create tree models") {
+  /* test("Create tree models") {
     val extensions = List("GHC")
     //val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
     val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
     var maxSeqCount = 100
 
 
-    for (i <- 5 to 15) {
+    for (i <- 8 to 15) {
       for (j <- 0 to 5) {
         for (k <- 1 to 10) {
 
@@ -1946,7 +1762,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
               }
             }
             System.gc
-            serializeTree(n1.asInstanceOf[SMT[Int, Int]], new File(serializePathHome + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+            serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serializePathHome + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
             System.gc
           } catch {
             case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
@@ -1957,7 +1773,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       System.gc
     }
     System.gc
-  }
+  }*/
 
 
   /*test("Deserialisation") {
@@ -1966,7 +1782,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   println("n1 deserialised:\n" + n1)
   println("n1 children: " + n1.getChildren.size)
 }*/
-  test("SMT predict explores whole structure") {
+  test("SparseMarkovTree predict explores whole structure") {
     val maxDepth = 3
     val maxPhi = 2
     val maxSeqCount = 1

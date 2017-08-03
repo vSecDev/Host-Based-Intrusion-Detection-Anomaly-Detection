@@ -1,18 +1,11 @@
-package TreeTest
+package SMT
 
 import scala.annotation.tailrec
 import scala.collection.mutable.Map
 import java.io._
 
-/**
-  * Created by Case on 02/07/2017.
-  * Implementation of Sparse Markov Tree
-  * @constructor create new Node with only  maxDepth and maxPhi set
-  * @param maxDepth the maximum depth of the tree
-  * @param maxPhi the maximum number of wildcards in the tree
-  */
 @SerialVersionUID(667L)
-abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends Serializable {
+abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends Serializable {
 
   var smoothing: Double
   var prior: Double
@@ -20,29 +13,29 @@ abstract class SMT[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing
 
   def getSmoothing: Double = smoothing
 
-  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("SMT smoothing cannot be reset")
+  def setSmoothing(aSmoothing: Double): Unit = if (smoothing == -1.0) smoothing = aSmoothing else throw new IllegalStateException("SparseMarkovTree smoothing cannot be reset")
 
   def getPrior: Double = prior
 
-  def setPrior(aPrior: Double): Unit = if (prior == -1.0) prior = aPrior else throw new IllegalStateException("SMT - prior cannot be changed after initialisation!")
+  def setPrior(aPrior: Double): Unit = if (prior == -1.0) prior = aPrior else throw new IllegalStateException("SparseMarkovTree - prior cannot be changed after initialisation!")
 
   def getWeight: Double = weight
 
-  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SMT weight cannot be negative")
+  def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SparseMarkovTree weight cannot be negative")
 }
 
-case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
+case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SparseMarkovTree(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
   var smoothing: Double = -1.0
-  var prior = -1.0
+  var prior: Double = -1.0
   var weight: Double = 1.0
-  //A root node has no key. Root.getKey = None
+
   private var key: Option[A] = None
   private var eventCount = 0
   private var events: Map[B, Int] = Map[B, Int]()
   private var predictions: Map[B, Double] = Map[B, Double]()
   private var isChanged: Boolean = false
-  private var children: Vector[Vector[SMT[_ <: A, _ <: B]]] = Vector[Vector[SMT[A, B]]]()
+  private var children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]] = Vector[Vector[SparseMarkovTree[A, B]]]()
 
   require(maxDepth > 0, "Node max depth count must be positive!")
   require(maxPhi >= 0, "Node max Phi count must be non-negative!")
@@ -80,6 +73,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
     case None => if(eventCount == 0) smoothing else  smoothing / eventCount
   }
 
+  def getChildren: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]] = children
+
   def updateEvents(newEvent: B): Unit = {
 
     //update events to keep count on how many times this input has been seen
@@ -101,8 +96,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
       else predictions += (k -> ((v.toDouble + smoothing) / eventCount))
     }
   }
-
-  def getChildren: Vector[Vector[SMT[_ <: A, _ <: B]]] = children
 
   //TODO REVISE THIS - MIGHT NOT HAVE TO MULTIPLY THE RESULT BY THE CURRENT PRIOR!!!
   private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
@@ -151,16 +144,17 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
           case None => children = children :+ Vector(newSeqList)
         }
       }
-    } else throw new IllegalStateException("SMT with maxDepth <= 0 has no predictions.")
+    } else throw new IllegalStateException("SparseMarkovTree with maxDepth <= 0 has no predictions.")
   }
 
   def predict(condition: Vector[A], event: B): (Double, Double) = {
     outer(condition, event, getChildren)
   }
 
-  private def inner(condition: Vector[A], event: B, children: Vector[SMT[_ <: A, _ <: B]]): (Double, Double) = {
+  //TODO - FIX TAIL RECURSION
+  private def inner(condition: Vector[A], event: B, children: Vector[SparseMarkovTree[_ <: A, _ <: B]]): (Double, Double) = {
     @tailrec
-    def innerHelper(condition: Vector[A], event: B, children: Vector[SMT[_ <: A, _ <: B]], acc: (Double, Double)): (Double, Double) = {
+    def innerHelper(condition: Vector[A], event: B, children: Vector[SparseMarkovTree[_ <: A, _ <: B]], acc: (Double, Double)): (Double, Double) = {
       children match {
         case x +: xs => x match {
           case sl: SequenceList[A, B] => {
@@ -188,9 +182,9 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
     innerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  private def outer(condition: Vector[A], event: B, children: Vector[Vector[SMT[_ <: A, _ <: B]]]): (Double, Double) = {
+  private def outer(condition: Vector[A], event: B, children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]]): (Double, Double) = {
     @tailrec
-    def outerHelper(condition: Vector[A], event: B, children: Vector[Vector[SMT[_ <: A, _ <: B]]], acc: (Double, Double)): (Double, Double) = children match {
+    def outerHelper(condition: Vector[A], event: B, children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], acc: (Double, Double)): (Double, Double) = children match {
       case x +: xs => {
         val sub = inner(condition, event, x)
         outerHelper(condition.drop(1), event, xs, (acc._1 + sub._1, acc._2 + sub._2))
@@ -227,7 +221,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
   }
 }
 
-case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SMT(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
+case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SparseMarkovTree(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
   var smoothing: Double = -1.0
   var prior = -1.0
@@ -264,7 +258,11 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
 
   def getKeys: Vector[Vector[A]] = sequences.map(_.getKey)
 
-  //private def canSplit = sequences.size >= maxSeqCount && maxDepth > 1 && getKeys(0).length > 1
+  def getPredictionWithWeight(condition: Vector[A], event: B): (Double, Double) = getSequence(condition) match {
+    case None => (0.0, 0.0)
+    case Some(x) => (x.getWeightedProbability(event), x.getWeight)
+  }
+
   private def canSplit = sequences.size >= maxSeqCount && maxDepth > 0 && getKeys(0).length > 1
 
   private def split(newSeq: (Vector[A], B)): Vector[Node[ A, B]] = {
@@ -291,10 +289,7 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
     newVector
   }
 
-  def getPredictionWithWeight(condition: Vector[A], event: B): (Double, Double) = getSequence(condition) match {
-    case None => (0.0, 0.0)
-    case Some(x) => (x.getWeightedProbability(event), x.getWeight)
-  }
+
 }
 
 

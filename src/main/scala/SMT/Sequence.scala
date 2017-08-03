@@ -1,13 +1,10 @@
-package TreeTest
+package SMT
 
 import sun.nio.cs.ext.DoubleByteEncoder
 
 import scala.collection.mutable.Map
 import java.io._
 
-/**
-  * Created by Case on 02/07/2017.
-  */
 @SerialVersionUID(666L)
 class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) extends Serializable {
 
@@ -20,13 +17,11 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
   private var predictions: Map[B, Double] = Map[B, Double]()
   private var isChanged: Boolean = false
 
-  //Constructor argument validation
   require(_condition.nonEmpty, "Sequence key cannot be an empty list!")
   require(_event != Nil && _event != None, "Sequence event cannot be Nil or None!")
   require(_smoothing >= 0, "Sequence smoothing value must be non-negative!")
   require(_prior > 0, "Sequence prior weight must be larger than zero!")
 
-  //Initialise Sequence
   setKey(_condition)
   setSmoothing(_smoothing)
   setPrior(_prior)
