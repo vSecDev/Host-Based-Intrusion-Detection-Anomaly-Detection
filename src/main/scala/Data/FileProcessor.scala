@@ -36,14 +36,18 @@ class FileProcessor(source: File, target: File, delimiter: String) extends DataP
     val parentDir = new File(source)
 
     fileStreamNoDirs(parentDir).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
+    println("sysCallSet.size AFTER: " + sysCallSet.size)
+
     sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
+    println("sysCallMap.size AFTER (should be same as sysCallSet.size): " + sysCallMap.size)
 
     fileStream(parentDir).foreach(f => {
       if(f.isDirectory){
-        val path = Paths.get(target + f.getName + "_INT")
-        Files.createFile(path)
+        println("new dir will be created here: " + (target + f.getCanonicalPath.replaceAll(source.getCanonicalPath, "") + "_INT"))
+       // val path = Paths.get(target + f.getName + "_INT")
+       // Files.createFile(path)
       }else {
-        toIntTrace(f, target, sysCallMap)
+       // toIntTrace(f, target, sysCallMap)
       }
     })
   }
