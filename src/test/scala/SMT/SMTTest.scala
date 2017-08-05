@@ -1673,7 +1673,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     time[Unit] {
       for (f <- files) {
         counter += 1
-        println("Processing file " + counter + " - filename: " + f.getName)
+        println("Processing file " + counter + " - fae: " + f.getName)
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
         val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
@@ -1720,20 +1720,23 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("tree: \n" + n1)*/
   }*/
 
- /*  test("Create tree models") {
+   test("Create tree models") {
     val extensions = List("GHC")
     //val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
     val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
-    var maxSeqCount = 100
+    var maxSeqCount = 1000
 
 
-    for (i <- 9 to 15) {
-      for (j <- 0 to 5) {
-        for (k <- 1 to 10) {
+    for (i <- 15 to 20) {
+    /*  for (j <- 0 to 5) {
+        for (k <- 1 to 10) {*/
 
           var maxDepth = i
-          var maxPhi = j
-          var smoothing = k.toDouble
+          /*var maxPhi = j
+          var smoothing = k.toDouble*/
+          var maxPhi = 2
+          var smoothing = 1.0
+
           try {
             val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, 1.0)
             var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
@@ -1761,14 +1764,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           } catch {
             case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
           }
-        }
+       /* }
         System.gc
       }
-      System.gc
+      System.gc*/
     }
     System.gc
   }
-*/
 
   /*test("Deserialisation") {
   val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_2_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
