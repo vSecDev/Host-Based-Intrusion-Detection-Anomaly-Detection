@@ -17,6 +17,16 @@ class FileProcessorTest extends FunSuite {
 
     val fp = new FileProcessor(s,t,d,e)
     fp.preprocess()
-
   }
+
+  //TODO - FIX LOGIC WITH MULTIPLE DELIMITERS
+  test("FileProcessor - preprocess works with multiple delimiters."){
+    val s = new File(testSource)
+    val t = new File(testTarget)
+    val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
+    val e = Array("GHC")
+    val fp = new FileProcessor(s,t,d,e)
+    fp.preprocess()
+  }
+
 }

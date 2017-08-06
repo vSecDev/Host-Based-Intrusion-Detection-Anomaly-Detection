@@ -94,6 +94,7 @@ class FileProcessor(source: File, target: File, delimiters: Array[String] = Arra
     try {
       val source = scala.io.Source.fromFile(f)
       val lines = try source.getLines mkString "\n" finally source.close()
+      println("delimiters.mkstring:" + delimiters.mkString("|"))
       val vec: Vector[String] = lines.split(delimiters.mkString("|")).map(_.trim).toVector
       set ++= vec
     } catch {
