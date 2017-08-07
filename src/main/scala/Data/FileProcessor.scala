@@ -21,9 +21,9 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
   setExtensions(_extensions)
 
   def getSource = source
-  def setSource(newSource: File) = if(newSource.exists && newSource.isDirectory) source = newSource
+  def setSource(newSource: File) = if(newSource.exists && newSource.isDirectory) source = Some(newSource)
   def getTarget = target
-  def setTarget(newTarget: File) = if(newTarget.exists && newTarget.isDirectory) target = newTarget
+  def setTarget(newTarget: File) = if(newTarget.exists && newTarget.isDirectory) target = Some(newTarget)
   def getDelimiters = delimiters
   def setDelimiters(newDelimiters: Array[String]) = if(newDelimiters.isEmpty) delimiters = Array("\\s") else delimiters = newDelimiters
   def getExtensions = extensions
@@ -34,23 +34,24 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
 
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
   @throws(classOf[DataException])
-  override def preprocess(): Map[String, Int] = {
+  override def preprocess(): Option[Map[String, Int]] = {
+    if(!checkDirs) None
     try {
-      clearDir(target)
+      clearDir(target.get)
 
       var sysCallSet = mutable.Set[String]()
       var sysCallMap = Map[String, Int]()
 
-      fileStreamNoDirs(source).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
+      fileStreamNoDirs(source.get).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
       sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
-      fileStream(source).foreach(f => {
+      fileStream(source.get).foreach(f => {
         if (f.isDirectory) {
-          val path = target.getCanonicalPath + f.getCanonicalPath.replace(source.getCanonicalPath, "")
+          val path = target.get.getCanonicalPath + f.getCanonicalPath.replace(source.get.getCanonicalPath, "")
           Files.createDirectory(Paths.get(path))
         } else {
           if (extensions.exists(f.getName.endsWith(_))) {
 
-            val path = target.getCanonicalPath + FilenameUtils.removeExtension(f.getCanonicalPath.replace(source.getCanonicalPath, "")) + "_INT.IDS"
+            val path = target.get.getCanonicalPath + FilenameUtils.removeExtension(f.getCanonicalPath.replace(source.get.getCanonicalPath, "")) + "_INT.IDS"
             val intTrace = toIntTrace(f, sysCallMap)
             val newFile = new File(path)
             val bw = new BufferedWriter(new FileWriter(newFile))
@@ -59,16 +60,23 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
           }
         }
       })
-      sysCallMap
+      Some(sysCallMap)
     } catch {
       case de: DataException => throw de
       case ex: Throwable => throw new DataException("An error occurred during data processing.", ex)
     }
   }
 
-  def clearDir(file: File): Unit = {
+  private def checkDirs: Boolean = {
+    if(source.isDefined && target.isDefined){
+      source.get.exists && target.get.exists && source.get.isDirectory && target.get.isDirectory
+    }
+    false
+  }
+
+  private def clearDir(file: File): Unit = {
     try {
-      target.listFiles.foreach(f => FileUtils.deleteDirectory(f))
+      file.listFiles.foreach(f => FileUtils.deleteDirectory(f))
     } catch {
       case se: SecurityException => throw new DataException("SecurityException thrown during clearing target directory.", se)
       case ioe: IOException => throw new DataException("IOException thrown during clearing target directory.", ioe)

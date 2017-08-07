@@ -7,10 +7,10 @@ import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
 
-  //val testSourceHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source"
-  //val testTargetHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\target"
-  val testSourceWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\source"
-  val testTargetWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\target"
+  val testSourceHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source"
+  val testTargetHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\target"
+  //val testSourceWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\source"
+  //val testTargetWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\target"
 
   def recursiveListDirs(f: File): Array[File] = {
     val these = f.listFiles.filter(_.isDirectory)
@@ -25,12 +25,49 @@ class FileProcessorTest extends FunSuite {
     files ++ all.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
 
+  test("FileProcessor - non-existent source") {
+    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Narnia")
+    val t = new File(testTargetHome)
+    //val t = new File(testTargetWork)
+    val d = Array("\\s")
+    val e = Array("GHC")
+
+    val caught = intercept[IllegalArgumentException](new FileProcessor(nonExistentDir, t, d, e))
+    assert(caught.getMessage == "requirement failed: Source directory does not exist or is not a directory!")
+  }
+  test("FileProcessor - non-existent target") {
+    val s = new File(testSourceHome)
+    //val s = new File(testSourceWork)
+    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Narnia")
+    val d = Array("\\s")
+    val e = Array("GHC")
+
+    val caught = intercept[IllegalArgumentException](new FileProcessor(s, nonExistentDir, d, e))
+    assert(caught.getMessage == "requirement failed: Target directory does not exist or is not a directory!")
+  }
+  test("FileProcessor - Default delimiter is '\\s'"){
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
+    val fp = new FileProcessor(s, t)
+    assert(fp.getDelimiters.size ==1)
+    assert(fp.getDelimiters(0).equals("\\s"))
+  }
+  test("FileProcessor - Default extensions is empty array"){
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
+    val fp = new FileProcessor(s, t)
+    assert(fp.getExtensions.isEmpty)
+  }
   test("FileProcessor - preprocess creates target dirs") {
 
-    /*val s = new File(testSourceHome)
-    val t = new File(testTargetHome)*/
-    val s = new File(testSourceWork)
-    val t = new File(testTargetWork)
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
     val d = Array("\\s")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
@@ -43,14 +80,15 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess works with multiple delimiters.") {
-    /*val s = new File(testSourceHome)
-    val t = new File(testTargetHome)*/
-    val s = new File(testSourceWork)
-    val t = new File(testTargetWork)
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
-    val sysCallMap = fp.preprocess()
+    val sysCallMap = fp.preprocess.get
+    println("sysCallMap: " + sysCallMap)
 
     var sfStr = Array[String]()
     val s1 = Source.fromFile(recursiveListFiles(s).filter(f => f.getName == "multipleDelimiters.GHC")(0))
@@ -70,14 +108,14 @@ class FileProcessorTest extends FunSuite {
   }
 
   test("FileProcessor - preprocess works with multiple extensions.") {
-    /*val s = new File(testSourceHome)
-    val t = new File(testTargetHome)*/
-    val s = new File(testSourceWork)
-    val t = new File(testTargetWork)
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC", "AAA", "EEE")
     val fp = new FileProcessor(s, t, d, e)
-    fp.preprocess()
+    fp.preprocess
     val sourceFiles = recursiveListFiles(s)
     val sourceFilesToCopy = recursiveListFiles(s).filter(f => FilenameUtils.getExtension(f.getName) == "GHC" || FilenameUtils.getExtension(f.getName) == "AAA" || FilenameUtils.getExtension(f.getName) == "EEE")
     val sourceFilesToCopy2 = recursiveListFiles(s).filter(f => e.exists(f.getName.endsWith(_)))
