@@ -62,6 +62,29 @@ class FileProcessorTest extends FunSuite {
     val fp = new FileProcessor(s, t)
     assert(fp.getExtensions.isEmpty)
   }
+  test("FileProcessor - revert to default delimiter if none provided in setDelimiters") {
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    val d = Array("\\s")
+    val e = Array("GHC")
+    val fp = new FileProcessor(s, t, d, e)
+    fp.setDelimiters(Array())
+    assert(fp.getDelimiters.length == 1)
+    assert(fp.getDelimiters(0)equals("\\s"))
+  }
+  test("FileProcessor - revert to default (no) extenisons if none provided in setExtensions") {
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
+    val s = new File(testSourceHome)
+    val t = new File(testTargetHome)
+    val d = Array("\\s")
+    val e = Array("GHC")
+    val fp = new FileProcessor(s, t, d, e)
+    fp.setExtensions(Array())
+    assert(fp.getExtensions.isEmpty)
+  }
   test("FileProcessor - preprocess returns None if source doesn't exist anymore"){
     val t = new File(testTargetHome)
     //val t = new File(testTargetWork)
@@ -134,7 +157,6 @@ class FileProcessorTest extends FunSuite {
       assert(sysCallMap(sfStr(i)) == tfStr(i).toInt)
     }
   }
-
   test("FileProcessor - preprocess works with multiple extensions.") {
     val s = new File(testSourceHome)
     val t = new File(testTargetHome)
@@ -157,5 +179,16 @@ class FileProcessorTest extends FunSuite {
 
     assert(sourceFiles.filter(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy").nonEmpty)
     assert(targetFiles.filter(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy").isEmpty)
+  }
+  test("FileProcessor - preprocess returns map of correct size"){
+    val s = new File(testSourceHome + "\\MapTest")
+    val t = new File(testTargetHome)
+    /*val s = new File(testSourceWork)
+    val t = new File(testTargetWork)*/
+    val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
+    val e = Array("GHC", "AAA", "EEE")
+    val fp = new FileProcessor(s, t, d, e)
+    val sysCallMap = fp.preprocess.get
+    assert(sysCallMap.size == 2)
   }
 }

@@ -20,15 +20,14 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
   setDelimiters(_delimiters)
   setExtensions(_extensions)
 
-  def getSource = source
-  def setSource(newSource: File) = if(newSource.exists && newSource.isDirectory) source = Some(newSource)
-  def getTarget = target
-  def setTarget(newTarget: File) = if(newTarget.exists && newTarget.isDirectory) target = Some(newTarget)
-  def getDelimiters = delimiters
-  def setDelimiters(newDelimiters: Array[String]) = if(newDelimiters.isEmpty) delimiters = Array("\\s") else delimiters = newDelimiters
-  def getExtensions = extensions
-  def setExtensions(newExtensions: Array[String]) = if(newExtensions.isEmpty) extensions = Array[String]() else extensions = newExtensions
-
+  def getSource: Option[File] = source
+  def setSource(newSource: File): Unit = if(newSource.exists && newSource.isDirectory) source = Some(newSource)
+  def getTarget: Option[File] = target
+  def setTarget(newTarget: File): Unit = if(newTarget.exists && newTarget.isDirectory) target = Some(newTarget)
+  def getDelimiters: Array[String] = delimiters
+  def setDelimiters(newDelimiters: Array[String]): Unit = if(newDelimiters.isEmpty) delimiters = Array("\\s") else delimiters = newDelimiters
+  def getExtensions: Array[String] = extensions
+  def setExtensions(newExtensions: Array[String]): Unit = if(newExtensions.isEmpty) extensions = Array[String]() else extensions = newExtensions
 
   override def configure(): Unit = {}
 
