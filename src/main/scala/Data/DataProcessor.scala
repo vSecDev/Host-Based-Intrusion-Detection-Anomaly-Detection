@@ -4,5 +4,5 @@ import java.io._
 
 trait DataProcessor {
   def configure(): Unit
-  def preprocess(): Unit
+  def preprocess(): Map[String,Int]
 }

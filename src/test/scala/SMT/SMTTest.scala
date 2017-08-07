@@ -21,6 +21,57 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
 
+  def time[T](block: => T): T = {
+    val start = System.currentTimeMillis
+    val res = block
+    val totalTime = System.currentTimeMillis - start
+    println("Elapsed time: %1d ms".format(totalTime))
+    res
+  }
+  def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) {
+      d.listFiles.filter(_.isFile).toList.filter { file => (file.getName.contains("Training-Backdoored-Executable") || file.getName.contains("Training-Background")) && extensions.exists(file.getName.endsWith(_))
+      }
+    } else {
+      List[File]()
+    }
+  }
+  def getListOfWindowsFiles(dir: String, extensions: List[String]): List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("INT") && extensions.exists(file.getName.endsWith(_))
+    } else {
+      List[File]()
+    }
+  }
+  def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
+    val fos = new FileOutputStream(target)
+    val oos = new ObjectOutputStream(fos)
+    try {
+      oos.writeObject(smt)
+      oos.close
+    } catch {
+      case e: Exception => println(e.getStackTrace)
+    } finally {
+      fos.close
+      oos.close
+    }
+  }
+  def deserializeTree(source: File): Option[SparseMarkovTree[Int, Int]] = {
+    val fis = new FileInputStream(source)
+    val ois = new ObjectInputStreamWithCustomClassLoader(fis)
+    try {
+      val smt = ois.readObject
+      ois.close
+      Some(smt.asInstanceOf[SparseMarkovTree[Int, Int]])
+    } catch {
+      case e: Exception => println(e.getStackTrace); None
+    } finally {
+      fis.close
+      ois.close
+    }
+  }
+
   test("SparseMarkovTree. maxDepth is not zero") {
     assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
     val caught = intercept[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
@@ -1535,109 +1586,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(splitSeq3.getEvents(event2) == 1)
   }
 
-  def time[T](block: => T): T = {
-    val start = System.currentTimeMillis
-    val res = block
-    val totalTime = System.currentTimeMillis - start
-    println("Elapsed time: %1d ms".format(totalTime))
-    res
-  }
-  def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
-    val d = new File(dir)
-    if (d.exists && d.isDirectory) {
-      d.listFiles.filter(_.isFile).toList.filter { file => (file.getName.contains("Training-Backdoored-Executable") || file.getName.contains("Training-Background")) && extensions.exists(file.getName.endsWith(_))
-      }
-    } else {
-      println("directory not found")
-      List[File]()
-    }
-  }
 
-  /* test("SparseMarkovTree - train tree with all training data - STRING benchmark") {
-    val maxDepth = 15
-    val maxPhi = 3
-    val maxSeqCount = 1000
-    val extensions = List("GHC")
-    //val files = getListOfFiles(dataHome, extensions)
-    val files = getListOfFiles(dataWork, extensions)
-    val n1 = new Node[String, String](maxDepth, maxPhi, maxSeqCount)
-    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
-    var counter = 0
-
-
-    println("Processing " + files.size + " files.")
-
-    println("\n\n\n\nTraining using all normal traces - tree depth: 20")
-    time[Unit] {
-      for (f <- files) {
-        counter += 1
-        println("Processing file " + counter)
-        val source = scala.io.Source.fromFile(f)
-        val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-        var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
-        for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if (t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
-        }
-
-        for (t <- trainingData_whole) {
-          n1.learn(t._1, t._2)
-        }
-
-      }
-    }
-    println("FINISHED trace length: 200 - tree depth: 15")
-    println("tree: \n" + n1)
-  }
-
-  def getListOfLinuxFiles(dir: String, extensions: List[String]): List[File] = {
-    val d = new File(dir)
-    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("UTD") && extensions.exists(file.getName.endsWith(_))
-    } else {
-      println("directory not found")
-      List[File]()
-    }
-  }*/
-
-
-  def getListOfWindowsFiles(dir: String, extensions: List[String]): List[File] = {
-    val d = new File(dir)
-    if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("INT") && extensions.exists(file.getName.endsWith(_))
-    } else {
-      println("directory not found")
-      List[File]()
-    }
-  }
-  
-  def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
-    val fos = new FileOutputStream(target)
-    val oos = new ObjectOutputStream(fos)
-    try {
-      oos.writeObject(smt)
-      oos.close
-    } catch {
-      case e: Exception => println(e.getStackTrace)
-    } finally {
-      fos.close
-      oos.close
-    }
-  }
-
-  def deserializeTree(source: File): Option[SparseMarkovTree[Int, Int]] = {
-    val fis = new FileInputStream(source)
-    val ois = new ObjectInputStreamWithCustomClassLoader(fis)
-    try {
-      val smt = ois.readObject
-      ois.close
-      Some(smt.asInstanceOf[SparseMarkovTree[Int, Int]])
-    } catch {
-      case e: Exception => println(e.getStackTrace); None
-    } finally {
-      fis.close
-      ois.close
-    }
-  }
 
   class ObjectInputStreamWithCustomClassLoader(
                                                 fileInputStream: FileInputStream
@@ -1651,79 +1600,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-
-  /*  test("SparseMarkovTree - train tree with all training data - INTEGER benchmark") {
-    val maxDepth = 15
-    val maxPhi = 3
-    val maxSeqCount = 1000
+ /*  test("Create tree models") {
     val extensions = List("GHC")
-    //val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
     val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
-
-
-    //val files = getListOfLinuxFiles(linuxDataWork, extensions)
-    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, 1.0, 1.0 )
-    var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
-    var counter = 0
-    var trainingData_whole_out: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-
-    println("Processing " + files.size + " files.")
-
-    println("\n\n\n\nTraining using all normal traces - tree depth: " + maxDepth)
-    time[Unit] {
-      for (f <- files) {
-        counter += 1
-        println("Processing file " + counter + " - fae: " + f.getName)
-        val source = scala.io.Source.fromFile(f)
-        val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-        for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if (t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
-        }
-
-        trainingData_whole_out = trainingData_whole_out ++ trainingData_whole
-
-        for (t <- trainingData_whole) {
-          n1.learn(t._1, t._2)
-        }
-      }
-    }
-
-    serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serializePath + "SMT_Large.tmp"))
-
-
-    val n2 = deserializeTree(new File(serializePath + "SMT_Large.tmp")).get.asInstanceOf[Node[Int, Int]]
-
-    println("After deserialization. maxDepth: " + n2.maxDepth)
-
-
-    /*var cs: Vector[Double] = Vector()
-    println("TrainingData_whole_out size: " + trainingData_whole_out.size)
-    for(i <- 0 to 100){
-      println("\n\n---\nClassify: " + trainingData_whole_out(i))
-      val c = n1.classify(trainingData_whole_out(i)._1, trainingData_whole_out(i)._2)
-      println(c + " - classification res: " + c._1/c._2)
-      cs = cs :+ c._1/c._2
-    }
-    val cs2 = cs.filter(!_.isNaN)
-    println("Average of classification results: " + cs2.foldLeft(0.0)(_+_) / cs2.foldLeft(0.0)((r,c) => r+1))*/
-
-   /* println("\n\n---\nClassify " + (Vector(227, 994, 682, 652),815))
-    println(n1.classify(Vector(227, 994, 682, 652), 815))
-
-    println("\n\n---\nClassify " + (Vector(2000, 2000, 2000, 2000),815))
-    println(n1.classify(Vector(2000, 2000, 2000, 2000), 815))
-*/
-    /*    println("FINISHED trace length: 200 - tree depth: " + maxDepth)
-    println("tree: \n" + n1)*/
-  }*/
-
-   test("Create tree models") {
-    val extensions = List("GHC")
-    //val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
-    val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
+    //val files = getListOfWindowsFiles(windowsTrainingDataHome, extensions)
     var maxSeqCount = 1000
 
 
@@ -1770,7 +1650,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       System.gc*/
     }
     System.gc
-  }
+  }*/
 
   /*test("Deserialisation") {
   val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_2_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
