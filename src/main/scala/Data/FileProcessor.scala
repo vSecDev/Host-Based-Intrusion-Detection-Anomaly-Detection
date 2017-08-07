@@ -5,10 +5,20 @@ import java.nio.file.{Files, Paths}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import scala.collection.mutable
 
-class FileProcessor(source: File, target: File, delimiters: Array[String] = Array("\\s"), extensions: Array[String] = Array[String]()) extends DataProcessor {
+class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
 
-  require(source.exists && source.isDirectory, "Source directory does not exist or is not a directory!")
-  require(target.exists && target.isDirectory, "Target directory does not exist or is not a directory!")
+  private var source: File = new File()
+  private var target: File = new File()
+  private var delimiters: = Array[String]()
+  private var extensions: Array[String]()
+
+  require(_source.exists && _source.isDirectory, "Source directory does not exist or is not a directory!")
+  require(_target.exists && _target.isDirectory, "Target directory does not exist or is not a directory!")
+
+  setSource(_source)
+  setTarget(_target)
+  setDelimiters(_delimiters)
+  setExtensions(_extensions)
 
   override def configure(): Unit = {}
 
