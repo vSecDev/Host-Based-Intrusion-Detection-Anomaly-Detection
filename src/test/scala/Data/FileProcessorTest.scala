@@ -26,7 +26,7 @@ class FileProcessorTest extends FunSuite {
   }
 
   test("FileProcessor - non-existent source") {
-    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Narnia")
+    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source\\Narnia")
     val t = new File(testTargetHome)
     //val t = new File(testTargetWork)
     val d = Array("\\s")
@@ -38,7 +38,7 @@ class FileProcessorTest extends FunSuite {
   test("FileProcessor - non-existent target") {
     val s = new File(testSourceHome)
     //val s = new File(testSourceWork)
-    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Narnia")
+    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source\\Narnia")
     val d = Array("\\s")
     val e = Array("GHC")
 
@@ -61,6 +61,28 @@ class FileProcessorTest extends FunSuite {
     val t = new File(testTargetWork)*/
     val fp = new FileProcessor(s, t)
     assert(fp.getExtensions.isEmpty)
+  }
+  test("FileProcessor - preprocess returns None if source doesn't exist anymore"){
+    val t = new File(testTargetHome)
+    //val t = new File(testTargetWork)
+    val tempF = new File(testSourceHome + "\\tempSource")
+    tempF.mkdir
+    if(tempF.exists){
+      val fp = new FileProcessor(tempF, t)
+      tempF.delete()
+      assert(fp.preprocess == None)
+    }
+  }
+  test("FileProcessor - preprocess returns None if target doesn't exist anymore"){
+    val s = new File(testSourceHome)
+    //val s = new File(testSourceWork)
+    val tempF = new File(testTargetHome + "\\tempTarget")
+    tempF.mkdir
+    if(tempF.exists){
+      val fp = new FileProcessor(s, tempF)
+      tempF.delete()
+      assert(fp.preprocess == None)
+    }
   }
   test("FileProcessor - preprocess creates target dirs") {
 
@@ -87,6 +109,12 @@ class FileProcessorTest extends FunSuite {
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
+    assert(fp.getSource.isDefined)
+    assert(fp.getTarget.isDefined)
+    assert(fp.getSource.get.exists)
+    assert(fp.getTarget.get.exists)
+    assert(fp.getSource.get.isDirectory)
+    assert(fp.getTarget.get.isDirectory)
     val sysCallMap = fp.preprocess.get
     println("sysCallMap: " + sysCallMap)
 

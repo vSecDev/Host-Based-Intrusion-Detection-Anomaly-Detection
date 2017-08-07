@@ -35,7 +35,7 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
   @throws(classOf[DataException])
   override def preprocess(): Option[Map[String, Int]] = {
-    if(!checkDirs) None
+    if(!checkDirs) return None
     try {
       clearDir(target.get)
 
@@ -69,7 +69,7 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
 
   private def checkDirs: Boolean = {
     if(source.isDefined && target.isDefined){
-      source.get.exists && target.get.exists && source.get.isDirectory && target.get.isDirectory
+      return source.get.exists && target.get.exists && source.get.isDirectory && target.get.isDirectory
     }
     false
   }
