@@ -7,10 +7,10 @@ import scala.collection.mutable
 
 class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
 
-  private var source: File = new File()
-  private var target: File = new File()
-  private var delimiters: = Array[String]()
-  private var extensions: Array[String]()
+  private var source: Option[File] = None
+  private var target: Option[File] = None
+  private var delimiters: Array[String] = Array[String]()
+  private var extensions: Array[String] = Array[String]()
 
   require(_source.exists && _source.isDirectory, "Source directory does not exist or is not a directory!")
   require(_target.exists && _target.isDirectory, "Target directory does not exist or is not a directory!")
@@ -19,6 +19,16 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
   setTarget(_target)
   setDelimiters(_delimiters)
   setExtensions(_extensions)
+
+  def getSource = source
+  def setSource(newSource: File) = if(newSource.exists && newSource.isDirectory) source = newSource
+  def getTarget = target
+  def setTarget(newTarget: File) = if(newTarget.exists && newTarget.isDirectory) target = newTarget
+  def getDelimiters = delimiters
+  def setDelimiters(newDelimiters: Array[String]) = if(newDelimiters.isEmpty) delimiters = Array("\\s") else delimiters = newDelimiters
+  def getExtensions = extensions
+  def setExtensions(newExtensions: Array[String]) = if(newExtensions.isEmpty) extensions = Array[String]() else extensions = newExtensions
+
 
   override def configure(): Unit = {}
 
