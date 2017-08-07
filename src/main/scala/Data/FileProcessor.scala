@@ -40,16 +40,15 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
 
       var sysCallSet = mutable.Set[String]()
       var sysCallMap = Map[String, Int]()
-
       fileStreamNoDirs(source.get).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
       sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
+
       fileStream(source.get).foreach(f => {
         if (f.isDirectory) {
           val path = target.get.getCanonicalPath + f.getCanonicalPath.replace(source.get.getCanonicalPath, "")
           Files.createDirectory(Paths.get(path))
         } else {
           if (extensions.exists(f.getName.endsWith(_))) {
-
             val path = target.get.getCanonicalPath + FilenameUtils.removeExtension(f.getCanonicalPath.replace(source.get.getCanonicalPath, "")) + "_INT.IDS"
             val intTrace = toIntTrace(f, sysCallMap)
             val newFile = new File(path)
@@ -75,7 +74,7 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
 
   private def clearDir(file: File): Unit = {
     try {
-      file.listFiles.foreach(f => FileUtils.deleteDirectory(f))
+      file.listFiles.foreach(f => {if(f.isDirectory) FileUtils.deleteDirectory(f) else if(f.isFile) f.delete()})
     } catch {
       case se: SecurityException => throw new DataException("SecurityException thrown during clearing target directory.", se)
       case ioe: IOException => throw new DataException("IOException thrown during clearing target directory.", ioe)

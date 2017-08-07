@@ -1,4 +1,4 @@
-package SMT
+package DecisionEngine.SMT
 
 import scala.annotation.tailrec
 import scala.collection.mutable.Map

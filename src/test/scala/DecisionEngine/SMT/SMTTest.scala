@@ -1,4 +1,4 @@
-package SMT
+package DecisionEngine.SMT
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._

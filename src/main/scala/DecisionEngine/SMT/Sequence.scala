@@ -1,4 +1,4 @@
-package SMT
+package DecisionEngine.SMT
 
 import sun.nio.cs.ext.DoubleByteEncoder
 

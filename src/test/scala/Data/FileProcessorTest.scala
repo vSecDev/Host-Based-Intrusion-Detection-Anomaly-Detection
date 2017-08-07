@@ -6,7 +6,8 @@ import org.scalatest.FunSuite
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-
+  val mapTestSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\source"
+  val mapTestTarget = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\target"
   val testSourceHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source"
   val testTargetHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\target"
   //val testSourceWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\source"
@@ -108,7 +109,6 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess creates target dirs") {
-
     val s = new File(testSourceHome)
     val t = new File(testTargetHome)
     /*val s = new File(testSourceWork)
@@ -138,8 +138,12 @@ class FileProcessorTest extends FunSuite {
     assert(fp.getTarget.get.exists)
     assert(fp.getSource.get.isDirectory)
     assert(fp.getTarget.get.isDirectory)
-    val sysCallMap = fp.preprocess.get
-    println("sysCallMap: " + sysCallMap)
+    var sysCallMap = Map[String, Int]()
+    try {
+      sysCallMap = fp.preprocess.get
+    }catch{
+      case e: Throwable => println("MESSAGE: " + e.getCause.getMessage)
+    }
 
     var sfStr = Array[String]()
     val s1 = Source.fromFile(recursiveListFiles(s).filter(f => f.getName == "multipleDelimiters.GHC")(0))
@@ -177,12 +181,12 @@ class FileProcessorTest extends FunSuite {
 
     for (f <- targetFiles) assert(sourceFiles.exists(f2 => f.getName == FilenameUtils.removeExtension(f2.getName) + "_INT.IDS"))
 
-    assert(sourceFiles.filter(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy").nonEmpty)
-    assert(targetFiles.filter(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy").isEmpty)
+    assert(sourceFiles.exists(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy"))
+    assert(!targetFiles.exists(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy"))
   }
   test("FileProcessor - preprocess returns map of correct size"){
-    val s = new File(testSourceHome + "\\MapTest")
-    val t = new File(testTargetHome)
+    val s = new File(mapTestSource)
+    val t = new File(mapTestTarget)
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")

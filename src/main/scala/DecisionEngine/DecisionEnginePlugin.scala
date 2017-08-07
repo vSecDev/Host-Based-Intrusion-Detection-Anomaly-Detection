@@ -1,0 +1,5 @@
+package DecisionEngine
+
+trait DecisionEnginePlugin {
+
+}
