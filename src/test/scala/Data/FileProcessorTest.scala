@@ -15,7 +15,7 @@ class FileProcessorTest extends FunSuite {
   var mapTestSource = ""
   var mapTestTarget = ""
 
-  if(isHome) {
+  if (isHome) {
     mapTestSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\source"
     mapTestTarget = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\target"
     testSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source"
@@ -61,16 +61,16 @@ class FileProcessorTest extends FunSuite {
     val caught = intercept[IllegalArgumentException](new FileProcessor(s, nonExistentDir, d, e))
     assert(caught.getMessage == "requirement failed: Target directory does not exist or is not a directory!")
   }
-  test("FileProcessor - Default delimiter is '\\s'"){
+  test("FileProcessor - Default delimiter is '\\s'") {
     val s = new File(testSource)
     val t = new File(testTarget)
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
     val fp = new FileProcessor(s, t)
-    assert(fp.getDelimiters.size ==1)
+    assert(fp.getDelimiters.size == 1)
     assert(fp.getDelimiters(0).equals("\\s"))
   }
-  test("FileProcessor - Default extensions is empty array"){
+  test("FileProcessor - Default extensions is empty array") {
     val s = new File(testSource)
     val t = new File(testTarget)
     /*val s = new File(testSourceWork)
@@ -88,7 +88,7 @@ class FileProcessorTest extends FunSuite {
     val fp = new FileProcessor(s, t, d, e)
     fp.setDelimiters(Array())
     assert(fp.getDelimiters.length == 1)
-    assert(fp.getDelimiters(0)equals("\\s"))
+    assert(fp.getDelimiters(0) equals ("\\s"))
   }
   test("FileProcessor - revert to default (no) extenisons if none provided in setExtensions") {
     /*val s = new File(testSourceWork)
@@ -101,23 +101,23 @@ class FileProcessorTest extends FunSuite {
     fp.setExtensions(Array())
     assert(fp.getExtensions.isEmpty)
   }
-  test("FileProcessor - preprocess returns None if source doesn't exist anymore"){
+  test("FileProcessor - preprocess returns None if source doesn't exist anymore") {
     val t = new File(testTarget)
     //val t = new File(testTargetWork)
     val tempF = new File(testSource + "\\tempSource")
     tempF.mkdir
-    if(tempF.exists){
+    if (tempF.exists) {
       val fp = new FileProcessor(tempF, t)
       tempF.delete()
       assert(fp.preprocess == None)
     }
   }
-  test("FileProcessor - preprocess returns None if target doesn't exist anymore"){
+  test("FileProcessor - preprocess returns None if target doesn't exist anymore") {
     val s = new File(testSource)
     //val s = new File(testSourceWork)
     val tempF = new File(testTarget + "\\tempTarget")
     tempF.mkdir
-    if(tempF.exists){
+    if (tempF.exists) {
       val fp = new FileProcessor(s, tempF)
       tempF.delete()
       assert(fp.preprocess == None)
@@ -132,10 +132,10 @@ class FileProcessorTest extends FunSuite {
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
     fp.preprocess()
-    val folderNames = Array("1", "2", "3", "4")
+    val sourceDirs = recursiveListDirs(s).map(f => f.getName)
     val dirs = recursiveListDirs(t).map(f => f.getName)
-    assert(dirs.length == 4)
-    for (n <- folderNames) {
+
+    for (n <- sourceDirs) {
       assert(dirs.contains(n))
     }
   }
@@ -156,7 +156,7 @@ class FileProcessorTest extends FunSuite {
     var sysCallMap = Map[String, Int]()
     try {
       sysCallMap = fp.preprocess.get
-    }catch{
+    } catch {
       case e: Throwable => println("MESSAGE: " + e.getCause.getMessage)
     }
 
@@ -199,15 +199,39 @@ class FileProcessorTest extends FunSuite {
     assert(sourceFiles.exists(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy"))
     assert(!targetFiles.exists(f => FilenameUtils.removeExtension(f.getName) == "file2_DontCopy"))
   }
-  test("FileProcessor - preprocess returns map of correct size"){
+  test("FileProcessor - preprocess returns map of correct size") {
     val s = new File(mapTestSource)
     val t = new File(mapTestTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC", "AAA", "EEE")
     val fp = new FileProcessor(s, t, d, e)
     val sysCallMap = fp.preprocess.get
     assert(sysCallMap.size == 5)
+  }
+  test("FileProcessor - getData returns content of file") {
+    val s = new File(testSource)
+    val t = new File(testTarget)
+    val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
+    val e = Array("GHC")
+    val fp = new FileProcessor(s, t, d, e)
+    val f = new File(testSource + "\\2\\getDataTest.GHC")
+    val w = fp.getData(f)
+    assert(w isDefined)
+    assert(w.get.retrieve.get == "kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b")
+  }
+  test("FileProcessor - getAllData returns content of all files") {
+    val s = new File(testSource)
+    val t = new File(testTarget)
+    val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
+    val e = Array("GHC", "AAA", "EEE")
+    val fp = new FileProcessor(s, t, d, e)
+    val f = new File(testSource + "\\2\\getAllDataTest")
+    val traces = Vector("kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b", "ntdll.dll+0x16d33 ntdll.dll+0x16f03 ntdll.dll+0x16d33 ntdll.dll+0x2b82e", "330 577 335 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149", "")
+    val w = fp.getAllData(f)
+    assert(w isDefined)
+    val vect = w.get
+    for (i <- vect.indices) {
+      assert(vect(i).retrieve.get.equals(traces(i)))
+    }
   }
 }
