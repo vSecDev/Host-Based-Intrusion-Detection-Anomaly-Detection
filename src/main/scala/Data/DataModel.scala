@@ -6,4 +6,3 @@ package Data
 trait DataModel {
 
 }
-
