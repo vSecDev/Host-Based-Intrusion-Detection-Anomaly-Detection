@@ -1,8 +1,11 @@
-package Data
+package Data.File
 
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
+
+import Data.{DataException, DataProcessor, DataWrapper}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
+
 import scala.collection.mutable
 
 class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
@@ -64,6 +67,9 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
       case ex: Throwable => throw new DataException("An error occurred during data processing.", ex)
     }
   }
+
+
+  override def getData(wrapper: DataWrapper): Option[DataWrapper] = ???
 
   private def checkDirs: Boolean = {
     if(source.isDefined && target.isDefined){

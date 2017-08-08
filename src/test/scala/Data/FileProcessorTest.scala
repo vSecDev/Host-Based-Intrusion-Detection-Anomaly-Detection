@@ -1,8 +1,11 @@
 package Data
 
 import java.io._
+
+import Data.File.FileProcessor
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.FunSuite
+
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
