@@ -6,8 +6,8 @@ import java.nio.file.{Files, Paths}
 import Data.{DataException, DataModel, DataProcessor, DataWrapper}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 
+import scala.collection.immutable.VectorBuilder
 import scala.collection.mutable
-import scala.io.BufferedSource
 
 class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor[String] {
 
@@ -81,12 +81,21 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
     }
   }
 
-  override def getAllData(f: File): Option[List[DataWrapper[String]]] = ???
-  /*{
-    if (wrapper.isInstanceOf[FileDataWrapper] && source.exists() && source.isDirectory) {
+  override def getAllData(d: File): Option[Vector[DataWrapper[String]]] = {
+    if (d.exists() && d.isDirectory) {
+      val fs = fileStreamNoDirs(d)
+      var ws = Vector[DataWrapper[String]]()
 
+      fs.foreach(f => {
+        val src = scala.io.Source.fromFile(f)
+        val lines = try src.getLines mkString "\n" finally src.close()
+        val wrapper = new DataWrapper[String]
+        wrapper.store(lines)
+        ws = ws :+ wrapper
+      })
+      Some(ws)
     } else { None }
-  }*/
+  }
 
   override def saveModel(model: DataModel, target: File): Boolean = ???
 

@@ -9,7 +9,7 @@ trait DataProcessor[T] {
 
   def getData(source: File): Option[DataWrapper[T]]
 
-  def getAllData(source: File): Option[List[DataWrapper[T]]]
+  def getAllData(source: File): Option[Vector[DataWrapper[T]]]
 
   def saveModel(model: DataModel, target: File): Boolean
 
