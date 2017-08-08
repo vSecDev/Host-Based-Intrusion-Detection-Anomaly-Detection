@@ -46,7 +46,7 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
       var sysCallMap = Map[String, Int]()
       fileStreamNoDirs(source.get).foreach(f => sysCallSet = fileToSet(f, sysCallSet))
       sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
-
+      println("\nsysCallMap: " + sysCallMap)
       fileStream(source.get).foreach(f => {
         if (f.isDirectory) {
           val path = target.get.getCanonicalPath + f.getCanonicalPath.replace(source.get.getCanonicalPath, "")
@@ -157,8 +157,10 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
     try {
       val source = scala.io.Source.fromFile(f)
       val lines = try source.getLines mkString "\n" finally source.close()
+      println("lines: " + lines)
       //val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString))
       val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString)).replaceAll(delimiters.mkString("|"), " ")
+      println("result: " + result)
       result
     } catch {
       case ioe: IOException => throw new DataException("IOException thrown during conversion of source data file.", ioe)

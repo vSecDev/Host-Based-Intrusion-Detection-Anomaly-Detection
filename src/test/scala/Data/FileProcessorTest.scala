@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-  val isHome = false
+  val isHome = true
   var testSource = ""
   var testTarget = ""
   var mapTestSource = ""
@@ -18,8 +18,8 @@ class FileProcessorTest extends FunSuite {
   if (isHome) {
     mapTestSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\source"
     mapTestTarget = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\MapTest\\target"
-    testSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source"
-    testTarget = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\target"
+    testSource = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\"
+    testTarget = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\main\\target"
   }
   else {
     mapTestSource = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\MapTest\\source"
@@ -52,7 +52,7 @@ class FileProcessorTest extends FunSuite {
     assert(caught.getMessage == "requirement failed: Source directory does not exist or is not a directory!")
   }
   test("FileProcessor - non-existent target") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     //val s = new File(testSourceWork)
     val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source\\Narnia")
     val d = Array("\\s")
@@ -62,7 +62,7 @@ class FileProcessorTest extends FunSuite {
     assert(caught.getMessage == "requirement failed: Target directory does not exist or is not a directory!")
   }
   test("FileProcessor - Default delimiter is '\\s'") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
@@ -71,7 +71,7 @@ class FileProcessorTest extends FunSuite {
     assert(fp.getDelimiters(0).equals("\\s"))
   }
   test("FileProcessor - Default extensions is empty array") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
@@ -81,7 +81,7 @@ class FileProcessorTest extends FunSuite {
   test("FileProcessor - revert to default delimiter if none provided in setDelimiters") {
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
     val d = Array("\\s")
     val e = Array("GHC")
@@ -93,7 +93,7 @@ class FileProcessorTest extends FunSuite {
   test("FileProcessor - revert to default (no) extenisons if none provided in setExtensions") {
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
     val d = Array("\\s")
     val e = Array("GHC")
@@ -104,7 +104,7 @@ class FileProcessorTest extends FunSuite {
   test("FileProcessor - preprocess returns None if source doesn't exist anymore") {
     val t = new File(testTarget)
     //val t = new File(testTargetWork)
-    val tempF = new File(testSource + "\\tempSource")
+    val tempF = new File(testSource + "main\\source" + "\\tempSource")
     tempF.mkdir
     if (tempF.exists) {
       val fp = new FileProcessor(tempF, t)
@@ -113,7 +113,7 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess returns None if target doesn't exist anymore") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     //val s = new File(testSourceWork)
     val tempF = new File(testTarget + "\\tempTarget")
     tempF.mkdir
@@ -124,10 +124,8 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess creates target dirs") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
     val d = Array("\\s")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
@@ -140,10 +138,8 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess works with multiple delimiters.") {
-    val s = new File(testSource)
+    val s = new File(testSource + "\\multDel")
     val t = new File(testTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
@@ -177,7 +173,7 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess works with multiple extensions.") {
-    val s = new File(testSource)
+    val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
     /*val s = new File(testSourceWork)
     val t = new File(testTargetWork)*/
@@ -214,7 +210,7 @@ class FileProcessorTest extends FunSuite {
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC")
     val fp = new FileProcessor(s, t, d, e)
-    val f = new File(testSource + "\\2\\getDataTest.GHC")
+    val f = new File(testSource + "main\\source\\2\\getDataTest.GHC")
     val w = fp.getData(f)
     assert(w isDefined)
     assert(w.get.retrieve.get == "kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b")
@@ -225,13 +221,11 @@ class FileProcessorTest extends FunSuite {
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC", "AAA", "EEE")
     val fp = new FileProcessor(s, t, d, e)
-    val f = new File(testSource + "\\2\\getAllDataTest")
+    val f = new File(testSource + "\\getAllDataTest")
     val traces = Vector("kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b", "ntdll.dll+0x16d33 ntdll.dll+0x16f03 ntdll.dll+0x16d33 ntdll.dll+0x2b82e", "330 577 335 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149 779 703 342 1034 641 602 268 913 1149", "")
     val w = fp.getAllData(f)
     assert(w isDefined)
     val vect = w.get
-    for (i <- vect.indices) {
-      assert(vect(i).retrieve.get.equals(traces(i)))
-    }
+    for (i <- vect.indices) assert(vect(i).retrieve.get.equals(traces(i)))
   }
 }
