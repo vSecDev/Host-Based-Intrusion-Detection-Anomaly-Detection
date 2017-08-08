@@ -3,12 +3,13 @@ package Data.File
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
 
-import Data.{DataException, DataProcessor, DataWrapper}
+import Data.{DataException, DataModel, DataProcessor, DataWrapper}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 
 import scala.collection.mutable
+import scala.io.BufferedSource
 
-class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
+class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor[String] {
 
   private var source: Option[File] = None
   private var target: Option[File] = None
@@ -68,8 +69,28 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
     }
   }
 
+  override def getData(f: File): Option[DataWrapper[String]] = {
+    if (f.exists() && f.isFile && extensions.contains(FilenameUtils.getExtension(f.getName))) {
+      val src = scala.io.Source.fromFile(f)
+      val lines = try src.getLines mkString "\n" finally src.close()
+      val wrapper = new DataWrapper[String]
+      wrapper.store(lines)
+      Some(wrapper)
+    } else {
+      None
+    }
+  }
 
-  override def getData(wrapper: DataWrapper): Option[DataWrapper] = ???
+  override def getAllData(f: File): Option[List[DataWrapper[String]]] = ???
+  /*{
+    if (wrapper.isInstanceOf[FileDataWrapper] && source.exists() && source.isDirectory) {
+
+    } else { None }
+  }*/
+
+  override def saveModel(model: DataModel, target: File): Boolean = ???
+
+  override def loadModel(source: File): Option[DataModel] = ???
 
   private def checkDirs: Boolean = {
     if(source.isDefined && target.isDefined){

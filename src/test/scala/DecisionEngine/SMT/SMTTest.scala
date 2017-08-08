@@ -1600,7 +1600,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-  /*
+/*
+
  test("Create tree models") {
     val extensions = List("GHC")
     val files = getListOfWindowsFiles(windowsTrainingDataWork, extensions)
@@ -1651,7 +1652,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       System.gc*/
     }
     System.gc
-  }*/
+  }
+*/
 
   /*test("Deserialisation") {
   val n1: Node[Int, Int] = deserializeTree(new File(serializePath + "SMT_2_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
