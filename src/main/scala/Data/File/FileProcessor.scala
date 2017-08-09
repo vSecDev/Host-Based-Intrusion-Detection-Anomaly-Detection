@@ -54,9 +54,11 @@ class FileProcessor extends DataProcessor {
             sysCallSet.foreach(s => if (!map.keySet.contains(s)) {
               map += (s -> (map.valuesIterator.max + 1))
             })
+            println("map after update in processNew: " + map)
             val path = target.getCanonicalPath + "\\" + FilenameUtils.getBaseName(f.getName) + "_INT.IDS"
             println("------------------------------------------------------new file path: " + path)
             val intTrace = toIntTrace(f, map, delimiters)
+            println("intTrace: " + intTrace)
             val newFile = new File(path)
             val bw = new BufferedWriter(new FileWriter(newFile))
             bw.write(intTrace)
@@ -200,10 +202,10 @@ class FileProcessor extends DataProcessor {
   private def toIntTrace(f: File, map: mutable.Map[String, Int], delimiters: Array[String]): String = {
     try {
       val source = scala.io.Source.fromFile(f)
-      val lines = try source.getLines mkString "\n" finally source.close()
+      val lines = try source.getLines mkString "\n" replaceAll(delimiters.mkString("|"), " ") finally source.close()
       println("lines: " + lines)
-      //val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString))
-      val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(b._1, b._2.toString)).replaceAll(delimiters.mkString("|"), " ")
+      println("map before replace: " + map)
+      val result = map.foldLeft(lines)((a, b) => a.replaceAll("\\b" + b._1 + "\\b", b._2.toString))
       println("result: " + result)
       result
     } catch {

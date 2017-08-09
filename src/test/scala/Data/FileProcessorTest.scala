@@ -10,7 +10,7 @@ import scala.collection.mutable
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-  val isHome = false
+  val isHome = true
   var testSource = ""
   var testTarget = ""
   var mapTestSource = ""
@@ -149,18 +149,22 @@ class FileProcessorTest extends FunSuite {
      } catch {
        case e: Throwable => println("MESSAGE: " + e.getCause.getMessage)
      }
-
+      println("---- sysCallMap: "+ sysCallMap)
      var sfStr = Array[String]()
      val s1 = Source.fromFile(recursiveListFiles(s).filter(f => f.getName == "multipleDelimiters.GHC")(0))
      try
        sfStr = s1.mkString.split(d.mkString("|"))
      finally s1.close()
 
-     var tfStr = Array[String]()
+     for(s <- sfStr) { println("sfStr: " + s)}
+
+    var tfStr = Array[String]()
      val s2 = Source.fromFile(recursiveListFiles(t).filter(f => f.getName == "multipleDelimiters_INT.IDS")(0))
      try
        tfStr = s2.mkString.split(d.mkString("|"))
      finally s2.close()
+
+     for(s <- tfStr) { println("tfStr: " + s)}
 
      for (i <- sfStr.indices) {
        assert(sysCallMap(sfStr(i)) == tfStr(i).toInt)
@@ -226,5 +230,26 @@ class FileProcessorTest extends FunSuite {
     assert(w isDefined)
     val vect = w.get
     for (i <- vect.indices) assert(vect(i).retrieve.get.equals(traces(i)))
+  }
+  test("FileProcessor - processNew creates new file and returns updated system call map"){
+    val s = new File(testSource + "\\unseenTest\\source")
+    val t = new File(testSource + "\\unseenTest\\target")
+    val unseen = new File(testSource + "\\unseenTest\\unseen.GHC")
+    val d = Array("\\s", ";", "_")
+    val e = Array("GHC")
+    val fp = new FileProcessor
+
+    val sysCallMap = fp.preprocess(s,t,d,e).get
+    assert(sysCallMap.size == 8)
+    for(i <- 1 to sysCallMap.size){
+      assert(sysCallMap.contains("seen" + i))
+    }
+
+    fp.processNew(unseen, t, sysCallMap, d, e).get
+    println("new sysCallMap: " + sysCallMap)
+    assert(sysCallMap.size == 12)
+    for(i <- 1 to 4){
+      assert(sysCallMap.contains("unseen" + i))
+    }
   }
 }
