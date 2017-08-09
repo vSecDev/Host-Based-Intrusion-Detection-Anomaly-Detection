@@ -36,13 +36,13 @@ class FileProcessor extends DataProcessor {
 
   //TODO - HANDLE PREVIOUSLY UNSEEN CALLS
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
-  @throws(classOf[DataException])
+  /*@throws(classOf[DataException])
   def processNew(f: File, target: File, map: Map[String, Int], delimiters: Array[String]): Option[Map[String, Int]] = {
     if (!checkFiles(f) || !checkDirs(target)) { return None }
 
 
   }
-
+*/
   @throws(classOf[DataException])
   override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[Map[String, Int]] = {
     if(!checkDirs(source, target)) return None
@@ -60,7 +60,7 @@ class FileProcessor extends DataProcessor {
           val path = target.getCanonicalPath + f.getCanonicalPath.replace(source.getCanonicalPath, "")
           Files.createDirectory(Paths.get(path))
         } else {
-          if (extensions.exists(f.getName.endsWith(_))) {
+          if (checkExtension(f, extensions)) {
             val path = target.getCanonicalPath + FilenameUtils.removeExtension(f.getCanonicalPath.replace(source.getCanonicalPath, "")) + "_INT.IDS"
             val intTrace = toIntTrace(f, sysCallMap, delimiters)
             val newFile = new File(path)
@@ -78,7 +78,7 @@ class FileProcessor extends DataProcessor {
   }
 
   override def getData(f: File, extensions: Array[String]): Option[StringDataWrapper] = {
-    if (checkFiles(f) && extensions.contains(FilenameUtils.getExtension(f.getName))) {
+    if (checkFiles(f) && checkExtension(f, extensions)) {
       val src = scala.io.Source.fromFile(f)
       val lines = try src.getLines mkString "\n" finally src.close()
       val wrapper = new StringDataWrapper
@@ -120,6 +120,7 @@ class FileProcessor extends DataProcessor {
     files.foreach(f => if(!f.exists || !f.isFile) return false)
     true
   }
+  private def checkExtension(f: File, extensions: Array[String]): Boolean = extensions.contains(FilenameUtils.getExtension(f.getName))
 
   private def clearDir(dir: File): Unit = {
     try
@@ -149,7 +150,7 @@ class FileProcessor extends DataProcessor {
     try {
       Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
         .map { case (dirs, files) =>
-          files.filter(f => extensions.exists(f.getName.endsWith(_))).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
+          files.filter(f => checkExtension(f,extensions)).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
         } getOrElse {
         //println("exception: dir cannot be listed: " + dir.getPath)
         Stream.empty
