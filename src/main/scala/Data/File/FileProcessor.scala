@@ -34,26 +34,53 @@ class FileProcessor extends DataProcessor {
 
   override def configure(): Unit = {}
 
-  //TODO - HANDLE PREVIOUSLY UNSEEN CALLS
+
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
-  /*@throws(classOf[DataException])
-  def processNew(f: File, target: File, map: Map[String, Int], delimiters: Array[String]): Option[Map[String, Int]] = {
-    if (!checkFiles(f) || !checkDirs(target)) { return None }
 
 
-  }
-*/
+  //TODO - HANDLE PREVIOUSLY UNSEEN CALLS  -- processNew to test!!!
   @throws(classOf[DataException])
-  override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[Map[String, Int]] = {
+  def processNew(f: File, target: File, map: mutable.Map[String, Int], delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
+    if (!checkFiles(f) || !checkDirs(target)) { return None }
+    val data = getData(f, extensions)
+    try {
+      data match {
+        case None => None
+        case Some(strOpt) => strOpt.retrieve match {
+          case None => None
+          case Some(str) => {
+            var sysCallSet = mutable.Set[String]()
+            sysCallSet = fileToSet(f, sysCallSet, delimiters)
+            sysCallSet.foreach(s => if (!map.keySet.contains(s)) {
+              map += (s -> (map.valuesIterator.max + 1))
+            })
+            val path = target.getCanonicalPath + "\\" + FilenameUtils.getBaseName(f.getName) + "_INT.IDS"
+            println("------------------------------------------------------new file path: " + path)
+            val intTrace = toIntTrace(f, map, delimiters)
+            val newFile = new File(path)
+            val bw = new BufferedWriter(new FileWriter(newFile))
+            bw.write(intTrace)
+            bw.close()
+            Some(map)
+          }
+        }
+      }
+    } catch {
+      case de: DataException => throw de
+      case ex: Throwable => throw new DataException("An error occurred during data processing.", ex)
+    }
+  }
+  @throws(classOf[DataException])
+  override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
     if(!checkDirs(source, target)) return None
     try {
       clearDir(target)
 
       var sysCallSet = mutable.Set[String]()
-      var sysCallMap = Map[String, Int]()
+      var sysCallMap = mutable.Map[String, Int]()
       fileStreamNoDirs(source, extensions).foreach(f => sysCallSet = fileToSet(f, sysCallSet, delimiters))
-      sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
-
+      //sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
+      sysCallMap ++= sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }
       println("\nsysCallMap: " + sysCallMap)
       fileStream(source).foreach(f => {
         if (f.isDirectory) {
@@ -170,7 +197,7 @@ class FileProcessor extends DataProcessor {
     }
   }
 
-  private def toIntTrace(f: File, map: Map[String, Int], delimiters: Array[String]): String = {
+  private def toIntTrace(f: File, map: mutable.Map[String, Int], delimiters: Array[String]): String = {
     try {
       val source = scala.io.Source.fromFile(f)
       val lines = try source.getLines mkString "\n" finally source.close()

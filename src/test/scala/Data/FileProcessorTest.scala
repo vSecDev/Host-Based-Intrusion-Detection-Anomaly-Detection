@@ -6,6 +6,7 @@ import Data.File.FileProcessor
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.FunSuite
 
+import scala.collection.mutable
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
@@ -142,7 +143,7 @@ class FileProcessorTest extends FunSuite {
      val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
      val e = Array("GHC")
      val fp = new FileProcessor
-     var sysCallMap = Map[String, Int]()
+     var sysCallMap = mutable.Map[String, Int]()
      try {
        sysCallMap = fp.preprocess(s, t, d, e).get
      } catch {

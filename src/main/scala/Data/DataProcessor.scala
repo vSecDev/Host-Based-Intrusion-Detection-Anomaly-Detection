@@ -1,11 +1,12 @@
 package Data
 
 import java.io.File
+import scala.collection.mutable
 
 trait DataProcessor {
   def configure(): Unit
 
-  def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[Map[String, Int]]
+  def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]]
 
   def getData(source: File, extensions: Array[String]): Option[DataWrapper]
 
