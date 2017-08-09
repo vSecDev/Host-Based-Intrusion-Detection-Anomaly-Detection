@@ -2,10 +2,8 @@ package Data.File
 
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
-
 import Data._
 import org.apache.commons.io.{FileUtils, FilenameUtils}
-
 import scala.collection.mutable
 
 class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
@@ -34,6 +32,7 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
 
   override def configure(): Unit = {}
 
+  //TODO - HANDLE PREVIOUSLY UNSEEN CALLS
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
   @throws(classOf[DataException])
   override def preprocess(): Option[Map[String, Int]] = {
