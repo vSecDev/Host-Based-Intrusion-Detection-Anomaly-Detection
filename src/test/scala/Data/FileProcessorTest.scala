@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-  val isHome = true
+  val isHome = false
   var testSource = ""
   var testTarget = ""
   var mapTestSource = ""
@@ -24,8 +24,8 @@ class FileProcessorTest extends FunSuite {
   else {
     mapTestSource = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\MapTest\\source"
     mapTestTarget = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\MapTest\\target"
-    testSource = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\mainTest\\source"
-    testTarget = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\mainTest\\target"
+    testSource = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\"
+    testTarget = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\main\\target"
   }
 
   def recursiveListDirs(f: File): Array[File] = {
