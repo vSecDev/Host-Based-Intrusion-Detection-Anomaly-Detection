@@ -5,11 +5,11 @@ import java.io.File
 trait DataProcessor {
   def configure(): Unit
 
-  def preprocess(): Option[Map[String, Int]]
+  def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[Map[String, Int]]
 
-  def getData(source: File): Option[DataWrapper]
+  def getData(source: File, extensions: Array[String]): Option[DataWrapper]
 
-  def getAllData(source: File): Option[Vector[DataWrapper]]
+  def getAllData(source: File, extensions: Array[String]): Option[Vector[DataWrapper]]
 
   def saveModel(model: DataModel, target: File): Boolean
 
