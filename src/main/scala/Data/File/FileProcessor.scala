@@ -37,6 +37,13 @@ class FileProcessor extends DataProcessor {
   //TODO - HANDLE PREVIOUSLY UNSEEN CALLS
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
   @throws(classOf[DataException])
+  def processNew(f: File, target: File, map: Map[String, Int], delimiters: Array[String]): Option[Map[String, Int]] = {
+    if (!checkFiles(f) || !checkDirs(target)) { return None }
+
+
+  }
+
+  @throws(classOf[DataException])
   override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[Map[String, Int]] = {
     if(!checkDirs(source, target)) return None
     try {
@@ -71,7 +78,7 @@ class FileProcessor extends DataProcessor {
   }
 
   override def getData(f: File, extensions: Array[String]): Option[StringDataWrapper] = {
-    if (f.exists() && f.isFile && extensions.contains(FilenameUtils.getExtension(f.getName))) {
+    if (checkFiles(f) && extensions.contains(FilenameUtils.getExtension(f.getName))) {
       val src = scala.io.Source.fromFile(f)
       val lines = try src.getLines mkString "\n" finally src.close()
       val wrapper = new StringDataWrapper
@@ -83,7 +90,7 @@ class FileProcessor extends DataProcessor {
   }
 
   override def getAllData(d: File, extensions: Array[String]): Option[Vector[StringDataWrapper]] = {
-    if (d.exists() && d.isDirectory) {
+    if (checkDirs(d)) {
       val fs = fileStreamNoDirs(d, extensions)
       var ws = Vector[StringDataWrapper]()
 
@@ -102,8 +109,16 @@ class FileProcessor extends DataProcessor {
 
   override def loadModel(source: File): Option[DataModel] = ???
 
-  private def checkDirs(source: File, target: File): Boolean = {
+  /*private def checkDirs(source: File, target: File): Boolean = {
     source.exists && target.exists && source.isDirectory && target.isDirectory
+  }*/
+  private def checkDirs(dirs: File*): Boolean ={
+    dirs.foreach(f => if(!f.exists || !f.isDirectory) return false)
+    true
+  }
+  private def checkFiles(files: File*): Boolean = {
+    files.foreach(f => if(!f.exists || !f.isFile) return false)
+    true
   }
 
   private def clearDir(dir: File): Unit = {

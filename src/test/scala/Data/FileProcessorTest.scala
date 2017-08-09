@@ -198,6 +198,9 @@ class FileProcessorTest extends FunSuite {
     val fp = new FileProcessor
     val sysCallMap = fp.preprocess(s, t, d, e).get
     assert(sysCallMap.size == 5)
+    println("sysCallMap size: " + sysCallMap.size)
+    println("sysCallMap: " + sysCallMap)
+    println("sysCallMap.valuesIterator.max: " + sysCallMap.valuesIterator.max)
   }
   test("FileProcessor - getData returns content of file") {
     val s = new File(testSource)
