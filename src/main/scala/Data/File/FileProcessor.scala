@@ -3,13 +3,12 @@ package Data.File
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
 
-import Data.{DataException, DataModel, DataProcessor, DataWrapper}
+import Data._
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 
-import scala.collection.immutable.VectorBuilder
 import scala.collection.mutable
 
-class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor[String] {
+class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()) extends DataProcessor {
 
   private var source: Option[File] = None
   private var target: Option[File] = None
@@ -69,11 +68,11 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
     }
   }
 
-  override def getData(f: File): Option[DataWrapper[String]] = {
+  override def getData(f: File): Option[StringDataWrapper] = {
     if (f.exists() && f.isFile && extensions.contains(FilenameUtils.getExtension(f.getName))) {
       val src = scala.io.Source.fromFile(f)
       val lines = try src.getLines mkString "\n" finally src.close()
-      val wrapper = new DataWrapper[String]
+      val wrapper = new StringDataWrapper
       wrapper.store(lines)
       Some(wrapper)
     } else {
@@ -81,15 +80,15 @@ class FileProcessor(_source: File, _target: File, _delimiters: Array[String] = A
     }
   }
 
-  override def getAllData(d: File): Option[Vector[DataWrapper[String]]] = {
+  override def getAllData(d: File): Option[Vector[StringDataWrapper]] = {
     if (d.exists() && d.isDirectory) {
       val fs = fileStreamNoDirs(d)
-      var ws = Vector[DataWrapper[String]]()
+      var ws = Vector[StringDataWrapper]()
 
       fs.foreach(f => {
         val src = scala.io.Source.fromFile(f)
         val lines = try src.getLines mkString "\n" finally src.close()
-        val wrapper = new DataWrapper[String]
+        val wrapper = new StringDataWrapper
         wrapper.store(lines)
         ws = ws :+ wrapper
       })
