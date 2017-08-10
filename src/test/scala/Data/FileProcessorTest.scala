@@ -3,6 +3,7 @@ package Data
 import java.io._
 
 import Data.File.FileProcessor
+import DecisionEngine.SMT.{Node, SequenceList}
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.FunSuite
 
@@ -252,5 +253,42 @@ class FileProcessorTest extends FunSuite {
     for(i <- 1 to 4){
       assert(sysCallMap.contains("unseen" + i))
     }
+  }
+  test("FileProcessor - saveModel serialisation works"){
+    val maxDepth = 3
+    val maxPhi = 2
+    val maxSeqCount = 1
+    val smoothing = 1.0
+    val prior = 1.0
+    val condition1 = Vector(1, 2, 3)
+    val condition2 = Vector(4, 5, 6)
+    val condition3 = Vector(7, 8, 9)
+    val event1 = 666
+    val event2 = 777
+    val event3 = 888
+
+    val s = new File(testSource + "\\serialisation\\source")
+    val t = new File(testSource + "\\serialisation\\target\\test.MOD")
+    val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
+    val e = Array("GHC", "AAA", "EEE")
+    val fp = new FileProcessor
+
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+
+    val dm1 = new DataModel
+    dm1.store(n1)
+    assert(fp.saveModel(dm1, t))
+
+    val loadedModel = fp.loadModel(new DataModel, t).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    var r1 = loadedModel.predict(condition1, event1)
+    var r2 = loadedModel.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+
+
   }
 }

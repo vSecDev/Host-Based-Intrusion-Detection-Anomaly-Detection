@@ -4,8 +4,8 @@ import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
 import Data._
 import org.apache.commons.io.{FileUtils, FilenameUtils}
+
 import scala.collection.mutable
-import java.util.regex.Pattern
 
 class FileProcessor extends DataProcessor {
 
@@ -107,9 +107,9 @@ class FileProcessor extends DataProcessor {
     } else { None }
   }
 
-  override def saveModel(model: DataModel, target: File): Boolean = ???
+  override def saveModel(dm: DataModel, target: File): Boolean = dm.serialise(target)
 
-  override def loadModel(source: File): Option[DataModel] = ???
+  override def loadModel(dm: DataModel, source: File): Option[DataModel] = dm.deserialise(source)
 
   private def checkDirs(dirs: File*): Boolean ={
     dirs.foreach(f => if(!f.exists || !f.isDirectory) return false)
