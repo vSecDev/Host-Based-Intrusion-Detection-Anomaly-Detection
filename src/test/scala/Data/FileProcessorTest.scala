@@ -268,7 +268,7 @@ class FileProcessorTest extends FunSuite {
     val event3 = 888
 
     val s = new File(testSource + "\\serialisation\\source")
-    val t = new File(testSource + "\\serialisation\\target\\test.MOD")
+    val t = new File(testSource + "\\serialisation\\target\\test.SMT")
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC", "AAA", "EEE")
     val fp = new FileProcessor
@@ -286,9 +286,60 @@ class FileProcessorTest extends FunSuite {
     var r2 = loadedModel.predict(condition1, event2)
     assert(r1._1 == 4.0 && r1._2 == 2.0)
     assert(r2._1 == 2.0 && r2._2 == 2.0)
-    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+    assert(loadedModel.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
 
+    loadedModel.learn(condition1, event2)
+    dm1.store(loadedModel)
+    val t2 = new File(testSource + "\\serialisation\\target\\test2.SMT")
+    assert(fp.saveModel(dm1, t2))
+    val loadedModel2 = fp.loadModel(new DataModel, t2).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+    r1 = loadedModel2.predict(condition1, event1)
+    r2 = loadedModel2.predict(condition1, event2)
+    var r3 = loadedModel2.predict(condition1, event3)
+    assert(loadedModel2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+    assert(r1._1 == 2.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(r3._1 == 1.0 && r3._2 == 2.0)
 
+    loadedModel2.learn(condition2, event1)
+    dm1.store(loadedModel2)
+    val t3 = new File(testSource + "\\serialisation\\target\\test3.SMT")
+    assert(fp.saveModel(dm1, t3))
+    val loadedModel3 = fp.loadModel(new DataModel, t3).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+    r1 = loadedModel3.predict(condition1, event1)
+    r2 = loadedModel3.predict(condition1, event2)
+    r3 = loadedModel3.predict(condition1, event3)
+    var r4 = loadedModel3.predict(condition2, event1)
+    var r5 = loadedModel3.predict(condition2, event2)
+    var r6 = loadedModel3.predict(condition2, event3)
 
+    assert(loadedModel3.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 1.0 / 3)
+    assert(r1._1 == 2.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(r3._1 == 1.0 && r3._2 == 2.0)
+    assert(r4._1 == 4.0 && r4._2 == 2.0)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
+
+    loadedModel3.learn(condition2, event1)
+    dm1.store(loadedModel3)
+    val t4 = new File(testSource + "\\serialisation\\target\\test4.SMT")
+    assert(fp.saveModel(dm1, t4))
+    val loadedModel4 = fp.loadModel(new DataModel, t4).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    loadedModel4.learn(condition3, event2)
+
+    dm1.store(loadedModel4)
+    val t5 = new File(testSource + "\\serialisation\\target\\test5.SMT")
+    assert(fp.saveModel(dm1, t5))
+    val loadedModel5 = fp.loadModel(new DataModel, t5).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    var r7 = loadedModel5.predict(condition3, event2)
+    assert(r7._1 == 4.0 && r7._2 == 2.0)
+
+    val condition4 = Vector(1, 3, 4)
+    loadedModel5.learn(condition4, event1)
+    var r8 = loadedModel5.predict(condition4, event1)
+    assert(r8._1 == 4.0 && r8._2 == 2.0)
   }
 }
