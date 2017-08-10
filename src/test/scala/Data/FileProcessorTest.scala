@@ -10,7 +10,7 @@ import scala.collection.mutable
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-  val isHome = true
+  val isHome = false
   var testSource = ""
   var testTarget = ""
   var mapTestSource = ""
@@ -138,8 +138,8 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - preprocess works with multiple delimiters.") {
-     val s = new File(testSource + "\\multDel")
-     val t = new File(testTarget)
+     val s = new File(testSource + "\\multDel\\source")
+     val t = new File(testSource + "\\multDel\\target")
      val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
      val e = Array("GHC")
      val fp = new FileProcessor
@@ -155,8 +155,9 @@ class FileProcessorTest extends FunSuite {
      try
        sfStr = s1.mkString.split(d.mkString("|"))
      finally s1.close()
-
      for(s <- sfStr) { println("sfStr: " + s)}
+
+    println("--")
 
     var tfStr = Array[String]()
      val s2 = Source.fromFile(recursiveListFiles(t).filter(f => f.getName == "multipleDelimiters_INT.IDS")(0))
@@ -164,7 +165,7 @@ class FileProcessorTest extends FunSuite {
        tfStr = s2.mkString.split(d.mkString("|"))
      finally s2.close()
 
-     for(s <- tfStr) { println("tfStr: " + s)}
+     for(k <- tfStr) { println("tfStr: " + k)}
 
      for (i <- sfStr.indices) {
        assert(sysCallMap(sfStr(i)) == tfStr(i).toInt)

@@ -5,40 +5,15 @@ import java.nio.file.{Files, Paths}
 import Data._
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import scala.collection.mutable
+import java.util.regex.Pattern
 
 class FileProcessor extends DataProcessor {
-
-  //_source: File, _target: File, _delimiters: Array[String] = Array("\\s"), _extensions: Array[String] = Array[String]()
-
-  /*private var source: Option[File] = None
-  private var target: Option[File] = None
-  private var delimiters: Array[String] = Array[String]()
-  private var extensions: Array[String] = Array[String]()
-
-  require(_source.exists && _source.isDirectory, "Source directory does not exist or is not a directory!")
-  require(_target.exists && _target.isDirectory, "Target directory does not exist or is not a directory!")*/
-
-  /*setSource(_source)
-  setTarget(_target)
-  setDelimiters(_delimiters)
-  setExtensions(_extensions)*/
-
-  /*def getSource: Option[File] = source
-  def setSource(newSource: File): Unit = if(newSource.exists && newSource.isDirectory) source = Some(newSource)
-  def getTarget: Option[File] = target
-  def setTarget(newTarget: File): Unit = if(newTarget.exists && newTarget.isDirectory) target = Some(newTarget)
-  def getDelimiters: Array[String] = delimiters
-  def setDelimiters(newDelimiters: Array[String]): Unit = if(newDelimiters.isEmpty) delimiters = Array("\\s") else delimiters = newDelimiters
-  def getExtensions: Array[String] = extensions
-  def setExtensions(newExtensions: Array[String]): Unit = if(newExtensions.isEmpty) extensions = Array[String]() else extensions = newExtensions*/
 
   override def configure(): Unit = {}
 
 
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
 
-
-  //TODO - HANDLE PREVIOUSLY UNSEEN CALLS  -- processNew to test!!!
   @throws(classOf[DataException])
   def processNew(f: File, target: File, map: mutable.Map[String, Int], delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
     if (!checkFiles(f) || !checkDirs(target)) { return None }
@@ -54,11 +29,8 @@ class FileProcessor extends DataProcessor {
             sysCallSet.foreach(s => if (!map.keySet.contains(s)) {
               map += (s -> (map.valuesIterator.max + 1))
             })
-            println("map after update in processNew: " + map)
             val path = target.getCanonicalPath + "\\" + FilenameUtils.getBaseName(f.getName) + "_INT.IDS"
-            println("------------------------------------------------------new file path: " + path)
             val intTrace = toIntTrace(f, map, delimiters)
-            println("intTrace: " + intTrace)
             val newFile = new File(path)
             val bw = new BufferedWriter(new FileWriter(newFile))
             bw.write(intTrace)
@@ -72,6 +44,7 @@ class FileProcessor extends DataProcessor {
       case ex: Throwable => throw new DataException("An error occurred during data processing.", ex)
     }
   }
+
   @throws(classOf[DataException])
   override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
     if(!checkDirs(source, target)) return None
@@ -83,7 +56,7 @@ class FileProcessor extends DataProcessor {
       fileStreamNoDirs(source, extensions).foreach(f => sysCallSet = fileToSet(f, sysCallSet, delimiters))
       //sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
       sysCallMap ++= sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }
-      println("\nsysCallMap: " + sysCallMap)
+
       fileStream(source).foreach(f => {
         if (f.isDirectory) {
           val path = target.getCanonicalPath + f.getCanonicalPath.replace(source.getCanonicalPath, "")
@@ -138,17 +111,16 @@ class FileProcessor extends DataProcessor {
 
   override def loadModel(source: File): Option[DataModel] = ???
 
-  /*private def checkDirs(source: File, target: File): Boolean = {
-    source.exists && target.exists && source.isDirectory && target.isDirectory
-  }*/
   private def checkDirs(dirs: File*): Boolean ={
     dirs.foreach(f => if(!f.exists || !f.isDirectory) return false)
     true
   }
+
   private def checkFiles(files: File*): Boolean = {
     files.foreach(f => if(!f.exists || !f.isFile) return false)
     true
   }
+
   private def checkExtension(f: File, extensions: Array[String]): Boolean = extensions.contains(FilenameUtils.getExtension(f.getName))
 
   private def clearDir(dir: File): Unit = {
@@ -181,7 +153,6 @@ class FileProcessor extends DataProcessor {
         .map { case (dirs, files) =>
           files.filter(f => checkExtension(f,extensions)).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
         } getOrElse {
-        //println("exception: dir cannot be listed: " + dir.getPath)
         Stream.empty
       }
     } catch {
@@ -202,10 +173,10 @@ class FileProcessor extends DataProcessor {
   private def toIntTrace(f: File, map: mutable.Map[String, Int], delimiters: Array[String]): String = {
     try {
       val source = scala.io.Source.fromFile(f)
-      val lines = try source.getLines mkString "\n" replaceAll(delimiters.mkString("|"), " ") finally source.close()
-      println("lines: " + lines)
+      val lines = try " " + (source.getLines mkString "\n" replaceAll(delimiters.mkString("|"), " ")) finally source.close()
+      println("\nlines: " + lines)
       println("map before replace: " + map)
-      val result = map.foldLeft(lines)((a, b) => a.replaceAll("\\b" + b._1 + "\\b", b._2.toString))
+      val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(" " + b._1, " " + b._2.toString)).trim
       println("result: " + result)
       result
     } catch {
