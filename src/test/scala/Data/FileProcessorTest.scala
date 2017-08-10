@@ -4,7 +4,7 @@ import java.io._
 
 import Data.File.FileProcessor
 import DecisionEngine.SMT.{Node, SequenceList}
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.FunSuite
 
 import scala.collection.mutable
@@ -255,6 +255,9 @@ class FileProcessorTest extends FunSuite {
     }
   }
   test("FileProcessor - saveModel serialisation works"){
+    val toClean = new File(testSource + "\\serialisation\\target\\")
+    toClean.listFiles.foreach { f => if (f.isDirectory) FileUtils.deleteDirectory(f) else if (f.isFile)   f.delete() }
+
     val maxDepth = 3
     val maxPhi = 2
     val maxSeqCount = 1

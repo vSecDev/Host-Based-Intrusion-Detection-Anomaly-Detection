@@ -42,12 +42,8 @@ class DataModel {
     try {
       val newModel = ois.readObject.asInstanceOf[Serializable]
       ois.close
-      //val res = new DataModel
-      //res.store(model)
       store(newModel)
-      //Some(res)
       Some(this)
-      //Some(smt.asInstanceOf[SMT[Int, Int]])
     } catch {
       case cnfe: ClassNotFoundException => throw new DataException("ClassNotFoundException thrown during model deserialisation.", cnfe)
       case ice: InvalidClassException => throw new DataException("InvalidClassException thrown during model deserialisation.", ice)
@@ -59,8 +55,7 @@ class DataModel {
     }
   }
 
-
-  class ObjectInputStreamWithCustomClassLoader(
+  private class ObjectInputStreamWithCustomClassLoader(
                                                 fileInputStream: FileInputStream
                                               ) extends ObjectInputStream(fileInputStream) {
     override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
@@ -73,10 +68,3 @@ class DataModel {
     }
   }
 }
-/*
-case class SMTDataModel extends DataModel {
-  override type T = String
-  override var data: Option[String] = _
-  override def store(_data: String): Unit = {data = Some(_data)}
-  override def retrieve(): Option[String] = data
-}*/
