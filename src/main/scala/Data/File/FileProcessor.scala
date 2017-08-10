@@ -4,13 +4,11 @@ import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
 import Data._
 import org.apache.commons.io.{FileUtils, FilenameUtils}
-
 import scala.collection.mutable
 
 class FileProcessor extends DataProcessor {
 
   override def configure(): Unit = {}
-
 
   //TODO - FIX EXCEPTION HANDLING - Lock resources!
 
@@ -107,9 +105,23 @@ class FileProcessor extends DataProcessor {
     } else { None }
   }
 
-  override def saveModel(dm: DataModel, target: File): Boolean = dm.serialise(target)
+  @throws(classOf[DataException])
+  override def saveModel(dm: DataModel, target: File): Boolean = {
+    try {
+      dm.serialise(target)
+    } catch {
+      case de: DataException => throw de
+    }
+  }
 
-  override def loadModel(dm: DataModel, source: File): Option[DataModel] = dm.deserialise(source)
+  @throws(classOf[DataException])
+  override def loadModel(dm: DataModel, source: File): Option[DataModel] = {
+    try {
+      dm.deserialise(source)
+    } catch {
+      case de: DataException => throw de
+    }
+  }
 
   private def checkDirs(dirs: File*): Boolean ={
     dirs.foreach(f => if(!f.exists || !f.isDirectory) return false)

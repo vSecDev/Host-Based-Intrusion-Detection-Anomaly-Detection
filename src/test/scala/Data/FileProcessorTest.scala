@@ -1,12 +1,10 @@
 package Data
 
 import java.io._
-
 import Data.File.FileProcessor
 import DecisionEngine.SMT.{Node, SequenceList}
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.scalatest.FunSuite
-
 import scala.collection.mutable
 import scala.io.Source
 
@@ -38,66 +36,9 @@ class FileProcessorTest extends FunSuite {
   def recursiveListFiles(f: File): Array[File] = {
     val all = f.listFiles
     val files = f.listFiles.filter(_.isFile)
-    //val these = f.listFiles
-    //these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
     files ++ all.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
 
-  /*test("FileProcessor - non-existent source") {
-    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source\\Narnia")
-    val t = new File(testTarget)
-    //val t = new File(testTargetWork)
-    val d = Array("\\s")
-    val e = Array("GHC")
-
-    val caught = intercept[IllegalArgumentException](new FileProcessor(nonExistentDir, t, d, e))
-    assert(caught.getMessage == "requirement failed: Source directory does not exist or is not a directory!")
-  }
-  test("FileProcessor - non-existent target") {
-    val s = new File(testSource + "main\\source")
-    //val s = new File(testSourceWork)
-    val nonExistentDir = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\test\\source\\Narnia")
-    val d = Array("\\s")
-    val e = Array("GHC")
-
-    val caught = intercept[IllegalArgumentException](new FileProcessor(s, nonExistentDir, d, e))
-    assert(caught.getMessage == "requirement failed: Target directory does not exist or is not a directory!")
-  }
-  test("FileProcessor - Default delimiter is '\\s'") {
-    val s = new File(testSource + "main\\source")
-    val t = new File(testTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
-    val fp = new FileProcessor(s, t)
-    assert(fp.getDelimiters.size == 1)
-    assert(fp.getDelimiters(0).equals("\\s"))
-  }
-  test("FileProcessor - Default extensions is empty array") {
-    val s = new File(testSource + "main\\source")
-    val t = new File(testTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
-    val fp = new FileProcessor(s, t)
-    assert(fp.getExtensions.isEmpty)
-  }*/
-  /*test("FileProcessor - revert to default delimiter if none provided in setDelimiters") {
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
-    val s = new File(testSource + "main\\source")
-    val t = new File(testTarget)
-    val d = Array("\\s")
-    val e = Array("GHC")
-    val fp = new FileProcessor
-  }*/
- /* test("FileProcessor - revert to default (no) extensions if none provided in setExtensions") {
-    val s = new File(testSource + "main\\source")
-    val t = new File(testTarget)
-    val d = Array("\\s")
-    val e = Array("GHC")
-    val fp = new FileProcessor
-    fp.setExtensions(Array())
-    assert(fp.getExtensions.isEmpty)
-  }*/
   test("FileProcessor - preprocess returns None if source doesn't exist anymore") {
     val d = Array("\\s")
     val e = Array("GHC")
@@ -123,7 +64,6 @@ class FileProcessorTest extends FunSuite {
       assert(fp.preprocess(s,tempF,d,e) == None)
     }
   }
-
   test("FileProcessor - preprocess creates target dirs") {
     val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
@@ -150,15 +90,12 @@ class FileProcessorTest extends FunSuite {
      } catch {
        case e: Throwable => println("MESSAGE: " + e.getCause.getMessage)
      }
-      println("---- sysCallMap: "+ sysCallMap)
+
      var sfStr = Array[String]()
      val s1 = Source.fromFile(recursiveListFiles(s).filter(f => f.getName == "multipleDelimiters.GHC")(0))
      try
        sfStr = s1.mkString.split(d.mkString("|"))
      finally s1.close()
-     for(s <- sfStr) { println("sfStr: " + s)}
-
-    println("--")
 
     var tfStr = Array[String]()
      val s2 = Source.fromFile(recursiveListFiles(t).filter(f => f.getName == "multipleDelimiters_INT.IDS")(0))
@@ -166,19 +103,13 @@ class FileProcessorTest extends FunSuite {
        tfStr = s2.mkString.split(d.mkString("|"))
      finally s2.close()
 
-     for(k <- tfStr) { println("tfStr: " + k)}
-
      for (i <- sfStr.indices) {
        assert(sysCallMap(sfStr(i)) == tfStr(i).toInt)
      }
    }
-
-
   test("FileProcessor - preprocess works with multiple extensions.") {
     val s = new File(testSource + "main\\source")
     val t = new File(testTarget)
-    /*val s = new File(testSourceWork)
-    val t = new File(testTargetWork)*/
     val d = Array("\\s", "\\|", "\\;", "\\,", "\\_")
     val e = Array("GHC", "AAA", "EEE")
     val fp = new FileProcessor
@@ -205,9 +136,6 @@ class FileProcessorTest extends FunSuite {
     val fp = new FileProcessor
     val sysCallMap = fp.preprocess(s, t, d, e).get
     assert(sysCallMap.size == 5)
-    println("sysCallMap size: " + sysCallMap.size)
-    println("sysCallMap: " + sysCallMap)
-    println("sysCallMap.valuesIterator.max: " + sysCallMap.valuesIterator.max)
   }
   test("FileProcessor - getData returns content of file") {
     val s = new File(testSource)
@@ -248,7 +176,6 @@ class FileProcessorTest extends FunSuite {
     }
 
     fp.processNew(unseen, t, sysCallMap, d, e).get
-    println("new sysCallMap: " + sysCallMap)
     assert(sysCallMap.size == 12)
     for(i <- 1 to 4){
       assert(sysCallMap.contains("unseen" + i))

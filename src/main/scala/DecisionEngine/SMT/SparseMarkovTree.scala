@@ -77,12 +77,11 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: D
 
   def updateEvents(newEvent: B): Unit = {
 
-    //update events to keep count on how many times this input has been seen
     events.get(newEvent) match {
       case Some(event) => events.update(newEvent, events(newEvent) + 1)
       case None => events += (newEvent -> 1)
     }
-    //update event count to keep track of number of overall observations
+
     eventCount += 1
     isChanged = true
     updateWeight(newEvent)
@@ -288,8 +287,6 @@ case class SequenceList[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoo
     }
     newVector
   }
-
-
 }
 
 
