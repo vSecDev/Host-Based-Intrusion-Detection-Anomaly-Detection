@@ -39,11 +39,13 @@ class SMTPlugin extends DecisionEnginePlugin{
         root match {
           case None => None
           case Some(m1) =>
-            //TODO  - LEARN WITH NODE STORED IN ROOT HERE
+            //TODO  - LEARN WITH NODE STORED IN ROOT HERE - delete None
+            None
         }
       }
       case Some(m2) => {
-        //TODO - LEARN WITH NODE PASSED IN HERE
+        //TODO - LEARN WITH NODE PASSED IN HERE - delete None
+        None
       }
     }
 
