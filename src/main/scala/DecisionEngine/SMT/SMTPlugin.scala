@@ -2,27 +2,25 @@ package DecisionEngine.SMT
 
 import java.io.File
 
-import Data.DataModel
-import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin}
+import Data.{DataException, DataModel, DataWrapper}
+import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngineReport}
 
 /**
   * Created by apinter on 08/08/2017.
   */
 class SMTPlugin extends DecisionEnginePlugin{
 
-  //TODO - REF TO TREE + PLUGIN IMPLEMENTATION LOGIC HERE
   var root: Option[Node[_, _]] = _
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
-    case _: SMTConfig =>
+    case c: SMTConfig =>
       try
-        config.asInstanceOf[SMTConfig].getSettings match {
+        c.asInstanceOf[SMTConfig].getSettings match {
           case None => false
           case Some(s) => if (s.isIntTrace) {
             setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
             true
           } else {
-            //TODO - CREATE NON-INT ROOT HERE
             setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
             false
           }
@@ -33,11 +31,11 @@ class SMTPlugin extends DecisionEnginePlugin{
     case _ => false
   }
 
-  override def learn(_source: List[File], _target: File, _model: DataModel): Unit = ???
+  override def learn(_data: Vector[DataWrapper], _model: Option[DataModel]): DataModel = ???
 
-  override def validate(_source: List[File], _target: Option[File], _model: DataModel): Unit = ???
+  override def validate(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport = ???
 
-  override def classify(_source: List[File], _target: Option[File], _model: DataModel): Unit = ???
+  override def classify(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport = ???
 
   private def setRoot(node: Node[_, _]) = root = Some(node)
 }

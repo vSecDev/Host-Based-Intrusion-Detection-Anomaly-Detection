@@ -1,12 +1,13 @@
 package DecisionEngine
 
 import java.io.File
-import Data.DataModel
+
+import Data.{DataModel, DataWrapper}
 
 trait DecisionEnginePlugin {
 
-  def configure(config: DecisionEngineConfig): Unit
-  def learn(_source: List[File], _target: File, _model: DataModel = new DataModel) //_model is optional (if passed, the model is further trained with additional training examples
-  def validate(_source: List[File], _target: Option[File], _model: DataModel)
-  def classify(_source: List[File], _target: Option[File], _model: DataModel)
+  def configure(config: DecisionEngineConfig): Boolean
+  def learn(_data: Vector[DataWrapper], _model: Option[DataModel]): DataModel //_model is optional (if passed, the model is further trained with additional training examples
+  def validate(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport
+  def classify(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport
 }
