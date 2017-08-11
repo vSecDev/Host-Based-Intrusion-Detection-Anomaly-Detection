@@ -31,11 +31,27 @@ class SMTPlugin extends DecisionEnginePlugin{
     case _ => false
   }
 
-  override def learn(_data: Vector[DataWrapper], _model: Option[DataModel]): DataModel = ???
+  override def learn(data: Vector[DataWrapper], model: Option[DataModel]): Option[DataModel] = {
+    if(data.isEmpty) return model
 
-  override def validate(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport = ???
+    model match {
+      case None => {
+        root match {
+          case None => None
+          case Some(m1) =>
+            //TODO  - LEARN WITH NODE STORED IN ROOT HERE
+        }
+      }
+      case Some(m2) => {
+        //TODO - LEARN WITH NODE PASSED IN HERE
+      }
+    }
 
-  override def classify(_data: Vector[DataWrapper], _model: Option[DataModel]): DecisionEngineReport = ???
+  }
+
+  override def validate(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
+
+  override def classify(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
 
   private def setRoot(node: Node[_, _]) = root = Some(node)
 }
