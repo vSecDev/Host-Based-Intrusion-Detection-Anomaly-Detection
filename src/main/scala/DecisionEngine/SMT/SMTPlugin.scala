@@ -8,7 +8,7 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
 /**
   * Created by apinter on 08/08/2017.
   */
-class SMTPlugin extends DecisionEnginePlugin{
+class SMTPlugin extends DecisionEnginePlugin {
 
   var root: Option[Node[_, _]] = _
 
@@ -32,7 +32,7 @@ class SMTPlugin extends DecisionEnginePlugin{
   }
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel]): Option[DataModel] = {
-    if(data.isEmpty) return model
+    if (data.isEmpty) return model
 
     model match {
       case None => {
@@ -56,4 +56,20 @@ class SMTPlugin extends DecisionEnginePlugin{
   override def classify(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
 
   private def setRoot(node: Node[_, _]) = root = Some(node)
+
+  def loadModel(model: DataModel): Boolean = model.retrieve match {
+    case None => false
+    case Some(mod) => mod match {
+      case m: Node[_, _] => setRoot(m); true
+      case _ => false
+    }
+  }
+
+  def getModel(): Option[DataModel] = root match {
+    case None => None
+    case Some(m) =>
+      val dm = new DataModel
+      dm.store(m)
+      Some(dm)
+  }
 }
