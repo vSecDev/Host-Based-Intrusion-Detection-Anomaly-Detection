@@ -2,7 +2,7 @@ package DecisionEngine.SMT
 
 import java.io.File
 
-import Data.{DataException, DataModel, DataWrapper}
+import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
 import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngineReport}
 
 /**
@@ -31,24 +31,71 @@ class SMTPlugin extends DecisionEnginePlugin {
     case _ => false
   }
 
-  override def learn(data: Vector[DataWrapper], model: Option[DataModel]): Option[DataModel] = {
+  override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     if (data.isEmpty) return model
 
     model match {
       case None => {
         root match {
-          case None => None
-          case Some(m1) =>
-            //TODO  - LEARN WITH NODE STORED IN ROOT HERE - delete None
-            None
+          case None => None //No model/SMT to train
+          case Some(node) =>
+            //TODO - LEARN WITH NODE STORED IN ROOT HERE - delete None
+            learnHelper(data, node, ints)
         }
       }
-      case Some(m2) => {
+      case Some(w) => {
         //TODO - LEARN WITH NODE PASSED IN HERE - delete None
-        None
+        w.retrieve match {
+          case None => None
+          case Some(m) => m match {
+            case node: Node[_, _] => learnHelper(data, node, ints)
+            case _ => None
+          }
+        }
       }
     }
+  }
 
+  private def learnHelper(data: Vector[DataWrapper], node: Node[_,_], ints: Boolean): Option[DataModel] = {
+    data foreach(wrapper => wrapper match {
+      case w: StringDataWrapper => w.retrieve match {
+        case None =>
+        case Some(lines) => {
+          if(ints && node.isInstanceOf[Node[Int, Int]]){
+            //process as int trace
+            val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+            var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+            for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
+              if (t.size == node.maxDepth)
+                trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
+            }
+
+            for (t <- trainingData_whole) {
+              node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
+            }
+          }else node match {
+            case value: Node[String, String] =>
+              //process as string trace
+              val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+              var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+              for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
+                if (t.size == node.maxDepth)
+                  trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
+              }
+
+              for (t <- trainingData_whole) {
+                value.learn(t._1, t._2)
+              }
+            case _ =>
+          }
+        }
+      }
+      case _ =>
+    })
+    //TODO - RETURN COPY OF TRAINED MODEL INSTEAD???
+    val dm = new DataModel
+    dm.store(node)
+    Some(dm)
   }
 
   override def validate(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
