@@ -4,8 +4,9 @@ import scala.annotation.tailrec
 import scala.collection.mutable.Map
 import java.io._
 
+//TODO - SORT OUT VISIBILITY + ACCESSORS OF ARGS AND FIELDS
 @SerialVersionUID(667L)
-abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends Serializable {
+abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _smoothing: Double, private val _prior: Double) extends Serializable {
 
   var smoothing: Double
   var prior: Double
@@ -24,7 +25,7 @@ abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: In
   def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SparseMarkovTree weight cannot be negative")
 }
 
-case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, _smoothing: Double, _prior: Double) extends SparseMarkovTree(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
+case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _smoothing: Double, private val _prior: Double) extends SparseMarkovTree(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
 
   var smoothing: Double = -1.0
   var prior: Double = -1.0

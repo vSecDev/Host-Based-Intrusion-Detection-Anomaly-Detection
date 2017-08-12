@@ -10,7 +10,7 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
   */
 class SMTPlugin extends DecisionEnginePlugin {
 
-  var root: Option[Node[_, _]] = _
+  private var root: Option[Node[_, _]] = _
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
