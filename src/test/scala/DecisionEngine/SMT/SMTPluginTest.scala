@@ -243,4 +243,13 @@ class SMTPluginTest extends  FunSuite {
     assert(r4._1 == 2.0 && r2._2 == 2.0)
     assert(root2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
   }
+  test("SMTPlugin - learn returns None if no model is set as root or passed as param"){
+
+    val ints = true
+    val plugin = new SMTPlugin
+    assert(plugin.getModel().isEmpty)
+    val dw2 = new StringDataWrapper
+    dw2.store("1 2 3 666")
+    assert(plugin.learn(Vector(dw2), None, ints).isEmpty)
+  }
 }
