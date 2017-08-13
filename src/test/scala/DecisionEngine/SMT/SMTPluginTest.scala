@@ -41,9 +41,16 @@ class SMTPluginTest extends  FunSuite {
   val condition1 = Vector(1, 2, 3)
   val condition2 = Vector(4, 5, 6)
   val condition3 = Vector(7, 8, 9)
+  val strCondition1 = Vector("one", "two", "three")
+  val strCondition2 = Vector("four", "five", "six")
+  val strCondition3 = Vector("seven", "eight", "nine")
   val event1 = 666
   val event2 = 777
   val event3 = 888
+  val eventStr1 = "eventStr1"
+  val eventStr2 = "eventStr2"
+  val eventStr3 = "eventStr3"
+
 
   test("SMTPlugin - configuration works") {
 
@@ -173,6 +180,108 @@ class SMTPluginTest extends  FunSuite {
     assert(r12._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r12._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
     assert(r13._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r13._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
   }
+  test("SMTPlugin - learn returns trained model - root loaded - STRING traces") {
+    val ints2 = false
+    val n1 = Node[String, String](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(strCondition1, eventStr1)
+    var r1 = n1.predict(strCondition1, eventStr1)
+    var r2 = n1.predict(strCondition1, eventStr2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+
+    val model = new DataModel
+    model.store(n1)
+    assert(model.retrieve.get.isInstanceOf[Node[String, String]])
+
+    val plugin = new SMTPlugin
+    assert(plugin.loadModel(model))
+    val returnedModel1 = plugin.getModel.get.retrieve.get
+    assert(returnedModel1.isInstanceOf[Node[String, String]])
+    val retNode1 = returnedModel1.asInstanceOf[Node[String, String]]
+
+    var r3 = retNode1.predict(strCondition1, eventStr1)
+    var r4 = retNode1.predict(strCondition1, eventStr2)
+    assert(r3._1 == 4.0 && r1._2 == 2.0)
+    assert(r4._1 == 2.0 && r2._2 == 2.0)
+    assert(retNode1.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+
+    val dw = new StringDataWrapper
+    //storing strCondition1, eventStr2
+    dw.store("one two three eventStr2")
+    plugin.learn(Vector(dw), None, ints2)
+    val returnedModel2 = plugin.getModel.get.retrieve.get
+    val retNode2 = returnedModel2.asInstanceOf[Node[String, String]]
+
+    val r5 = retNode2.predict(strCondition1, eventStr1)
+    val r6 = retNode2.predict(strCondition1, eventStr2)
+    var r7 = retNode2.predict(strCondition1, eventStr3)
+    assert(retNode2.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
+    assert(r7._1 == 1.0 && r7._2 == 2.0)
+
+    //storing condition2, eventStr1
+    dw.store("four five six eventStr1")
+
+    plugin.learn(Vector(dw), None, ints2)
+    val returnedModel3 = plugin.getModel.get.retrieve.get
+    val retNode3 = returnedModel3.asInstanceOf[Node[String, String]]
+
+    var r8 = retNode3.predict(strCondition1, eventStr1)
+    var r9 = retNode3.predict(strCondition1, eventStr2)
+    var r10 = retNode3.predict(strCondition1, eventStr3)
+    var r11 = retNode3.predict(strCondition2, eventStr1)
+    var r12 = retNode3.predict(strCondition2, eventStr2)
+    var r13 = retNode3.predict(strCondition2, eventStr3)
+
+    assert(retNode3.getChildren(0)(0).asInstanceOf[Node[String, String]].getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1.drop(1)).get.getWeight == 2.0 / 9)
+    assert(r8._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r8._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r9._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r9._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r10._1 == 1.0 / 9 + 1.0 / 9 + 1.0 / 6 + 1.0 / 3 && r10._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r11._1 == 4.0 / 9 + 4.0 / 9 + 4.0 / 6 + 4.0 / 3 && r11._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r12._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r12._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r13._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r13._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+
+    val n2 = Node[String, String](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    val n2Wrapper = new DataModel
+    n2Wrapper.store(n2)
+    val dw2 = new StringDataWrapper
+    //store strCondition1, eventStr1
+    dw2.store("one two three eventStr1")
+
+    //DataModel stored as root in DecisionEngine should not change. Only the new tree passed in should be trained.
+    val newDM = plugin.learn(Vector(dw2), Some(n2Wrapper), ints2)
+    val n2Trained = newDM.get.retrieve.get.asInstanceOf[Node[String, String]]
+    assert(n2 == n2Trained)
+
+    var newR1 = n2Trained.predict(strCondition1, eventStr1)
+    var newR2 = n2Trained.predict(strCondition1, eventStr2)
+    assert(newR1._1 == 4.0 && newR1._2 == 2.0)
+    assert(newR2._1 == 2.0 && newR2._2 == 2.0)
+    assert(n2Trained.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+
+    //Root has not changed after training new model passed in to learn
+    val returnedModel4 = plugin.getModel.get.retrieve.get
+    val retNode4 = returnedModel3.asInstanceOf[Node[String, String]]
+
+    r8 = retNode4.predict(strCondition1, eventStr1)
+    r9 = retNode4.predict(strCondition1, eventStr2)
+    r10 = retNode4.predict(strCondition1, eventStr3)
+    r11 = retNode4.predict(strCondition2, eventStr1)
+    r12 = retNode4.predict(strCondition2, eventStr2)
+    r13 = retNode4.predict(strCondition2, eventStr3)
+
+    assert(retNode4.getChildren(0)(0).asInstanceOf[Node[String, String]].getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1.drop(1)).get.getWeight == 2.0 / 9)
+    assert(r8._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r8._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r9._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r9._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r10._1 == 1.0 / 9 + 1.0 / 9 + 1.0 / 6 + 1.0 / 3 && r10._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r11._1 == 4.0 / 9 + 4.0 / 9 + 4.0 / 6 + 4.0 / 3 && r11._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r12._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r12._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r13._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r13._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+  }
+
+
   test("SMTPlugin - learn returns model if data is empty") {
     //Creating + loading root
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
@@ -329,5 +438,60 @@ class SMTPluginTest extends  FunSuite {
     assert(r6._1 == 2.0 && r6._2 == 2.0)
     assert(r7._1 == 1.0 && r7._2 == 2.0)
   }
+  test("SMTPlugin learn ignores short traces") {
 
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+    val dm = new DataModel
+    dm.store(n1)
+    val shortWrapper = new StringDataWrapper
+    shortWrapper.store("1")
+    val wrapper2 = new StringDataWrapper
+    wrapper2.store("1 2 3 777")
+    val plugin = new SMTPlugin
+    val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
+
+    val r5 = retNode.predict(condition1, event1)
+    val r6 = retNode.predict(condition1, event2)
+    var r7 = retNode.predict(condition1, event3)
+    assert(retNode.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
+    assert(r7._1 == 1.0 && r7._2 == 2.0)
+  }
+  test("SMTPlugin learn ignores short traces - STRING") {
+    val ints2 = false
+    val n1 = Node[String, String](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(strCondition1, eventStr1)
+    var r1 = n1.predict(strCondition1, eventStr1)
+    var r2 = n1.predict(strCondition1, eventStr2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+
+    val dm = new DataModel
+    dm.store(n1)
+    val shortWrapper = new StringDataWrapper
+    shortWrapper.store("shortStr")
+    val wrapper2 = new StringDataWrapper
+    wrapper2.store("one two three eventStr2")
+    val plugin = new SMTPlugin
+    val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints2).get.retrieve.get.asInstanceOf[Node[String, String]]
+    val retNode = returnedModel.asInstanceOf[Node[String, String]]
+    val r5 = retNode.predict(strCondition1, eventStr1)
+    val r6 = retNode.predict(strCondition1, eventStr2)
+    var r7 = retNode.predict(strCondition1, eventStr3)
+    assert(retNode.getChildren(0)(0).asInstanceOf[SequenceList[String, String]].getSequence(strCondition1).get.getWeight == 2.0 / 3)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
+    assert(r7._1 == 1.0 && r7._2 == 2.0)
+  }
 }

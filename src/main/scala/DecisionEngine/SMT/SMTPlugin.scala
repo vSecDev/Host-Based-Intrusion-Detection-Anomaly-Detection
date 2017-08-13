@@ -84,7 +84,7 @@ class SMTPlugin extends DecisionEnginePlugin {
             for (t <- trainingData_whole) {
               node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
             }
-          }else node match {
+          }else if(lines.nonEmpty) node match {
             case value: Node[String, String] =>
               //process as string trace
               val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
@@ -93,7 +93,6 @@ class SMTPlugin extends DecisionEnginePlugin {
                 if (t.size == node.maxDepth)
                   trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
               }
-
               for (t <- trainingData_whole) {
                 value.learn(t._1, t._2)
               }
