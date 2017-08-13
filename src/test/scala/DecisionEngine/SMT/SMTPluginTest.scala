@@ -32,13 +32,20 @@ class SMTPluginTest extends  FunSuite {
     testTarget = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\test\\main\\target"
   }
 
+  val maxDepth = 4
+  val maxPhi = 2
+  val maxSeqCount = 1
+  val smoothing = 1.0
+  val prior = 1.0
+  val ints = true
+  val condition1 = Vector(1, 2, 3)
+  val condition2 = Vector(4, 5, 6)
+  val condition3 = Vector(7, 8, 9)
+  val event1 = 666
+  val event2 = 777
+  val event3 = 888
+
   test("SMTPlugin - configuration works") {
-    val maxDepth = 3
-    val maxPhi = 2
-    val maxSeqCount = 1
-    val smoothing = 1.0
-    val prior = 1.0
-    val ints = true
 
     val settings = new SMTSettings(maxDepth, maxPhi, maxSeqCount, smoothing, prior, ints)
     val config: DecisionEngineConfig = new SMTConfig
@@ -66,20 +73,7 @@ class SMTPluginTest extends  FunSuite {
     assert(root.smoothing == smoothing)
     assert(root.prior == prior)
   }
-  test("SMTPlugin - learn returns trained model - root loaded"){
-
-    val maxDepth = 4
-    val maxPhi = 2
-    val maxSeqCount = 1
-    val smoothing = 1.0
-    val prior = 1.0
-    val ints = true
-    val condition1 = Vector(1, 2, 3)
-    val condition2 = Vector(4, 5, 6)
-    val condition3 = Vector(7, 8, 9)
-    val event1 = 666
-    val event2 = 777
-    val event3 = 888
+  test("SMTPlugin - learn returns trained model - root loaded") {
 
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     n1.learn(condition1, event1)
@@ -91,7 +85,7 @@ class SMTPluginTest extends  FunSuite {
 
     val model = new DataModel
     model.store(n1)
-    assert(model.retrieve.get.isInstanceOf[Node[Int,Int]])
+    assert(model.retrieve.get.isInstanceOf[Node[Int, Int]])
 
     val plugin = new SMTPlugin
     assert(plugin.loadModel(model))
@@ -104,7 +98,6 @@ class SMTPluginTest extends  FunSuite {
     assert(r3._1 == 4.0 && r1._2 == 2.0)
     assert(r4._1 == 2.0 && r2._2 == 2.0)
     assert(retNode1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
-
 
     val dw = new StringDataWrapper
     //storing condition1, event2
@@ -136,14 +129,12 @@ class SMTPluginTest extends  FunSuite {
     var r13 = retNode3.predict(condition2, event3)
 
     assert(retNode3.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 2.0 / 9)
-    assert(r8._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r8._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r9._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r9._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r10._1 == 1.0/9 + 1.0/9 + 1.0/6 + 1.0/3 && r10._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r11._1 == 4.0/9 + 4.0/9 + 4.0/6 + 4.0/3 && r11._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r12._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r12._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r13._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r13._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-
-
+    assert(r8._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r8._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r9._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r9._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r10._1 == 1.0 / 9 + 1.0 / 9 + 1.0 / 6 + 1.0 / 3 && r10._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r11._1 == 4.0 / 9 + 4.0 / 9 + 4.0 / 6 + 4.0 / 3 && r11._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r12._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r12._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r13._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r13._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
 
     val n2 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val n2Wrapper = new DataModel
@@ -154,7 +145,7 @@ class SMTPluginTest extends  FunSuite {
 
     //DataModel stored as root in DecisionEngine should not change. Only the new tree passed in should be trained.
     val newDM = plugin.learn(Vector(dw2), Some(n2Wrapper), ints)
-    val n2Trained = newDM.get.retrieve.get.asInstanceOf[Node[Int,Int]]
+    val n2Trained = newDM.get.retrieve.get.asInstanceOf[Node[Int, Int]]
     assert(n2 == n2Trained)
 
     var newR1 = n2Trained.predict(condition1, event1)
@@ -162,7 +153,6 @@ class SMTPluginTest extends  FunSuite {
     assert(newR1._1 == 4.0 && newR1._2 == 2.0)
     assert(newR2._1 == 2.0 && newR2._2 == 2.0)
     assert(n2Trained.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
-
 
     //Root has not changed after training new model passed in to learn
     val returnedModel4 = plugin.getModel.get.retrieve.get
@@ -176,28 +166,14 @@ class SMTPluginTest extends  FunSuite {
     r13 = retNode4.predict(condition2, event3)
 
     assert(retNode4.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 2.0 / 9)
-    assert(r8._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r8._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r9._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r9._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r10._1 == 1.0/9 + 1.0/9 + 1.0/6 + 1.0/3 && r10._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r11._1 == 4.0/9 + 4.0/9 + 4.0/6 + 4.0/3 && r11._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r12._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r12._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
-    assert(r13._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r13._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r8._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r8._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r9._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r9._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r10._1 == 1.0 / 9 + 1.0 / 9 + 1.0 / 6 + 1.0 / 3 && r10._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r11._1 == 4.0 / 9 + 4.0 / 9 + 4.0 / 6 + 4.0 / 3 && r11._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r12._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r12._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
+    assert(r13._1 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3 && r13._2 == 2.0 / 9 + 2.0 / 9 + 2.0 / 6 + 2.0 / 3)
   }
-  test("SMTPlugin - learn returns model if data is empty"){
-
-    val maxDepth = 4
-    val maxPhi = 2
-    val maxSeqCount = 1
-    val smoothing = 1.0
-    val prior = 1.0
-    val ints = true
-    val condition1 = Vector(1, 2, 3)
-    val condition2 = Vector(4, 5, 6)
-    val condition3 = Vector(7, 8, 9)
-    val event1 = 666
-    val event2 = 777
-    val event3 = 888
-
+  test("SMTPlugin - learn returns model if data is empty") {
     //Creating + loading root
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     n1.learn(condition1, event1)
@@ -221,7 +197,6 @@ class SMTPluginTest extends  FunSuite {
     assert(r4._1 == 2.0 && r2._2 == 2.0)
     assert(root.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
 
-
     //Passing in new model to learn - root should not change
     val n2 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val childrenCountBefore = n2.getChildren.size
@@ -230,8 +205,8 @@ class SMTPluginTest extends  FunSuite {
     dm2.store(n2)
 
     //No data passed in
-    val nonTrainedModel = plugin.learn(Vector(), Some(dm2), ints).get.retrieve.get.asInstanceOf[Node[Int,Int]]
-    val root2 = plugin.getModel.get.retrieve.get.asInstanceOf[Node[Int,Int]]
+    val nonTrainedModel = plugin.learn(Vector(), Some(dm2), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+    val root2 = plugin.getModel.get.retrieve.get.asInstanceOf[Node[Int, Int]]
     assert(n2 == nonTrainedModel)
     assert(nonTrainedModel.getChildren.size == childrenCountBefore)
     assert(nonTrainedModel.getChildren.size != root2.getChildren.size)
@@ -245,20 +220,114 @@ class SMTPluginTest extends  FunSuite {
     assert(nonTrainedModel.getChildren.size == 0)
 
     //root hasn't changed
-
     r3 = root2.predict(condition1, event1)
     r4 = root2.predict(condition1, event2)
     assert(r3._1 == 4.0 && r1._2 == 2.0)
     assert(r4._1 == 2.0 && r2._2 == 2.0)
     assert(root2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
   }
-  test("SMTPlugin - learn returns None if no model is set as root or passed as param"){
-
-    val ints = true
+  test("SMTPlugin - learn returns None if no model is set as root or passed as param") {
     val plugin = new SMTPlugin
     assert(plugin.getModel().isEmpty)
-    val dw2 = new StringDataWrapper
-    dw2.store("1 2 3 666")
-    assert(plugin.learn(Vector(dw2), None, ints).isEmpty)
+    val dw = new StringDataWrapper
+    dw.store("1 2 3 666")
+    assert(plugin.learn(Vector(dw), None, ints).isEmpty)
   }
+  test("SMTPlugin - passing empty DataWrapper to learn returns DataModel") {
+    //Creating + loading root
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+    val model = new DataModel
+    model.store(n1)
+    val plugin = new SMTPlugin
+    val emptyWrapper = new StringDataWrapper
+    val returnedModel = plugin.learn(Vector(emptyWrapper), Some(model), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    var r3 = returnedModel.predict(condition1, event1)
+    var r4 = returnedModel.predict(condition1, event2)
+    assert(r3._1 == 4.0 && r1._2 == 2.0)
+    assert(r4._1 == 2.0 && r2._2 == 2.0)
+    assert(returnedModel.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+  }
+  test("SMTPlugin - Empty string in StringWrapper - passed DataModel returned") {
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+
+    val dm = new DataModel
+    dm.store(n1)
+    val wrapper = new StringDataWrapper
+    wrapper.store("")
+    val plugin = new SMTPlugin
+    val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    r1 = returnedModel.predict(condition1, event1)
+    r2 = returnedModel.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(returnedModel.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+  }
+  test("SMTPlugin - StringWrapper contains non-numeric calls") {
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+
+    val dm = new DataModel
+    dm.store(n1)
+    val wrapper = new StringDataWrapper
+    wrapper.store("1 2 3 nonNumeric")
+    val plugin = new SMTPlugin
+    val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    r1 = returnedModel.predict(condition1, event1)
+    r2 = returnedModel.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(returnedModel.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+  }
+  test("SMTPlugin - Multiple StringWrappers - one with non-numeric traces ignored in learn") {
+    val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    n1.learn(condition1, event1)
+    var r1 = n1.predict(condition1, event1)
+    var r2 = n1.predict(condition1, event2)
+    assert(r1._1 == 4.0 && r1._2 == 2.0)
+    assert(r2._1 == 2.0 && r2._2 == 2.0)
+    assert(n1.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+    val dm = new DataModel
+    dm.store(n1)
+    val wrapper = new StringDataWrapper
+    wrapper.store("1 2 3 nonNumeric")
+    val wrapper2 = new StringDataWrapper
+    wrapper2.store("1 2 3 777")
+    val plugin = new SMTPlugin
+    val returnedModel = plugin.learn(Vector(wrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
+
+    val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
+
+    val r5 = retNode.predict(condition1, event1)
+    val r6 = retNode.predict(condition1, event2)
+    var r7 = retNode.predict(condition1, event3)
+    assert(retNode.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+    assert(r5._1 == 2.0 && r5._2 == 2.0)
+    assert(r6._1 == 2.0 && r6._2 == 2.0)
+    assert(r7._1 == 1.0 && r7._2 == 2.0)
+  }
+
 }

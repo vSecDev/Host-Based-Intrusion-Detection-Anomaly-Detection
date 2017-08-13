@@ -61,9 +61,20 @@ class SMTPlugin extends DecisionEnginePlugin {
       case w: StringDataWrapper => w.retrieve match {
         case None =>
         case Some(lines) => {
-          if(ints && node.isInstanceOf[Node[Int, Int]]){
+          if(ints && node.isInstanceOf[Node[Int, Int]] && lines.nonEmpty){
             //process as int trace
-            val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+            var wholeTrace: Vector[Int] = Vector.empty
+            val linesArray = lines.split("\\s")
+            println("linesArray.size: " + linesArray.size)
+            if(linesArray.forall(_.matches("[0-9]*"))){
+              wholeTrace = linesArray.map(_.trim.toInt).toVector
+            }else{
+              println("lines has a non-numeric call: " + lines)
+            }
+            println("after check. wholeTrace.size: " + wholeTrace.size)
+
+
+
             var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
             for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
               if (t.size == node.maxDepth)
@@ -92,7 +103,6 @@ class SMTPlugin extends DecisionEnginePlugin {
       }
       case _ =>
     })
-    //TODO - RETURN COPY OF TRAINED MODEL INSTEAD???
     val dm = new DataModel
     dm.store(node)
     Some(dm)

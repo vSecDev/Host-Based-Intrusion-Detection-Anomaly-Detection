@@ -8,7 +8,7 @@ import DecisionEngine.DecisionEngineConfig
 case class SMTConfig() extends DecisionEngineConfig{
 
   override type T = SMTSettings
-  override var settings: Option[SMTSettings] = _
+  override var settings: Option[SMTSettings] = None
 
   override def storeSettings(_settings: SMTSettings): Unit = {settings = Some(_settings)}
   override def getSettings(): Option[SMTSettings] = settings
