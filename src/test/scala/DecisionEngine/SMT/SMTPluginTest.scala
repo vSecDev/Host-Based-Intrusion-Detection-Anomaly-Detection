@@ -80,6 +80,18 @@ class SMTPluginTest extends  FunSuite {
     assert(root.smoothing == smoothing)
     assert(root.prior == prior)
   }
+  test("SMTPlugin - configure returns false if no settings are provided"){
+    val emptyConfig = new SMTConfig
+    val plugin = new SMTPlugin
+    assert(!plugin.configure(emptyConfig))
+  }
+  test("SMTPlugin - configure returns false if settings are invalid"){
+    val invalidSettings = new SMTSettings(0, maxPhi, maxSeqCount, smoothing, prior, ints)
+    val invalidConfig = new SMTConfig
+    invalidConfig.storeSettings(invalidSettings)
+    val plugin = new SMTPlugin
+    assert(!plugin.configure(invalidConfig))
+  }
   test("SMTPlugin - learn returns trained model - root loaded") {
 
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)

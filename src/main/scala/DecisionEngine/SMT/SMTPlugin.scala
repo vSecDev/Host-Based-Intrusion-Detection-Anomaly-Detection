@@ -90,7 +90,7 @@ class SMTPlugin extends DecisionEnginePlugin {
               for (t <- trainingData_whole) {
                 value.learn(t._1, t._2)
               }
-            case _ =>
+            case _ => //TODO - ADD LOGIC FOR OTHER TPYES
           }
         }
       }
