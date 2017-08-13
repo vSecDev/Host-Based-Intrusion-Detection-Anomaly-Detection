@@ -66,7 +66,7 @@ class SMTPluginTest extends  FunSuite {
     assert(root.smoothing == smoothing)
     assert(root.prior == prior)
   }
-  test("SMTPlugin - learn returns trained model"){
+  test("SMTPlugin - learn returns trained model - root loaded"){
 
     val maxDepth = 4
     val maxPhi = 2
@@ -120,12 +120,71 @@ class SMTPluginTest extends  FunSuite {
     assert(r5._1 == 2.0 && r5._2 == 2.0)
     assert(r6._1 == 2.0 && r6._2 == 2.0)
     assert(r7._1 == 1.0 && r7._2 == 2.0)
+
+    //storing condition2, event1
+    dw.store("4 5 6 666")
+
+    plugin.learn(Vector(dw), None, ints)
+    val returnedModel3 = plugin.getModel.get.retrieve.get
+    val retNode3 = returnedModel3.asInstanceOf[Node[Int, Int]]
+
+    var r8 = retNode3.predict(condition1, event1)
+    var r9 = retNode3.predict(condition1, event2)
+    var r10 = retNode3.predict(condition1, event3)
+    var r11 = retNode3.predict(condition2, event1)
+    var r12 = retNode3.predict(condition2, event2)
+    var r13 = retNode3.predict(condition2, event3)
+
+    assert(retNode3.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 2.0 / 9)
+    assert(r8._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r8._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r9._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r9._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r10._1 == 1.0/9 + 1.0/9 + 1.0/6 + 1.0/3 && r10._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r11._1 == 4.0/9 + 4.0/9 + 4.0/6 + 4.0/3 && r11._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r12._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r12._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r13._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r13._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+
+
+
+    val n2 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    val n2Wrapper = new DataModel
+    n2Wrapper.store(n2)
+    val dw2 = new StringDataWrapper
+    //store condition1, event1
+    dw2.store("1 2 3 666")
+
+    //DataModel stored as root in DecisionEngine should not change. Only the new tree passed in should be trained.
+    val newDM = plugin.learn(Vector(dw2), Some(n2Wrapper), ints)
+    val n2Trained = newDM.get.retrieve.get.asInstanceOf[Node[Int,Int]]
+    assert(n2 == n2Trained)
+
+
+    var newR1 = n2Trained.predict(condition1, event1)
+    var newR2 = n2Trained.predict(condition1, event2)
+    assert(newR1._1 == 4.0 && newR1._2 == 2.0)
+    assert(newR2._1 == 2.0 && newR2._2 == 2.0)
+    assert(n2Trained.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
+
+
+    //Root has not changed after training new model passed in to learn
+    val returnedModel4 = plugin.getModel.get.retrieve.get
+    val retNode4 = returnedModel3.asInstanceOf[Node[Int, Int]]
+
+    r8 = retNode4.predict(condition1, event1)
+    r9 = retNode4.predict(condition1, event2)
+    r10 = retNode4.predict(condition1, event3)
+    r11 = retNode4.predict(condition2, event1)
+    r12 = retNode4.predict(condition2, event2)
+    r13 = retNode4.predict(condition2, event3)
+
+    assert(retNode4.getChildren(0)(0).asInstanceOf[Node[Int, Int]].getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1.drop(1)).get.getWeight == 2.0 / 9)
+    assert(r8._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r8._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r9._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r9._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r10._1 == 1.0/9 + 1.0/9 + 1.0/6 + 1.0/3 && r10._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r11._1 == 4.0/9 + 4.0/9 + 4.0/6 + 4.0/3 && r11._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r12._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r12._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+    assert(r13._1 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3 && r13._2 == 2.0/9 + 2.0/9 + 2.0/6 + 2.0/3)
+
+
+
   }
-
-
 }
-
-
-
-
-

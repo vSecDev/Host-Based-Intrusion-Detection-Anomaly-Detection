@@ -67,7 +67,6 @@ class SMTPlugin extends DecisionEnginePlugin {
             var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
             for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
               if (t.size == node.maxDepth)
-                println("t.take(node.maxDepth - 1), t.takeRight(1)(0) ---- data: " + t.take(node.maxDepth - 1), t.takeRight(1)(0))
                 trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
             }
 
