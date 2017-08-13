@@ -225,6 +225,7 @@ class SMTPluginTest extends  FunSuite {
     //Passing in new model to learn - root should not change
     val n2 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val childrenCountBefore = n2.getChildren.size
+    println("childrencoundbefore: " + childrenCountBefore)
     val dm2 = new DataModel
     dm2.store(n2)
 
@@ -234,6 +235,14 @@ class SMTPluginTest extends  FunSuite {
     assert(n2 == nonTrainedModel)
     assert(nonTrainedModel.getChildren.size == childrenCountBefore)
     assert(nonTrainedModel.getChildren.size != root2.getChildren.size)
+
+    //Non-trained model predictions different from root's
+    val r5 = nonTrainedModel.predict(condition1, event1)
+    val r6 = nonTrainedModel.predict(condition1, event2)
+
+    assert(r5._1 == 0.0 && r5._2 == 0.0)
+    assert(r6._1 == 0.0 && r6._2 == 0.0)
+    assert(nonTrainedModel.getChildren.size == 0)
 
     //root hasn't changed
 
