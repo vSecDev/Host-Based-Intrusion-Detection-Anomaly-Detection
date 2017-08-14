@@ -12,19 +12,20 @@ import scala.tools.nsc.classpath.FileUtils
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-val isHome = true
-  /*val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
-  val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
-  val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
-  val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
-  val windowsTrainingDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data"
-  val windowsTrainingDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
-  val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
-  val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
-  val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
-  val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
-  val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
-*/
+  val isHome = true
+  val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
+
+  /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
+    val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
+    val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+    val windowsTrainingDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data"
+    val windowsTrainingDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+    val linuxDataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
+    val dataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+    val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+    val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
+    val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
+  */
   def time[T](block: => T): T = {
     val start = System.currentTimeMillis
     val res = block
@@ -73,12 +74,60 @@ val isHome = true
       ois.close
       Some(smt.asInstanceOf[SparseMarkovTree[Int, Int]])
     } catch {
-      case e: Exception => println(e.getStackTrace); None
+      case e: Exception => println("EXCEPTION IN DES"); println(e.getStackTrace); None
     } finally {
       fis.close
       ois.close
     }
   }
+
+  class ObjectInputStreamWithCustomClassLoader(
+                                                fileInputStream: FileInputStream
+                                              ) extends ObjectInputStream(fileInputStream) {
+    override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
+      try {
+        Class.forName(desc.getName, false, getClass.getClassLoader)
+      }
+      catch {
+        case ex: ClassNotFoundException => super.resolveClass(desc)
+      }
+    }
+  }
+
+  def bottom (n: Int, li: List [Double]) : List[Double] = {
+
+    def updateSofar (sofar: List [Double], el: Double) : List [Double] = {
+      // println (el + " - " + sofar)
+      if (el < sofar.head)
+        (el :: sofar.tail).sortWith (_ > _)
+      else sofar
+    }
+    (li.take (n). sortWith (_ > _) /: li.drop (n)) (updateSofar (_, _))
+  }
+
+
+  def top (n: Int, li: List [Double]) : List[Double] = {
+
+    def updateSofar (sofar: List [Double], el: Double) : List [Double] = {
+      // println (el + " - " + sofar)
+      if (el > sofar.head)
+        (el :: sofar.tail).sortWith (_ < _)
+      else sofar
+    }
+    (li.take (n). sortWith (_ < _) /: li.drop (n)) (updateSofar (_, _))
+  }
+
+
+  test("top") {
+    val v1 = Vector(80.0, 100.0, -5.0, 10.0, 8.0, 6.0, 4.0, 2.0, 1.0, 3.0, 5.0,0.0,0.1, 7.0, 9.0)
+    val bottom5 = bottom(5, v1.toList)
+    println("bottom 5: " + bottom5)
+
+    val top5 = top(5, v1.toList)
+    println("top 5: " + top5)
+  }
+
+
 
   test("SparseMarkovTree. maxDepth is not zero") {
     assertThrows[IllegalArgumentException](Node(0, 1, 3, 0.0, 1.0))
@@ -1595,18 +1644,7 @@ val isHome = true
   }
 
 
-  class ObjectInputStreamWithCustomClassLoader(
-                                                fileInputStream: FileInputStream
-                                              ) extends ObjectInputStream(fileInputStream) {
-    override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
-      try {
-        Class.forName(desc.getName, false, getClass.getClassLoader)
-      }
-      catch {
-        case ex: ClassNotFoundException => super.resolveClass(desc)
-      }
-    }
-  }
+
 
   /*
 
@@ -1730,70 +1768,64 @@ val isHome = true
     require(data.length > nBins)
 
     val Epsilon = 0.000001
-    val (max,min) = (data.max,data.min)
+    val (max, min) = (data.max, data.min)
     val binWidth = (max - min) / nBins + Epsilon
     val bounds = (1 to nBins).map { x => min + binWidth * x }.toList
 
     def histo(bounds: List[Double], data: List[Double]): List[List[Double]] =
       bounds match {
         case h :: Nil => List(data)
-        case h :: t   => val (l,r) = data.partition( _ < h) ; l :: histo(t,r)
+        case h :: t => val (l, r) = data.partition(_ < h); l :: histo(t, r)
       }
 
     val histogram = histo(bounds, data)
   }
 
   test("CREATE REPORTS") {
-
-
     val maxDepth = 8
     val maxPhi = 2
     val maxSeqCount = 50
     val smoothing = 1.0
     val prior = 1.0
 
-    val extensions = List("GHC")
-    val trainingDir = ""
-    val validationDir = ""
-    val attackDir = ""
-    val serialiseDir = ""
-    val valPredictions = ""
-    val attackPredictions = ""
+    var extensions = List("GHC")
+    var trainingDir = ""
+    var validationDir = ""
+    var attackDir = ""
+    var serialiseDir = ""
+    var valPredictions = ""
+    var attackPredictions = ""
 
+    if (isHome) {
+      trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
+      serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\serialiseDir\\"
+      valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\valPredictions\\"
+      attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\attackPredictions\\"
+    } else {
+      trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
+      serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
+      valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
+      attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
 
-
-if(isHome){
-  val trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
-  val validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
-  val attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
-  val serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\serialiseDir\\"
-  val valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\valPredictions\\"
-  val attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\attackPredictions\\"
-}else {
-  val trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
-  val validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
-  val attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
-  val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
-  val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
-  val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
-
-}
+    }
     val trainingFiles = getListOfWindowsFiles(trainingDir, extensions)
     val validationFiles = getListOfWindowsFiles(validationDir, extensions)
     val attackFiles = getListOfWindowsFiles(attackDir, extensions)
 
     var counter = 0
-   // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    //val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     //for work
     //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
-
     //for home
-    val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
     println("n1 childrenCount: " + n1.getChildren.size)
-    //Train and save model
-   /* try {
 
-      //var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+    //Train and save model
+    try {
 
 
       for (f <- trainingFiles) {
@@ -1815,7 +1847,7 @@ if(isHome){
       serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
-    }*/
+    }
 
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
@@ -1844,7 +1876,9 @@ if(isHome){
 
           val pred = n1.predict(t._1, t._2)
           var quotient = 0.0
-          if(pred._2 != 0.0) {quotient = pred._1 / pred._2}
+          if (pred._2 != 0.0) {
+            quotient = pred._1 / pred._2
+          }
           quotVector = quotVector :+ quotient
           builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
 
@@ -1853,7 +1887,7 @@ if(isHome){
 
         val quotMax = quotVector max
         val quotMin = quotVector min
-        val quotientAvg =   quotVector.foldLeft(0.0)(_+_) / quotVector.foldLeft(0.0)((r,c) => r+1)
+        val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
         builder.append("\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
 
         val h = Distribution(50, quotVector.toList).histogram
@@ -1891,18 +1925,24 @@ if(isHome){
         for (t <- trainingData_whole) {
           val pred = n1.predict(t._1, t._2)
           var quotient = 0.0
-          if(pred._2 != 0.0) {quotient = pred._1 / pred._2}
+          if (pred._2 != 0.0) {
+            quotient = pred._1 / pred._2
+          }
           quotVector = quotVector :+ quotient
           builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
         val quotMax = quotVector max
         val quotMin = quotVector min
-        val quotientAvg =   quotVector.foldLeft(0.0)(_+_) / quotVector.foldLeft(0.0)((r,c) => r+1)
+        val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
         builder.append("\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
-
         val h = Distribution(50, quotVector.toList).histogram
         builder.append("\nHistogram:\n" + h)
+
+        val top15 = top(15, quotVector.toList)
+        val bottom15 = bottom(15, quotVector.toList)
+        builder.append("\nTop 15 values:\n" + top15)
+        builder.append("\nBottom 15 values:\n" + bottom15)
 
         val file = new File(attackPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
