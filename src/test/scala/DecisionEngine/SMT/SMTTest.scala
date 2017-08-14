@@ -1842,15 +1842,5 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
     }
-
-
-
-
-
-
-
-
-
-
   }
 }
