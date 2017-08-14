@@ -1747,7 +1747,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     var counter = 0
    // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-    val n1 = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
     println("n1 childrenCount: " + n1.getChildren.size)
     //Train and save model
    /* try {
