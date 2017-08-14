@@ -9,7 +9,7 @@ import scala.collection.mutable
 import scala.io.Source
 
 class FileProcessorTest extends FunSuite {
-  val isHome = true
+  val isHome = false
   var testSource = ""
   var testTarget = ""
   var mapTestSource = ""

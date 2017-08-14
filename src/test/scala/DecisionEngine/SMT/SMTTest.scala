@@ -3,13 +3,17 @@ package DecisionEngine.SMT
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.io._
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+
+
+import scala.tools.nsc.classpath.FileUtils
 
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
 
-  val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
+  /*val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
   val workDataParent = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\WindowsToProcess\\"
   val linuxDataHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Original\\Old\\ADFA-LD\\ADFA-LD\\Training_Data_Master\\"
@@ -20,7 +24,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   val dataWork = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\"
   val homeTrainingPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Old\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_680.GHC"
   val workTrainingPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Full_Process_Traces 2\\Full_Process_Traces\\Full_Trace_Training_Data\\Training-Wireless-Karma_2132.GHC"
-
+*/
   def time[T](block: => T): T = {
     val start = System.currentTimeMillis
     val res = block
@@ -28,6 +32,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     println("Elapsed time: %1d ms".format(totalTime))
     res
   }
+
   def getListOfFiles(dir: String, extensions: List[String]): List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
@@ -37,6 +42,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
+
   def getListOfWindowsFiles(dir: String, extensions: List[String]): List[File] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) d.listFiles.filter(_.isFile).toList.filter { file => file.getName.contains("INT") && extensions.exists(file.getName.endsWith(_))
@@ -44,6 +50,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
+
   def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
     val fos = new FileOutputStream(target)
     val oos = new ObjectOutputStream(fos)
@@ -57,6 +64,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       oos.close
     }
   }
+
   def deserializeTree(source: File): Option[SparseMarkovTree[Int, Int]] = {
     val fis = new FileInputStream(source)
     val ois = new ObjectInputStreamWithCustomClassLoader(fis)
@@ -1587,7 +1595,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-
   class ObjectInputStreamWithCustomClassLoader(
                                                 fileInputStream: FileInputStream
                                               ) extends ObjectInputStream(fileInputStream) {
@@ -1600,7 +1607,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     }
   }
-/*
+
+  /*
 
  test("Create tree models") {
     val extensions = List("GHC")
@@ -1716,5 +1724,133 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var r8 = n1.predict(condition4, event1)
     assert(r8._1 == 4.0 && r8._2 == 2.0)
   }
-}
 
+  test("CREATE REPORTS") {
+
+    val maxDepth = 8
+    val maxPhi = 2
+    val maxSeqCount = 50
+    val smoothing = 1.0
+    val prior = 1.0
+
+    val trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+    val validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+    val attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
+    val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
+    val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
+    val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
+    val extensions = List("GHC")
+
+    val trainingFiles = getListOfWindowsFiles(trainingDir, extensions)
+    val validationFiles = getListOfWindowsFiles(validationDir, extensions)
+    val attackFiles = getListOfWindowsFiles(attackDir, extensions)
+
+    var counter = 0
+   // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    val n1 = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    println("n1 childrenCount: " + n1.getChildren.size)
+    //Train and save model
+   /* try {
+
+      //var in: BufferedReader = new BufferedReader(new FileReader(files(0)))
+
+
+      for (f <- trainingFiles) {
+        counter += 1
+        println("Training. Processing file " + counter + " - filename: " + f.getName)
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          n1.learn(t._1, t._2)
+        }
+      }
+      serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+    } catch {
+      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+    }*/
+
+    //Validate files
+    println("Training finished. n1 root children size: " + n1.getChildren.size)
+    println("\n----\nValidating files")
+    counter = 0
+    try {
+      for (f <- validationFiles) {
+        val builder = StringBuilder.newBuilder
+        var predictionStr = "Validation File name: " + f.getName
+        builder.append(predictionStr)
+
+        counter += 1
+        println("Validation. Processing file " + counter + " - filename: " + f.getName)
+
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          val pred = n1.predict(t._1, t._2)
+          builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + (pred._1 / pred._2).toString)
+        }
+        val file = new File(valPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
+        val bw = new BufferedWriter(new FileWriter(file))
+        bw.write(builder.toString)
+        bw.close()
+      }
+    } catch {
+      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+    }
+
+    //Predicions for Attack traces
+    try {
+      for (f <- attackFiles) {
+        val builder = StringBuilder.newBuilder
+        var predictionStr = "Attack File name: " + f.getName
+        builder.append(predictionStr)
+
+        counter += 1
+        println("Attack. Processing file " + counter + " - filename: " + f.getName)
+
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          val pred = n1.predict(t._1, t._2)
+          builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + (pred._1 / pred._2).toString)
+        }
+        val file = new File(attackPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
+        val bw = new BufferedWriter(new FileWriter(file))
+        bw.write(builder.toString)
+        bw.close()
+      }
+    } catch {
+      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+    }
+
+
+
+
+
+
+
+
+
+
+  }
+}
