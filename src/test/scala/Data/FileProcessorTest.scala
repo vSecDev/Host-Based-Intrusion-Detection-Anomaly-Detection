@@ -222,6 +222,7 @@ class FileProcessorTest extends FunSuite {
     dm1.store(loadedModel)
     val t2 = new File(testSource + "\\serialisation\\target\\test2.SMT")
     assert(fp.saveModel(dm1, t2))
+
     val loadedModel2 = fp.loadModel(new DataModel, t2).get.retrieve.get.asInstanceOf[Node[Int, Int]]
     r1 = loadedModel2.predict(condition1, event1)
     r2 = loadedModel2.predict(condition1, event2)

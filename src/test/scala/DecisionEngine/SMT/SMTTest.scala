@@ -3,10 +3,13 @@ package DecisionEngine.SMT
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.scalatest.Matchers._
 import java.io._
+
 import org.apache.commons.io.{FileUtils, FilenameUtils}
 
-
 import scala.tools.nsc.classpath.FileUtils
+import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException}
+
+import Data.{DataException, DataModel}
 
 /**
   * Created by Case on 20/07/2017.
@@ -52,7 +55,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
+  /*def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
     val fos = new FileOutputStream(target)
     val oos = new ObjectOutputStream(fos)
     try {
@@ -67,11 +70,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   def deserializeTree(source: File): Option[SparseMarkovTree[Int, Int]] = {
+    println("1")
     val fis = new FileInputStream(source)
+    println("2")
     val ois = new ObjectInputStreamWithCustomClassLoader(fis)
+    println("3")
     try {
+      println("4")
       val smt = ois.readObject
+      println("5")
       ois.close
+      println("6")
+      println("smt as node: " + smt.asInstanceOf[Node[Int, Int]])
       Some(smt.asInstanceOf[SparseMarkovTree[Int, Int]])
     } catch {
       case e: Exception => println("EXCEPTION IN DES"); println(e.getStackTrace); None
@@ -79,11 +89,50 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       fis.close
       ois.close
     }
+  }*/
+
+  @throws(classOf[DataException])
+  def serialise(model: Serializable, _target: File): Boolean = {
+
+        val fos = new FileOutputStream(_target)
+        val oos = new ObjectOutputStream(fos)
+        try {
+
+          oos.writeObject(model)
+          oos.close
+          true
+        } catch {
+          case ice: InvalidClassException => throw new DataException("InvalidClassException thrown during model serialisation.", ice)
+          case nse: NotSerializableException => throw new DataException("NotSerializableException thrown during model serialisation.", nse)
+          case ioe: IOException => throw new DataException("IOException thrown during model serialisation.", ioe)
+        } finally {
+          fos.close
+          oos.close
+        }
+      }
+
+  def deserialise(_source: File): Option[Serializable] = {
+    if(!_source.exists || !_source.isFile) return None
+    val fis = new FileInputStream(_source)
+    val ois = new ObjectInputStreamWithCustomClassLoader(fis)
+    try {
+      val newModel = ois.readObject.asInstanceOf[Serializable]
+      ois.close
+      Some(newModel)
+    } catch {
+      case cnfe: ClassNotFoundException => throw new DataException("ClassNotFoundException thrown during model deserialisation.", cnfe)
+      case ice: InvalidClassException => throw new DataException("InvalidClassException thrown during model deserialisation.", ice)
+      case sce: StreamCorruptedException => throw new DataException("StreamCorruptedException thrown during model deserialisation.", sce)
+      case ioe: IOException => throw new DataException("IOException thrown during model deserialisation.", ioe)
+    } finally {
+      fis.close
+      ois.close
+    }
   }
 
-  class ObjectInputStreamWithCustomClassLoader(
-                                                fileInputStream: FileInputStream
-                                              ) extends ObjectInputStream(fileInputStream) {
+  private class ObjectInputStreamWithCustomClassLoader(
+                                                        fileInputStream: FileInputStream
+                                                      ) extends ObjectInputStream(fileInputStream) {
     override def resolveClass(desc: java.io.ObjectStreamClass): Class[_] = {
       try {
         Class.forName(desc.getName, false, getClass.getClassLoader)
@@ -1821,7 +1870,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     //for work
     //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
     //for home
-    val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
     println("n1 childrenCount: " + n1.getChildren.size)
 
     //Train and save model
@@ -1844,7 +1894,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           n1.learn(t._1, t._2)
         }
       }
-      serializeTree(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+    //  serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
     }
