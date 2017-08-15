@@ -1971,7 +1971,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
     }
 
-    //Predicions for Attack traces
+    //Predict6ions for Attack traces
     try {
       for (f <- attackFiles) {
         val builder = StringBuilder.newBuilder
