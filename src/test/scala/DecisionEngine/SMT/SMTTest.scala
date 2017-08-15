@@ -1946,8 +1946,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
         val quotMax = quotVector max
         val quotMin = quotVector min
+        val lowValCount = quotVector.count(_ < 0.6)
+        val lowValPercentage = (lowValCount / quotVector.size.toDouble) * 100.00
+
         val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\n----------\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+        builder.append("\n----------\nNr of subtraces: " + quotVector.size +  "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg + "\nNr of quotients less than 0.6: " + lowValCount + " - percentage of low quotients: " + lowValPercentage)
 
         val h = Distribution(50, quotVector.toList).histogram
         builder.append("\n----------\nHistogram:\n" + h)
@@ -2000,8 +2003,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
         val quotMax = quotVector max
         val quotMin = quotVector min
+        val lowValCount = quotVector.count(_ < 0.6)
+        val lowValPercentage = (lowValCount / quotVector.size.toDouble) * 100.00
+
         val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\n----------\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+        builder.append("\n----------\nNr of subtraces: " + quotVector.size +  "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg + "\nNr of quotients less than 0.6: " + lowValCount + " - percentage of low quotients: " + lowValPercentage)
         val h = Distribution(50, quotVector.toList).histogram
         builder.append("\n----------\nHistogram:\n" + h)
         val tabulated = h.map{_.size}
