@@ -1944,8 +1944,15 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
-        val quotMax = quotVector max
-        val quotMin = quotVector min
+
+        val quotMax = 0.0
+        val quotMin = 0.0
+
+        if(quotVector.nonEmpty) {
+         quotMax = quotVector max
+         quotMin = quotVector min
+        }
+
         val lowValCount1p0 = quotVector.count(_ < 1.0)
         val lowValCount0p8 = quotVector.count(_ < 0.8)
         val lowValCount0p6 =  quotVector.count(_ < 0.6)
@@ -2014,8 +2021,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
-        val quotMax = quotVector max
-        val quotMin = quotVector min
+        val quotMax = 0.0
+        val quotMin = 0.0
+
+        if(quotVector.nonEmpty) {
+          quotMax = quotVector max
+            quotMin = quotVector min
+        }
 
         val lowValCount1p0 = quotVector.count(_ < 1.0)
         val lowValCount0p8 = quotVector.count(_ < 0.8)
