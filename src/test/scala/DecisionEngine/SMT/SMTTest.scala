@@ -15,7 +15,7 @@ import Data.{DataException, DataModel}
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = false
+  val isHome = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -94,25 +94,25 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   @throws(classOf[DataException])
   def serialise(model: Serializable, _target: File): Boolean = {
 
-        val fos = new FileOutputStream(_target)
-        val oos = new ObjectOutputStream(fos)
-        try {
+    val fos = new FileOutputStream(_target)
+    val oos = new ObjectOutputStream(fos)
+    try {
 
-          oos.writeObject(model)
-          oos.close
-          true
-        } catch {
-          case ice: InvalidClassException => throw new DataException("InvalidClassException thrown during model serialisation.", ice)
-          case nse: NotSerializableException => throw new DataException("NotSerializableException thrown during model serialisation.", nse)
-          case ioe: IOException => throw new DataException("IOException thrown during model serialisation.", ioe)
-        } finally {
-          fos.close
-          oos.close
-        }
-      }
+      oos.writeObject(model)
+      oos.close
+      true
+    } catch {
+      case ice: InvalidClassException => throw new DataException("InvalidClassException thrown during model serialisation.", ice)
+      case nse: NotSerializableException => throw new DataException("NotSerializableException thrown during model serialisation.", nse)
+      case ioe: IOException => throw new DataException("IOException thrown during model serialisation.", ioe)
+    } finally {
+      fos.close
+      oos.close
+    }
+  }
 
   def deserialise(_source: File): Option[Serializable] = {
-    if(!_source.exists || !_source.isFile) return None
+    if (!_source.exists || !_source.isFile) return None
     val fis = new FileInputStream(_source)
     val ois = new ObjectInputStreamWithCustomClassLoader(fis)
     try {
@@ -143,39 +143,40 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 
-  def bottom (n: Int, li: List [Double]) : List[Double] = {
+  def bottom(n: Int, li: List[Double]): List[Double] = {
 
-    def updateSofar (sofar: List [Double], el: Double) : List [Double] = {
+    def updateSofar(sofar: List[Double], el: Double): List[Double] = {
       // println (el + " - " + sofar)
       if (el < sofar.head)
-        (el :: sofar.tail).sortWith (_ > _)
+        (el :: sofar.tail).sortWith(_ > _)
       else sofar
     }
-    (li.take (n). sortWith (_ > _) /: li.drop (n)) (updateSofar (_, _))
+
+    (li.take(n).sortWith(_ > _) /: li.drop(n)) (updateSofar(_, _))
   }
 
 
-  def top (n: Int, li: List [Double]) : List[Double] = {
+  def top(n: Int, li: List[Double]): List[Double] = {
 
-    def updateSofar (sofar: List [Double], el: Double) : List [Double] = {
+    def updateSofar(sofar: List[Double], el: Double): List[Double] = {
       // println (el + " - " + sofar)
       if (el > sofar.head)
-        (el :: sofar.tail).sortWith (_ < _)
+        (el :: sofar.tail).sortWith(_ < _)
       else sofar
     }
-    (li.take (n). sortWith (_ < _) /: li.drop (n)) (updateSofar (_, _))
+
+    (li.take(n).sortWith(_ < _) /: li.drop(n)) (updateSofar(_, _))
   }
 
 
   test("top") {
-    val v1 = Vector(80.0, 100.0, -5.0, 10.0, 8.0, 6.0, 4.0, 2.0, 1.0, 3.0, 5.0,0.0,0.1, 7.0, 9.0)
+    val v1 = Vector(80.0, 100.0, -5.0, 10.0, 8.0, 6.0, 4.0, 2.0, 1.0, 3.0, 5.0, 0.0, 0.1, 7.0, 9.0)
     val bottom5 = bottom(5, v1.toList)
     println("bottom 5: " + bottom5)
 
     val top5 = top(5, v1.toList)
     println("top 5: " + top5)
   }
-
 
 
   test("SparseMarkovTree. maxDepth is not zero") {
@@ -1693,8 +1694,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-
-
   /*
 
  test("Create tree models") {
@@ -1868,9 +1867,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     //var allVal = Vector()
 
 
-    var counter = 0
-   // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-   val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    //var counter = 0
+    // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
     val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
 
     //CODE BELOW WORKS AT WORK
@@ -1885,10 +1884,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     //for home
     //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
-   // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+    // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
 
     //Train and save model
-   /* try {
+    /* try {
       for (f <- trainingFiles) {
         counter += 1
         println("Training. Processing file " + counter + " - filename: " + f.getName)
@@ -1913,8 +1912,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
     println("\n----\nValidating files")
-    counter = 0
-    try {
+   // counter = 0
+
+    generateReport(validationFiles,false,n1,valPredictions)
+
+  /*  try {
       for (f <- validationFiles) {
         val builder = StringBuilder.newBuilder
         var predictionStr = "Validation File name: " + f.getName
@@ -1945,9 +1947,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
 
 
-
-
-        if(quotVector.nonEmpty) {
+        if (quotVector.nonEmpty) {
           val quotMax = quotVector max
           val quotMin = quotVector min
 
@@ -1987,10 +1987,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     } catch {
       case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
-    }
+    }*/
 
     //Predict6ions for Attack traces
-    try {
+
+    generateReport(attackFiles,true,n1,attackPredictions)
+ /*   try {
       for (f <- attackFiles) {
         val builder = StringBuilder.newBuilder
         var predictionStr = "Attack File name: " + f.getName
@@ -2019,7 +2021,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
-        if(quotVector.nonEmpty) {
+        if (quotVector.nonEmpty) {
           val quotMax = quotVector max
           val quotMin = quotVector min
 
@@ -2059,6 +2061,89 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
     } catch {
       case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
+    }*/
+  }
+
+  private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String) {
+    try {
+      var counter = 0
+      for (f <- srcFiles) {
+        val builder = StringBuilder.newBuilder
+        var modeStr = ""
+        if (isAttack) {
+          modeStr = "Attack"
+        } else {
+          modeStr = "Validation"
+        }
+
+        var predictionStr = modeStr + " - File name: " + f.getName
+        builder.append(predictionStr)
+
+        counter += 1
+        println(modeStr + ". Processing file " + counter + " - filename: " + f.getName)
+
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(n1.maxDepth, 1)) {
+          if (t.size == n1.maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(n1.maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        var quotVector: Vector[Double] = Vector()
+        for (t <- trainingData_whole) {
+          val pred = n1.predict(t._1, t._2)
+          var quotient = 0.0
+          if (pred._2 != 0.0) {
+            quotient = pred._1 / pred._2
+          }
+          quotVector = quotVector :+ quotient
+          //builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
+        }
+
+        if (quotVector.nonEmpty) {
+          val quotMax = quotVector max
+          val quotMin = quotVector min
+
+          val lowValCount1p0 = quotVector.count(_ < 1.0)
+          val lowValCount0p8 = quotVector.count(_ < 0.8)
+          val lowValCount0p6 = quotVector.count(_ < 0.6)
+          val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
+
+          val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
+
+          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+          builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
+          builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
+          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
+
+          val nBins = 50
+          if (quotVector.length > nBins) {
+            val h = Distribution(nBins, quotVector.toList).histogram
+            builder.append("\n----------\nHistogram:\n" + h)
+            val tabulated = h.map {
+              _.size
+            }
+            builder.append("\n----------\nTabulated:\n" + tabulated)
+
+            val sumOfBottom10Bins = tabulated.take(10).toVector.sum
+            val normalisedSum = sumOfBottom10Bins / quotVector.size
+            builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+          }else{
+            builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
+          }
+        }
+        val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
+
+        val bw = new BufferedWriter(new FileWriter(file))
+        bw.write(builder.toString)
+        bw.close()
+      }
+    } catch {
+      case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace())
     }
   }
 }
