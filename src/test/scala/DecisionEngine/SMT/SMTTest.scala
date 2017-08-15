@@ -1945,8 +1945,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
 
 
-        val quotMax = 0.0
-        val quotMin = 0.0
+        var quotMax = 0.0
+        var quotMin = 0.0
 
         if(quotVector.nonEmpty) {
          quotMax = quotVector max
@@ -2021,8 +2021,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
-        val quotMax = 0.0
-        val quotMin = 0.0
+        var quotMax = 0.0
+        var quotMin = 0.0
 
         if(quotVector.nonEmpty) {
           quotMax = quotVector max
