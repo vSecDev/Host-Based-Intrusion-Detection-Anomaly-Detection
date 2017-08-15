@@ -15,7 +15,7 @@ import Data.{DataException, DataModel}
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -1831,8 +1831,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("CREATE REPORTS") {
-    val maxDepth = 8
-    val maxPhi = 2
+    val maxDepth = 10
+    val maxPhi = 3
     val maxSeqCount = 50
     val smoothing = 1.0
     val prior = 1.0
@@ -1866,18 +1866,26 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val attackFiles = getListOfWindowsFiles(attackDir, extensions)
 
     var counter = 0
-    //val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-    //for work
-    //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_8_2_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
+
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+
+
+    //CODE BELOW WORKS AT WORK
+    /*try {
+      val modelFile = new File(serialiseDir + "SMT_8_2_1.0.tmp")
+      println("modelFile exists and is file: " + (modelFile.exists && modelFile.isFile))
+      val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
+      println("n1 deserialised. Children size: " +  n1.getChildren.size)
+    }catch{
+      case e: Throwable => println("deserialisation error: " + e.getMessage)
+    }*/
+
     //for home
     //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
-    val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
-    println("n1 childrenCount: " + n1.getChildren.size)
+   // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
 
     //Train and save model
     try {
-
-
       for (f <- trainingFiles) {
         counter += 1
         println("Training. Processing file " + counter + " - filename: " + f.getName)
@@ -1894,7 +1902,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           n1.learn(t._1, t._2)
         }
       }
-    //  serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+      serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
     }
@@ -1931,17 +1939,22 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           }
           quotVector = quotVector :+ quotient
           builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
-
-
         }
 
         val quotMax = quotVector max
         val quotMin = quotVector min
         val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+        builder.append("\n----------\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
 
         val h = Distribution(50, quotVector.toList).histogram
-        builder.append("\nHistogram:\n" + h)
+        builder.append("\n----------\nHistogram:\n" + h)
+        val tabulated = h.map{_.size}
+        builder.append("\n----------\nTabulated:\n" + tabulated)
+
+        val top15 = top(15, quotVector.toList)
+        val bottom15 = bottom(15, quotVector.toList)
+        builder.append("\n----------\nTop 15 values:\n" + top15)
+        builder.append("\n----------\nBottom 15 values:\n" + bottom15)
 
         val file = new File(valPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
@@ -1979,20 +1992,22 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             quotient = pred._1 / pred._2
           }
           quotVector = quotVector :+ quotient
-          builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
+          builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
         val quotMax = quotVector max
         val quotMin = quotVector min
         val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+        builder.append("\n----------\nMax quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
         val h = Distribution(50, quotVector.toList).histogram
-        builder.append("\nHistogram:\n" + h)
+        builder.append("\n----------\nHistogram:\n" + h)
+        val tabulated = h.map{_.size}
+        builder.append("\n----------\nTabulated:\n" + tabulated)
 
         val top15 = top(15, quotVector.toList)
         val bottom15 = bottom(15, quotVector.toList)
-        builder.append("\nTop 15 values:\n" + top15)
-        builder.append("\nBottom 15 values:\n" + bottom15)
+        builder.append("\n----------\nTop 15 values:\n" + top15)
+        builder.append("\n----------\nBottom 15 values:\n" + bottom15)
 
         val file = new File(attackPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
