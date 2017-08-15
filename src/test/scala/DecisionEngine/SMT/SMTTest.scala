@@ -2071,16 +2071,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       //(qLt06, qLt08, qLt10, pLQ06, pLQ08, pLQ10, normalisedSum)
       var allStatsVector: Vector[(Double, Double, Double, Double, Double, Double, Double)] = Vector()
       var counter = 0
+      var modeStr = ""
+      if (isAttack) { modeStr = "Attack" } else { modeStr = "Validation" }
 
       for (f <- srcFiles) {
         val builder = StringBuilder.newBuilder
-        var modeStr = ""
-        if (isAttack) {
-          modeStr = "Attack"
-        } else {
-          modeStr = "Validation"
-        }
-
         var predictionStr = modeStr + " - File name: " + f.getName
         builder.append(predictionStr)
 
@@ -2120,7 +2115,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
           val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
 
-          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+          builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
           builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
           builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
           builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
@@ -2152,7 +2147,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       val statsAvg = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
       allStatsBuilder.append(statsAvg.toString)
 
-      val file2 = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats.txt")
+      val file2 = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"+ modeStr + ".txt")
       val bw2 = new BufferedWriter(new FileWriter(file2))
       bw2.write(allStatsBuilder.toString)
       bw2.close()
