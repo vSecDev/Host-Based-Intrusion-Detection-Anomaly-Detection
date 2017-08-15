@@ -2066,12 +2066,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String) {
     try {
-      var allStats: String = ""
+      //var allStats: String = ""
       val allStatsBuilder = StringBuilder.newBuilder
       //(qLt06, qLt08, qLt10, pLQ06, pLQ08, pLQ10, normalisedSum)
-      var allStatsVector: Vector[(Double, Double, Double, Double, Double, Double, Double)] = new Vector()
-
+      var allStatsVector: Vector[(Double, Double, Double, Double, Double, Double, Double)] = Vector()
       var counter = 0
+
       for (f <- srcFiles) {
         val builder = StringBuilder.newBuilder
         var modeStr = ""
@@ -2129,7 +2129,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           val nBins = 50
           if (quotVector.length > nBins) {
             val h = Distribution(nBins, quotVector.toList).histogram
-            builder.append("\n----------\nHistogram:\n" + h)
+           // builder.append("\n----------\nHistogram:\n" + h)
             val tabulated = h.map {
               _.size
             }
