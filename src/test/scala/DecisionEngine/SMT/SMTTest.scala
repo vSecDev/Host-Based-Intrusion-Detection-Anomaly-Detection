@@ -1865,14 +1865,17 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val validationFiles = getListOfWindowsFiles(validationDir, extensions)
     val attackFiles = getListOfWindowsFiles(attackDir, extensions)
 
+    //var allVal = Vector()
+
+
     var counter = 0
-
-    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-
+   // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+   val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
 
     //CODE BELOW WORKS AT WORK
     /*try {
-      val modelFile = new File(serialiseDir + "SMT_8_2_1.0.tmp")
+      val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
       println("modelFile exists and is file: " + (modelFile.exists && modelFile.isFile))
       val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
       println("n1 deserialised. Children size: " +  n1.getChildren.size)
@@ -1885,7 +1888,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
    // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
 
     //Train and save model
-    try {
+   /* try {
       for (f <- trainingFiles) {
         counter += 1
         println("Training. Processing file " + counter + " - filename: " + f.getName)
@@ -1905,7 +1908,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
-    }
+    }*/
 
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
@@ -1962,7 +1965,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         bw.close()
       }
     } catch {
-      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+      case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
     }
 
     //Predicions for Attack traces
@@ -2015,7 +2018,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         bw.close()
       }
     } catch {
-      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+      case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
     }
   }
 }
