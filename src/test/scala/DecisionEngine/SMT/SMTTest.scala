@@ -1945,42 +1945,40 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
 
 
-        var quotMax = 0.0
-        var quotMin = 0.0
+
 
         if(quotVector.nonEmpty) {
-         quotMax = quotVector max
-         quotMin = quotVector min
+          val quotMax = quotVector max
+          val quotMin = quotVector min
+
+          val lowValCount1p0 = quotVector.count(_ < 1.0)
+          val lowValCount0p8 = quotVector.count(_ < 0.8)
+          val lowValCount0p6 = quotVector.count(_ < 0.6)
+          val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
+
+          val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
+
+          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+          builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
+          builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
+          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
+
+          val h = Distribution(50, quotVector.toList).histogram
+          builder.append("\n----------\nHistogram:\n" + h)
+          val tabulated = h.map {
+            _.size
+          }
+
+
+          builder.append("\n----------\nTabulated:\n" + tabulated)
+
+          val sumOfBottom10Bins = tabulated.take(10).toVector.sum
+          val normalisedSum = sumOfBottom10Bins / quotVector.size
+          builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+
         }
-
-        val lowValCount1p0 = quotVector.count(_ < 1.0)
-        val lowValCount0p8 = quotVector.count(_ < 0.8)
-        val lowValCount0p6 =  quotVector.count(_ < 0.6)
-        val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
-        val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
-        val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
-
-        val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\n----------\nNr of subtraces: " + quotVector.size +  "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
-        builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
-        builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
-        builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
-
-        val h = Distribution(50, quotVector.toList).histogram
-        builder.append("\n----------\nHistogram:\n" + h)
-        val tabulated = h.map{_.size}
-
-
-        builder.append("\n----------\nTabulated:\n" + tabulated)
-
-        val sumOfBottom10Bins = tabulated.take(10).toVector.sum
-        val normalisedSum = sumOfBottom10Bins/quotVector.size
-        builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
-
-        val top15 = top(15, quotVector.toList)
-        val bottom15 = bottom(15, quotVector.toList)
-        builder.append("\n----------\nTop 15 values:\n" + top15)
-        builder.append("\n----------\nBottom 15 values:\n" + bottom15)
 
         val file = new File(valPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
@@ -2021,40 +2019,38 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
 
-        var quotMax = 0.0
-        var quotMin = 0.0
-
         if(quotVector.nonEmpty) {
-          quotMax = quotVector max
-            quotMin = quotVector min
+          val quotMax = quotVector max
+          val quotMin = quotVector min
+
+          val lowValCount1p0 = quotVector.count(_ < 1.0)
+          val lowValCount0p8 = quotVector.count(_ < 0.8)
+          val lowValCount0p6 = quotVector.count(_ < 0.6)
+          val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
+          val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
+
+          val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
+
+          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+          builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
+          builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
+          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
+
+          val h = Distribution(50, quotVector.toList).histogram
+          builder.append("\n----------\nHistogram:\n" + h)
+          val tabulated = h.map {
+            _.size
+          }
+
+
+          builder.append("\n----------\nTabulated:\n" + tabulated)
+
+          val sumOfBottom10Bins = tabulated.take(10).toVector.sum
+          val normalisedSum = sumOfBottom10Bins / quotVector.size
+          builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+
         }
-
-        val lowValCount1p0 = quotVector.count(_ < 1.0)
-        val lowValCount0p8 = quotVector.count(_ < 0.8)
-        val lowValCount0p6 =  quotVector.count(_ < 0.6)
-        val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
-        val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
-        val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
-
-        val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-        builder.append("\n----------\nNr of subtraces: " + quotVector.size +  "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
-        builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
-        builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
-        builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
-
-        val h = Distribution(50, quotVector.toList).histogram
-        builder.append("\n----------\nHistogram:\n" + h)
-        val tabulated = h.map{_.size}
-        builder.append("\n----------\nTabulated:\n" + tabulated)
-
-        val sumOfBottom10Bins = tabulated.take(10).toVector.sum
-        val normalisedSum = sumOfBottom10Bins/quotVector.size
-        builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
-
-        val top15 = top(15, quotVector.toList)
-        val bottom15 = bottom(15, quotVector.toList)
-        builder.append("\n----------\nTop 15 values:\n" + top15)
-        builder.append("\n----------\nBottom 15 values:\n" + bottom15)
 
         val file = new File(attackPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
