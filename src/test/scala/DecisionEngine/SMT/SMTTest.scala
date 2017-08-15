@@ -2066,6 +2066,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String) {
     try {
+      var allStats: String = ""
+      val allStatsBuilder = StringBuilder.newBuilder
+      //(qLt06, qLt08, qLt10, pLQ06, pLQ08, pLQ10, normalisedSum)
+      var allStatsVector: Vector[(Double, Double, Double, Double, Double, Double, Double)] = new Vector()
+
       var counter = 0
       for (f <- srcFiles) {
         val builder = StringBuilder.newBuilder
@@ -2120,6 +2125,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
           builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
 
+
           val nBins = 50
           if (quotVector.length > nBins) {
             val h = Distribution(nBins, quotVector.toList).histogram
@@ -2130,18 +2136,26 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             builder.append("\n----------\nTabulated:\n" + tabulated)
 
             val sumOfBottom10Bins = tabulated.take(10).toVector.sum
-            val normalisedSum = sumOfBottom10Bins / quotVector.size
+            val normalisedSum = sumOfBottom10Bins.toDouble / quotVector.size
             builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+            allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, normalisedSum)
           }else{
+            allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, 0.0)
             builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
           }
         }
         val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
-
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(builder.toString)
         bw.close()
       }
+      val statsAvg = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
+      allStatsBuilder.append(statsAvg.toString)
+
+      val file2 = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats.txt")
+      val bw2 = new BufferedWriter(new FileWriter(file2))
+      bw2.write(allStatsBuilder.toString)
+      bw2.close()
     } catch {
       case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace())
     }
