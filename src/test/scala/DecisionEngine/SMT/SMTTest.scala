@@ -1880,7 +1880,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
     val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
 
-    //CODE BELOW WORKS AT WORK
     /*try {
       val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
       println("modelFile exists and is file: " + (modelFile.exists && modelFile.isFile))
@@ -1890,7 +1889,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case e: Throwable => println("deserialisation error: " + e.getMessage)
     }*/
 
-    //for home
+    // home
     //val n1: Node[Int, Int] = deserializeTree(new File(serialiseDir + "SMT_9_3_2.0.tmp")).get.asInstanceOf[Node[Int, Int]]
     // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
 
@@ -1926,9 +1925,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }else{
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
     }
-
     generateReport(validationFiles,false,n1,valPredictions, allStatsPath)
-
     //Predictions for Attack traces
     generateReport(attackFiles,true,n1,attackPredictions, allStatsPath)
   }
