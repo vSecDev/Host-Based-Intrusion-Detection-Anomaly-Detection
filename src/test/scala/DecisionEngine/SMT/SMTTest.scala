@@ -2075,9 +2075,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       if (isAttack) { modeStr = "Attack" } else { modeStr = "Validation" }
 
       for (f <- srcFiles) {
-        val builder = StringBuilder.newBuilder
+     //   val builder = StringBuilder.newBuilder
         var predictionStr = modeStr + " - File name: " + f.getName
-        builder.append(predictionStr)
+     //   builder.append(predictionStr)
 
         counter += 1
         println(modeStr + ". Processing file " + counter + " - filename: " + f.getName)
@@ -2115,10 +2115,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
           val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
 
-          builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+         /* builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
           builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
           builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
-          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
+          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)*/
 
 
           val nBins = 50
@@ -2128,21 +2128,21 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
             val tabulated = h.map {
               _.size
             }
-            builder.append("\n----------\nTabulated:\n" + tabulated)
+         //   builder.append("\n----------\nTabulated:\n" + tabulated)
 
             val sumOfBottom10Bins = tabulated.take(10).toVector.sum
             val normalisedSum = sumOfBottom10Bins.toDouble / quotVector.size
-            builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+       //     builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
             allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, normalisedSum)
           }else{
             allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, 0.0)
-            builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
+       //     builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
           }
         }
-        val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
+      /*  val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(builder.toString)
-        bw.close()
+        bw.close()*/
       }
       val statsAvg = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
       allStatsBuilder.append(statsAvg.toString)
