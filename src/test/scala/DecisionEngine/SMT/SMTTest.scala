@@ -51,6 +51,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
+  private def fileStreamNoDirs(dir: File, extensions: Array[String]): Stream[File] =
+    try {
+      Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
+        .map { case (dirs, files) =>
+          files.filter(f => checkExtension(f,extensions)).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
+        } getOrElse {
+        Stream.empty
+      }
+    } catch {
+      case se: SecurityException => throw new DataException("SecurityException thrown during processing source files.", se)
+    }
+
 
   /*def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
     val fos = new FileOutputStream(target)
@@ -1833,7 +1845,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val smoothing = 1.0
     val prior = 1.0
 
-    var extensions = List("GHC")
+    var extensions = Array("GHC")
     var trainingDir = ""
     var validationDir = ""
     var attackDir = ""
@@ -1844,22 +1856,22 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     if (isHome) {
       trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
-      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
+      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
       serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\serialiseDir\\"
       valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\valPredictions\\"
       attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\attackPredictions\\"
     } else {
       trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
-      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\V1-CesarFTP-N1-1\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
       serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
       valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
       attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
 
     }
-    val trainingFiles = getListOfWindowsFiles(trainingDir, extensions)
-    val validationFiles = getListOfWindowsFiles(validationDir, extensions)
-    val attackFiles = getListOfWindowsFiles(attackDir, extensions)
+  //  val trainingFiles = getListOfWindowsFiles(trainingDir, extensions)
+    val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
 
     //var allVal = Vector()
 
@@ -1921,7 +1933,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     generateReport(attackFiles,true,n1,attackPredictions, allStatsPath)
   }
 
-  private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
+  private def generateReport(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
     try {
       var allStatsMap: Map[Double, Double] = Map()
       val allStatsBuilder = StringBuilder.newBuilder
