@@ -3,6 +3,7 @@ package DecisionEngine.SMT
 import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException, _}
 
 import Data.DataException
+import org.apache.commons.io.FilenameUtils
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
@@ -63,6 +64,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case se: SecurityException => throw new DataException("SecurityException thrown during processing source files.", se)
     }
 
+  private def checkExtension(f: File, extensions: Array[String]): Boolean = extensions.contains(FilenameUtils.getExtension(f.getName))
 
   /*def serializeTree(smt: SparseMarkovTree[Int, Int], target: File): Unit = {
     val fos = new FileOutputStream(target)
