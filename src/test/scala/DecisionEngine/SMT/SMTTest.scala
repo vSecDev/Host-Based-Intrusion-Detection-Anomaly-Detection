@@ -1,21 +1,18 @@
 package DecisionEngine.SMT
 
-import org.scalatest.{BeforeAndAfterAll, FunSuite}
+import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException, _}
+
+import Data.DataException
 import org.scalatest.Matchers._
-import java.io._
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-import org.apache.commons.io.{FileUtils, FilenameUtils}
-
-import scala.tools.nsc.classpath.FileUtils
-import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException}
-
-import Data.{DataException, DataModel}
+import scala.collection.immutable.ListMap
 
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -1866,7 +1863,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     //var allVal = Vector()
 
-
     //var counter = 0
     // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
@@ -1912,171 +1908,33 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
     println("\n----\nValidating files")
-   // counter = 0
+    var allStatsPath = ""
+    if(isHome){
+      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
+    }else{
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
+    }
 
-    generateReport(validationFiles,false,n1,valPredictions)
+    generateReport(validationFiles,false,n1,valPredictions, allStatsPath)
 
-  /*  try {
-      for (f <- validationFiles) {
-        val builder = StringBuilder.newBuilder
-        var predictionStr = "Validation File name: " + f.getName
-        builder.append(predictionStr)
-
-        counter += 1
-        println("Validation. Processing file " + counter + " - filename: " + f.getName)
-
-        val source = scala.io.Source.fromFile(f)
-        val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-        for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if (t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
-        }
-
-        var quotVector: Vector[Double] = Vector()
-        for (t <- trainingData_whole) {
-
-          val pred = n1.predict(t._1, t._2)
-          var quotient = 0.0
-          if (pred._2 != 0.0) {
-            quotient = pred._1 / pred._2
-          }
-          quotVector = quotVector :+ quotient
-          builder.append("\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
-        }
-
-
-        if (quotVector.nonEmpty) {
-          val quotMax = quotVector max
-          val quotMin = quotVector min
-
-          val lowValCount1p0 = quotVector.count(_ < 1.0)
-          val lowValCount0p8 = quotVector.count(_ < 0.8)
-          val lowValCount0p6 = quotVector.count(_ < 0.6)
-          val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
-          val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
-          val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
-
-          val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-
-          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
-          builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
-          builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
-          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
-
-          val h = Distribution(50, quotVector.toList).histogram
-          builder.append("\n----------\nHistogram:\n" + h)
-          val tabulated = h.map {
-            _.size
-          }
-
-
-          builder.append("\n----------\nTabulated:\n" + tabulated)
-
-          val sumOfBottom10Bins = tabulated.take(10).toVector.sum
-          val normalisedSum = sumOfBottom10Bins / quotVector.size
-          builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
-
-        }
-
-        val file = new File(valPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
-        val bw = new BufferedWriter(new FileWriter(file))
-        bw.write(builder.toString)
-        bw.close()
-      }
-    } catch {
-      case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
-    }*/
-
-    //Predict6ions for Attack traces
-
-    generateReport(attackFiles,true,n1,attackPredictions)
- /*   try {
-      for (f <- attackFiles) {
-        val builder = StringBuilder.newBuilder
-        var predictionStr = "Attack File name: " + f.getName
-        builder.append(predictionStr)
-
-        counter += 1
-        println("Attack. Processing file " + counter + " - filename: " + f.getName)
-
-        val source = scala.io.Source.fromFile(f)
-        val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-        for (t <- wholeTrace.sliding(maxDepth, 1)) {
-          if (t.size == maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
-        }
-
-        var quotVector: Vector[Double] = Vector()
-        for (t <- trainingData_whole) {
-          val pred = n1.predict(t._1, t._2)
-          var quotient = 0.0
-          if (pred._2 != 0.0) {
-            quotient = pred._1 / pred._2
-          }
-          quotVector = quotVector :+ quotient
-          builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
-        }
-
-        if (quotVector.nonEmpty) {
-          val quotMax = quotVector max
-          val quotMin = quotVector min
-
-          val lowValCount1p0 = quotVector.count(_ < 1.0)
-          val lowValCount0p8 = quotVector.count(_ < 0.8)
-          val lowValCount0p6 = quotVector.count(_ < 0.6)
-          val lowValPercentage1p0 = (lowValCount1p0 / quotVector.size.toDouble) * 100.00
-          val lowValPercentage0p8 = (lowValCount0p8 / quotVector.size.toDouble) * 100.00
-          val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
-
-          val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
-
-          builder.append("\n----------\nNr of subtraces: " + quotVector.size + "Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
-          builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
-          builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
-          builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)
-
-          val h = Distribution(50, quotVector.toList).histogram
-          builder.append("\n----------\nHistogram:\n" + h)
-          val tabulated = h.map {
-            _.size
-          }
-
-
-          builder.append("\n----------\nTabulated:\n" + tabulated)
-
-          val sumOfBottom10Bins = tabulated.take(10).toVector.sum
-          val normalisedSum = sumOfBottom10Bins / quotVector.size
-          builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
-
-        }
-
-        val file = new File(attackPredictions + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
-        val bw = new BufferedWriter(new FileWriter(file))
-        bw.write(builder.toString)
-        bw.close()
-      }
-    } catch {
-      case e: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing); println("message:\n" + e.getMessage)
-    }*/
+    //Predictions for Attack traces
+    generateReport(attackFiles,true,n1,attackPredictions, allStatsPath)
   }
 
-  private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String) {
+  private def generateReport(srcFiles: List[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
     try {
-      //var allStats: String = ""
+      var allStatsMap: Map[Double, Double] = Map()
       val allStatsBuilder = StringBuilder.newBuilder
       //(qLt06, qLt08, qLt10, pLQ06, pLQ08, pLQ10, normalisedSum)
       var allStatsVector: Vector[(Double, Double, Double, Double, Double, Double, Double)] = Vector()
       var counter = 0
+      var subTraceCounter = 0
       var modeStr = ""
       if (isAttack) { modeStr = "Attack" } else { modeStr = "Validation" }
 
       for (f <- srcFiles) {
      //   val builder = StringBuilder.newBuilder
-        var predictionStr = modeStr + " - File name: " + f.getName
+     //   var predictionStr = modeStr + " - File name: " + f.getName
      //   builder.append(predictionStr)
 
         counter += 1
@@ -2103,6 +1961,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         }
 
         if (quotVector.nonEmpty) {
+          subTraceCounter = quotVector.length
           val quotMax = quotVector max
           val quotMin = quotVector min
 
@@ -2114,6 +1973,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           val lowValPercentage0p6 = (lowValCount0p6 / quotVector.size.toDouble) * 100.00
 
           val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
+
+          var statsMap: Map[Double,Double] = Map()
+          for(x <- 0.0 to 1.5 by 0.1){
+            //val c = quotVector.count(_<x).toDouble
+            statsMap = statsMap + (x -> quotVector.count(_<x).toDouble)
+          }
+
+          allStatsMap = merged(allStatsMap, statsMap)
+
+
 
          /* builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
           builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
@@ -2144,10 +2013,33 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         bw.write(builder.toString)
         bw.close()*/
       }
-      val statsAvg = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
-      allStatsBuilder.append(statsAvg.toString)
+      val statsSum = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
+      val statsAvg = (statsSum._1/subTraceCounter,statsSum._2/subTraceCounter,statsSum._3/subTraceCounter,statsSum._4/subTraceCounter,statsSum._5/subTraceCounter,statsSum._6/subTraceCounter, statsSum._7/subTraceCounter)
 
-      val file2 = new File("C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"+ modeStr + ".txt")
+      allStatsBuilder.append("\n-----\nStats (Sum):\n" + statsSum.toString)
+      allStatsBuilder.append("\n-----\nStats (Avg):\n" + statsAvg.toString)
+
+      allStatsBuilder.append("\n\n------------\nSorted Sum:\n\n")
+      val sorted = ListMap(allStatsMap.toSeq.sortBy(_._1):_*)
+      for(s <- sorted){
+        allStatsBuilder.append("\n"+s)
+      }
+
+      allStatsBuilder.append("\n\n------------\nSorted Avg:\n\n")
+      val sortedAvg = sorted.map(x => (x._1, x._2/subTraceCounter))
+      for(s <- sortedAvg){
+        allStatsBuilder.append("\n"+s)
+      }
+
+
+
+
+     /* allStatsBuilder.append("\n-----\nStats - Map (Avg):\n" + sortedAvg.toString)
+      allStatsBuilder.append("\n-----\nStats - Map (Sum):\n" + sorted.toString)*/
+
+
+
+      val file2 = new File(allStatsPath + modeStr + ".txt")
       val bw2 = new BufferedWriter(new FileWriter(file2))
       bw2.write(allStatsBuilder.toString)
       bw2.close()
@@ -2155,4 +2047,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace())
     }
   }
+
+
+  def merged(map1: Map[Double, Double], map2: Map[Double,Double]) = (map1 /: map2) { case (map, (k,v)) =>
+    map + ( k -> (v + map.getOrElse(k, 0.0)) )
+  }
+ /* test("asdf"){
+    val m1 = Map(1.1 ->200.0, 1.2 -> 300.0)
+    val m2 = Map(1.1 -> 500.0, 1.2 -> 50.0, 1.3 -> 0.1)
+
+    val mNew = merged(m1,m2)
+    println("mNew: " + mNew)
+  }*/
 }
