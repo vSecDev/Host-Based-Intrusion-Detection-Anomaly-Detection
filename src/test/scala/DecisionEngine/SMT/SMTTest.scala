@@ -1959,11 +1959,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           quotVector = quotVector :+ quotient
           //builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
+        println("File: " + f.getName + " - number of predictions (length): " + quotVector.length + " -- size: " +quotVector.size)
 
         if (quotVector.nonEmpty) {
-          subTraceCounter = quotVector.length
-          val quotMax = quotVector max
-          val quotMin = quotVector min
+          subTraceCounter += quotVector.length
+          /*val quotMax = quotVector max
+          val quotMin = quotVector min*/
 
           val lowValCount1p0 = quotVector.count(_ < 1.0)
           val lowValCount0p8 = quotVector.count(_ < 0.8)
@@ -2014,7 +2015,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         bw.close()*/
       }
       val statsSum = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
-      val statsAvg = (statsSum._1/subTraceCounter,statsSum._2/subTraceCounter,statsSum._3/subTraceCounter,statsSum._4/subTraceCounter,statsSum._5/subTraceCounter,statsSum._6/subTraceCounter, statsSum._7/subTraceCounter)
+      val statsAvg = (statsSum._1* 100.0/subTraceCounter,statsSum._2* 100.0/subTraceCounter,statsSum._3* 100.0/subTraceCounter,statsSum._4* 100.0/subTraceCounter,statsSum._5* 100.0/subTraceCounter,statsSum._6* 100.0/subTraceCounter, statsSum._7* 100.0/subTraceCounter)
 
       allStatsBuilder.append("\n-----\nStats (Sum):\n" + statsSum.toString)
       allStatsBuilder.append("\n-----\nStats (Avg):\n" + statsAvg.toString)
@@ -2026,12 +2027,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
 
       allStatsBuilder.append("\n\n------------\nSorted Avg:\n\n")
-      val sortedAvg = sorted.map(x => (x._1, x._2/subTraceCounter))
+      val sortedAvg = sorted.map(x => (x._1, (x._2 * 100.0) /subTraceCounter))
       for(s <- sortedAvg){
         allStatsBuilder.append("\n"+s)
       }
 
-
+      allStatsBuilder.append("\n\nSubtrace count (all files): " + subTraceCounter)
 
 
      /* allStatsBuilder.append("\n-----\nStats - Map (Avg):\n" + sortedAvg.toString)
