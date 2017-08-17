@@ -2095,6 +2095,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("Classify - Cesar") {
+    val maxDepth = 12
+    val maxPhi = 3
+    val maxSeqCount = 50
+    val smoothing = 1.0
+    val prior = 1.0
 
     var extensions = Array("GHC")
     var trainingDir = ""
@@ -2120,16 +2125,37 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
 
     }
-    // val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
+    val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
     val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
     val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
 
     var counter = 0
-    val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
-    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
+    /*val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]*/
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
 
 
+    try {
+      for (f <- trainingFiles) {
+        counter += 1
+        println("Training. Processing file " + counter + " - filename: " + f.getName)
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(maxDepth, 1)) {
+          if (t.size == maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+        }
 
+        for (t <- trainingData_whole) {
+          n1.learn(t._1, t._2)
+        }
+      }
+      serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+    } catch {
+      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+    }
 
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
