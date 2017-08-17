@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = false
+  val isHome = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -52,11 +52,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       List[File]()
     }
   }
+
   private def fileStreamNoDirs(dir: File, extensions: Array[String]): Stream[File] =
     try {
       Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
         .map { case (dirs, files) =>
-          files.filter(f => checkExtension(f,extensions)).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
+          files.filter(f => checkExtension(f, extensions)).append(dirs.flatMap(fileStreamNoDirs(_, extensions)))
         } getOrElse {
         Stream.empty
       }
@@ -1841,7 +1842,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
   test("CREATE REPORTS") {
-    val maxDepth = 10
+    val maxDepth = 12
     val maxPhi = 3
     val maxSeqCount = 50
     val smoothing = 1.0
@@ -1871,16 +1872,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
 
     }
-  //  val trainingFiles = getListOfWindowsFiles(trainingDir, extensions)
+    val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
     val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
     val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
 
     //var allVal = Vector()
 
-    //var counter = 0
-    // val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
-    val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
-    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
+    var counter = 0
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    /*val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]*/
 
     /*try {
       val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
@@ -1896,7 +1897,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     // val n1: Node[Int, Int] = deserialise(new File(serialiseDir + "SMT_5_0_1.0.tmp")).get.asInstanceOf[Node[Int, Int]]
 
     //Train and save model
-    /* try {
+    try {
       for (f <- trainingFiles) {
         counter += 1
         println("Training. Processing file " + counter + " - filename: " + f.getName)
@@ -1916,23 +1917,23 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
-    }*/
+    }
 
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
     println("\n----\nValidating files")
     var allStatsPath = ""
-    if(isHome){
+    if (isHome) {
       allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
-    }else{
+    } else {
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
     }
-    generateReport(validationFiles,false,n1,valPredictions, allStatsPath)
+    generateReport(validationFiles, false, n1, valPredictions, allStatsPath)
     //Predictions for Attack traces
-    generateReport(attackFiles,true,n1,attackPredictions, allStatsPath)
+    generateReport(attackFiles, true, n1, attackPredictions, allStatsPath)
   }
 
-  test("CREATE REPORTS = EACH ATTACK TYPE") {
+  /*  test("CREATE REPORTS = EACH ATTACK TYPE") {
 
     var extensions = Array("GHC")
     var validationDir = ""
@@ -1955,7 +1956,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       //Predictions for Attack traces
       generateReport(attackFiles,true,n1,"", allStatsPath)
     }
-  }
+  }*/
 
 
   private def generateReport(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
@@ -1967,12 +1968,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       var counter = 0
       var subTraceCounter = 0
       var modeStr = ""
-      if (isAttack) { modeStr = "Attack" } else { modeStr = "Validation" }
+      if (isAttack) {
+        modeStr = "Attack"
+      } else {
+        modeStr = "Validation"
+      }
 
       for (f <- srcFiles) {
-     //   val builder = StringBuilder.newBuilder
-     //   var predictionStr = modeStr + " - File name: " + f.getName
-     //   builder.append(predictionStr)
+        //   val builder = StringBuilder.newBuilder
+        //   var predictionStr = modeStr + " - File name: " + f.getName
+        //   builder.append(predictionStr)
 
         counter += 1
         println(modeStr + ". Processing file " + counter + " - filename: " + f.getName)
@@ -1996,7 +2001,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           quotVector = quotVector :+ quotient
           //builder.append("\n----------\nsubsegment: " + t.toString + " - prediction: " + pred.toString + " ---> P = " + quotient.toString)
         }
-        println("File: " + f.getName + " - number of predictions (length): " + quotVector.length + " -- size: " +quotVector.size)
+        println("File: " + f.getName + " - number of predictions (length): " + quotVector.length + " -- size: " + quotVector.size)
 
         if (quotVector.nonEmpty) {
           subTraceCounter += quotVector.length
@@ -2012,17 +2017,16 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
           val quotientAvg = quotVector.foldLeft(0.0)(_ + _) / quotVector.foldLeft(0.0)((r, c) => r + 1)
 
-          var statsMap: Map[Double,Double] = Map()
-          for(x <- 0.0 to 1.5 by 0.1){
+          var statsMap: Map[Double, Double] = Map()
+          for (x <- 0.0 to 1.5 by 0.1) {
             //val c = quotVector.count(_<x).toDouble
-            statsMap = statsMap + (x -> quotVector.count(_<x).toDouble)
+            statsMap = statsMap + (x -> quotVector.count(_ < x).toDouble)
           }
 
           allStatsMap = merged(allStatsMap, statsMap)
 
 
-
-         /* builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
+          /* builder.append("\n----------\nNr of subtraces: " + quotVector.size + " - Max quotient: " + quotMax + " - Min quotient: " + quotMin + " - Quotient average: " + quotientAvg)
           builder.append("\nNr of quotients less than 0.6: " + lowValCount0p6 + " - percentage of low quotients: " + lowValPercentage0p6)
           builder.append("\nNr of quotients less than 0.8: " + lowValCount0p8 + " - percentage of low quotients: " + lowValPercentage0p8)
           builder.append("\nNr of quotients less than 1.0: " + lowValCount1p0 + " - percentage of low quotients: " + lowValPercentage1p0)*/
@@ -2031,50 +2035,49 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           val nBins = 50
           if (quotVector.length > nBins) {
             val h = Distribution(nBins, quotVector.toList).histogram
-           // builder.append("\n----------\nHistogram:\n" + h)
+            // builder.append("\n----------\nHistogram:\n" + h)
             val tabulated = h.map {
               _.size
             }
-         //   builder.append("\n----------\nTabulated:\n" + tabulated)
+            //   builder.append("\n----------\nTabulated:\n" + tabulated)
 
             val sumOfBottom10Bins = tabulated.take(10).toVector.sum
             val normalisedSum = sumOfBottom10Bins.toDouble / quotVector.size
-       //     builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
+            //     builder.append("\n----\nLength normalised sum of bottom 10 bins: " + normalisedSum)
             allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, normalisedSum)
-          }else{
+          } else {
             allStatsVector = allStatsVector :+ (lowValCount0p6.toDouble, lowValPercentage0p6, lowValCount0p8.toDouble, lowValPercentage0p8, lowValCount1p0.toDouble, lowValPercentage1p0, 0.0)
-       //     builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
+            //     builder.append("data length (" + quotVector.length + ") is not larger than nBins (" + nBins + ")")
           }
         }
-      /*  val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
+        /*  val file = new File(predictionsPath + FilenameUtils.getBaseName(f.getCanonicalPath) + ".VAL")
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(builder.toString)
         bw.close()*/
       }
-      val statsSum = allStatsVector.foldLeft(0.0,0.0,0.0,0.0,0.0,0.0,0.0){ case ((acc1,acc2,acc3,acc4,acc5,acc6,acc7), (a,b,c,d,e,f,g)) => (acc1+a,acc2+b,acc3+c,acc4+d,acc5+e,acc6+f,acc7+g) }
-      val statsAvg = (statsSum._1* 100.0/subTraceCounter,statsSum._2* 100.0/subTraceCounter,statsSum._3* 100.0/subTraceCounter,statsSum._4* 100.0/subTraceCounter,statsSum._5* 100.0/subTraceCounter,statsSum._6* 100.0/subTraceCounter, statsSum._7* 100.0/subTraceCounter)
+      val statsSum = allStatsVector.foldLeft(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0) { case ((acc1, acc2, acc3, acc4, acc5, acc6, acc7), (a, b, c, d, e, f, g)) => (acc1 + a, acc2 + b, acc3 + c, acc4 + d, acc5 + e, acc6 + f, acc7 + g) }
+      val statsAvg = (statsSum._1 * 100.0 / subTraceCounter, statsSum._2 * 100.0 / subTraceCounter, statsSum._3 * 100.0 / subTraceCounter, statsSum._4 * 100.0 / subTraceCounter, statsSum._5 * 100.0 / subTraceCounter, statsSum._6 * 100.0 / subTraceCounter, statsSum._7 * 100.0 / subTraceCounter)
 
       allStatsBuilder.append("\n-----\nStats (Sum):\n" + statsSum.toString)
       allStatsBuilder.append("\n-----\nStats (Avg):\n" + statsAvg.toString)
 
       allStatsBuilder.append("\n\n------------\nSorted Sum:\n\n")
-      val sorted = ListMap(allStatsMap.toSeq.sortBy(_._1):_*)
-      for(s <- sorted){
-        allStatsBuilder.append("\n"+s)
+      val sorted = ListMap(allStatsMap.toSeq.sortBy(_._1): _*)
+      for (s <- sorted) {
+        allStatsBuilder.append("\n" + s)
       }
 
       allStatsBuilder.append("\n\n------------\nSorted Avg:\n\n")
-      val sortedAvg = sorted.map(x => (x._1, (x._2 * 100.0) /subTraceCounter))
-      for(s <- sortedAvg){
-        allStatsBuilder.append("\n"+s)
+      val sortedAvg = sorted.map(x => (x._1, (x._2 * 100.0) / subTraceCounter))
+      for (s <- sortedAvg) {
+        allStatsBuilder.append("\n" + s)
       }
 
       allStatsBuilder.append("\n\nSubtrace count (all files): " + subTraceCounter)
 
 
-     /* allStatsBuilder.append("\n-----\nStats - Map (Avg):\n" + sortedAvg.toString)
+      /* allStatsBuilder.append("\n-----\nStats - Map (Avg):\n" + sortedAvg.toString)
       allStatsBuilder.append("\n-----\nStats - Map (Sum):\n" + sorted.toString)*/
-
 
 
       val file2 = new File(allStatsPath + modeStr + ".txt")
@@ -2087,7 +2090,123 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-  def merged(map1: Map[Double, Double], map2: Map[Double,Double]) = (map1 /: map2) { case (map, (k,v)) =>
-    map + ( k -> (v + map.getOrElse(k, 0.0)) )
+  def merged(map1: Map[Double, Double], map2: Map[Double, Double]) = (map1 /: map2) { case (map, (k, v)) =>
+    map + (k -> (v + map.getOrElse(k, 0.0)))
+  }
+
+  test("Classify - Cesar") {
+
+    var extensions = Array("GHC")
+    var trainingDir = ""
+    var validationDir = ""
+    var attackDir = ""
+    var serialiseDir = ""
+    var valPredictions = ""
+    var attackPredictions = ""
+
+    if (isHome) {
+      trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+      serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\serialiseDir\\"
+      valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\valPredictions\\"
+      attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\attackPredictions\\"
+    } else {
+      trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
+      serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
+      valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
+      attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
+
+    }
+    // val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
+    val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
+
+    var counter = 0
+    val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
+
+
+
+
+    //Validate files
+    println("Training finished. n1 root children size: " + n1.getChildren.size)
+    println("\n----\nValidating files")
+    var allStatsPath = ""
+    if (isHome) {
+      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
+    } else {
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
+    }
+
+
+    /*classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, 0.1, 10.0 )
+    classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, 0.1, 10.0)*/
+
+    classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, 1.0, 33.0 )
+    classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, 1.0, 33.0)
+
+
+  }
+
+  private def classifyFiles(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String, threshold: Double, tolerance: Double) {
+    try {
+      var traceCount = 0
+      var anomalousTraceCount = 0
+      var normalTraceCount = 0
+      var modeStr = ""
+      val sb = StringBuilder.newBuilder
+      if (isAttack) {
+        sb.append("---- Attack traces ----\n"); modeStr = "Attack"
+      } else {
+        sb.append("---- Normal traces ----\n"); modeStr = "Validation"
+      }
+
+      for (f <- srcFiles) {
+
+
+        println(modeStr + ". Processing file " + traceCount + " - filename: " + f.getName)
+
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(n1.maxDepth, 1)) {
+          if (t.size == n1.maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(n1.maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        var quotVector: Vector[Double] = Vector()
+        for (t <- trainingData_whole) {
+          val pred = n1.predict(t._1, t._2)
+          var quotient = 0.0
+          if (pred._2 != 0.0) {
+            quotient = pred._1 / pred._2
+          }
+          quotVector = quotVector :+ quotient
+        }
+
+
+        if (quotVector.nonEmpty) {
+          traceCount += 1
+          val anomalyCount = quotVector.count(_ < threshold)
+          val anomalyPercentage = (anomalyCount / quotVector.size.toDouble) * 100.00
+          var isAnomaly = if (anomalyPercentage < tolerance) false else true
+          var result = if (isAnomaly)  "ANOMALY" else "NORMAL"
+
+          sb.append("\nfile: " + f.getName + " - " + anomalyCount + " anomalous subtraces out of " + quotVector.size + ". - " + anomalyPercentage + "% anomalous. Classification: " + result)
+          if (isAnomaly) anomalousTraceCount += 1 else normalTraceCount += 1
+        }
+      }
+      sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount)
+      val file2 = new File(allStatsPath + modeStr + ".txt")
+      val bw2 = new BufferedWriter(new FileWriter(file2))
+      bw2.write(sb.toString)
+      bw2.close()
+    } catch {
+      case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace())
+    }
   }
 }
