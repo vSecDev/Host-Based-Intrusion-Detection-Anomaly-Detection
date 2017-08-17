@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -1932,6 +1932,32 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     generateReport(attackFiles,true,n1,attackPredictions, allStatsPath)
   }
 
+  test("CREATE REPORTS = EACH ATTACK TYPE") {
+
+    var extensions = Array("GHC")
+    var validationDir = ""
+    var attackDir = ""
+    var valPredictions = ""
+    var attackPredictions = ""
+    var serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\models\\"
+    val modelFile = new File(serialiseDir + "SMT_10_3_1.0.tmp")
+    val n1: Node[Int, Int] = deserialise(modelFile).get.asInstanceOf[Node[Int, Int]]
+
+    for(i <- 1 to 11){
+      validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main" + i + "\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main" + i + "\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
+
+      val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+      val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
+
+      var allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main" + i + "\\"
+      generateReport(validationFiles,false,n1,"", allStatsPath)
+      //Predictions for Attack traces
+      generateReport(attackFiles,true,n1,"", allStatsPath)
+    }
+  }
+
+
   private def generateReport(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
     try {
       var allStatsMap: Map[Double, Double] = Map()
@@ -2064,11 +2090,5 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   def merged(map1: Map[Double, Double], map2: Map[Double,Double]) = (map1 /: map2) { case (map, (k,v)) =>
     map + ( k -> (v + map.getOrElse(k, 0.0)) )
   }
- /* test("asdf"){
-    val m1 = Map(1.1 ->200.0, 1.2 -> 300.0)
-    val m2 = Map(1.1 -> 500.0, 1.2 -> 50.0, 1.3 -> 0.1)
 
-    val mNew = merged(m1,m2)
-    println("mNew: " + mNew)
-  }*/
 }
