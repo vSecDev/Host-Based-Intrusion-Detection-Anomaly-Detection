@@ -2090,5 +2090,4 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   def merged(map1: Map[Double, Double], map2: Map[Double,Double]) = (map1 /: map2) { case (map, (k,v)) =>
     map + ( k -> (v + map.getOrElse(k, 0.0)) )
   }
-
 }
