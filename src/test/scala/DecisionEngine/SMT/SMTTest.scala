@@ -2111,7 +2111,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     var goodSettings: Array[String] = Array()
 
-    for(i <- 6 to 10; j <- 2 to 5; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.1; n <- 20.0 to 35.0 by 1.0){
+    for(i <- 6 to 10; j <- 2 to 5; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.2; n <- 20.0 to 35.0 by 5.0){
       if(createReports(i,j,k,l,m,n)){
         println("Good configuration found: maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n)
         val goodSettStr = "maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n
