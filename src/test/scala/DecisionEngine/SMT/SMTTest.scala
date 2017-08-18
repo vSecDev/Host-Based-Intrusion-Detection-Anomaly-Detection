@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   /* val serializePath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\"
@@ -2096,16 +2096,24 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   test("Learn to learn"){
     var allStatsPath = ""
-    if (isHome) {
+    //Windows
+    /*if (isHome) {
       allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
     } else {
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
+    }*/
+    //Unix
+    if (isHome) {
+      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStatsUNIX"
+    } else {
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStatsUNIX"
     }
 
     var goodSettings: Array[String] = Array()
 
-    for(i <- 6 to 10; j <- 0 to 5; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.1; n <- 20.0 to 35.0 by 1.0){
+    for(i <- 6 to 10; j <- 2 to 5; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.1; n <- 20.0 to 35.0 by 1.0){
       if(createReports(i,j,k,l,m,n)){
+        println("Good configuration found: maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n)
         val goodSettStr = "maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n
         goodSettings = goodSettings :+ goodSettStr
       }
@@ -2128,15 +2136,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val threshold = _threshold
     val tolerance = _tolerance
 
-    var extensions = Array("GHC")
+    //Windows
+    //var extensions = Array("GHC")
+    //Unix
+    var extensions = Array("txt")
     var trainingDir = ""
     var validationDir = ""
     var attackDir = ""
     var serialiseDir = ""
     var valPredictions = ""
     var attackPredictions = ""
-
-    if (isHome) {
+    //Windows
+    /*if (isHome) {
       trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
       attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
@@ -2151,7 +2162,26 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
       attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
 
+    }*/
+    //Unix
+    if (isHome) {
+      /*trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+      serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\serialiseDir\\"
+      valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\valPredictions\\"
+      attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\attackPredictions\\"*/
+    } else {
+      trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Training_Data_Master\\"
+      validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Validation_Data_Master\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Attack_Data_Master\\AddUser\\"
+      serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\serialised\\"
+      //valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
+      //attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
+
     }
+
+
     val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
     val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
     val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
@@ -2163,9 +2193,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
 
     try {
+      println("Training")
       for (f <- trainingFiles) {
         counter += 1
-        println("Training. Processing file " + counter + " - filename: " + f.getName)
+        //println("Training. Processing file " + counter + " - filename: " + f.getName)
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
         val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
@@ -2186,14 +2217,20 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     //Validate files
     println("Training finished. n1 root children size: " + n1.getChildren.size)
-    println("\n----\nValidating files")
+    println("Validating")
     var allStatsPath = ""
-    if (isHome) {
+    //Windows
+   /* if (isHome) {
       allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
     } else {
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
+    }*/
+    //Unix
+    if (isHome) {
+      //allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
+    } else {
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\reports\\allStats"
     }
-
 
     val resVal1 = classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, threshold, tolerance)
     val sb1 = resVal1._1
@@ -2205,6 +2242,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     bw2.write(sb1.toString)
     bw2.close()*/
 
+    println("Classifying")
     val resVal2 = classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, threshold, tolerance)
     val sb2 = resVal2._1
     val isGoodAttackPrediction = resVal2._2
@@ -2213,6 +2251,8 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val bw3 = new BufferedWriter(new FileWriter(file3))
     bw3.write(sb2.toString)
     bw3.close()*/
+
+    if(isGoodValPrediction && isGoodAttackPrediction) sb2.toString
 
     (isGoodValPrediction && isGoodAttackPrediction)
   }
@@ -2233,7 +2273,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       for (f <- srcFiles) {
 
 
-        println(modeStr + ". Processing file " + traceCount + " - filename: " + f.getName)
+        //println(modeStr + ". Processing file " + traceCount + " - filename: " + f.getName)
 
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
@@ -2268,10 +2308,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }
 
       var isGoodPrediction: Boolean = false
-      if(isAttack && ((anomalousTraceCount.toDouble/traceCount.toDouble)*100 > 75)) isGoodPrediction = true
-      else if(!isAttack && ((normalTraceCount.toDouble/traceCount.toDouble)*100 < 25)) isGoodPrediction = true
+      if(isAttack && ((anomalousTraceCount.toDouble/traceCount.toDouble)*100 > 90)) isGoodPrediction = true
+      else if(!isAttack && ((normalTraceCount.toDouble/traceCount.toDouble)*100 < 10)) isGoodPrediction = true
 
-      (sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount), isGoodPrediction)
+      (sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount + "\nAnomaly detection: " + ((anomalousTraceCount.toDouble/traceCount.toDouble)*100) + "%\nNormal detaction: " + ((normalTraceCount.toDouble/traceCount.toDouble)*100) + "%\nisAttack: " + isAttack  ), isGoodPrediction)
 /*      val file2 = new File(allStatsPath + modeStr + ".txt")
       val bw2 = new BufferedWriter(new FileWriter(file2))
       bw2.write(sb.toString)
