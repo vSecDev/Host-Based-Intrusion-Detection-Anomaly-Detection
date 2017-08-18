@@ -2200,19 +2200,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val isGoodValPrediction = resVal1._2
     sb1.append("\n\n------\nValidation:\nmaxDepth: " + maxDepth + "\nmaxPhi: " + maxPhi + "\nsmoothing: " + smoothing + "\nprior: " + prior + "\nthreshold: " + threshold + "\ntolerance: " + tolerance)
     //_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double
-    val file2 = new File(allStatsPath + "Validation_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
+    /*val file2 = new File(allStatsPath + "Validation_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
     val bw2 = new BufferedWriter(new FileWriter(file2))
     bw2.write(sb1.toString)
-    bw2.close()
+    bw2.close()*/
 
     val resVal2 = classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, threshold, tolerance)
     val sb2 = resVal2._1
     val isGoodAttackPrediction = resVal2._2
     sb2.append("\n\n------\nAttack:\nmaxDepth: " + maxDepth + "\nmaxPhi: " + maxPhi + "\nsmoothing: " + smoothing + "\nprior: " + prior + "\nthreshold: " + threshold + "\ntolerance: " + tolerance)
-    val file3 = new File(allStatsPath + "Attack_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
+   /* val file3 = new File(allStatsPath + "Attack_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
     val bw3 = new BufferedWriter(new FileWriter(file3))
     bw3.write(sb2.toString)
-    bw3.close()
+    bw3.close()*/
 
     (isGoodValPrediction && isGoodAttackPrediction)
   }
