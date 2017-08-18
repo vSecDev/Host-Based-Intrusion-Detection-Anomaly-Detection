@@ -2094,12 +2094,39 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     map + (k -> (v + map.getOrElse(k, 0.0)))
   }
 
-  test("Classify - Cesar") {
-    val maxDepth = 12
-    val maxPhi = 3
+  test("Learn to learn"){
+    var allStatsPath = ""
+    if (isHome) {
+      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\allStats"
+    } else {
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
+    }
+
+    var goodSettings: Array[String] = Array()
+
+    for(i <- 6 to 10; j <- 0 to 5; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.1; n <- 20.0 to 35.0 by 1.0){
+      if(createReports(i,j,k,l,m,n)){
+        val goodSettStr = "maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n
+        goodSettings = goodSettings :+ goodSettStr
+      }
+    }
+
+    val sb4 = new StringBuilder
+    sb4.append(goodSettings.toString)
+    val file4 = new File(allStatsPath + "GOODSETTINGS.txt")
+    val bw4 = new BufferedWriter(new FileWriter(file4))
+    bw4.write(sb4.toString)
+    bw4.close()
+  }
+
+  def createReports(_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double): Boolean = {
+    val maxDepth = _maxDepth
+    val maxPhi = _maxPhi
     val maxSeqCount = 50
-    val smoothing = 1.0
-    val prior = 1.0
+    val smoothing = _smoothing
+    val prior = _prior
+    val threshold = _threshold
+    val tolerance = _tolerance
 
     var extensions = Array("GHC")
     var trainingDir = ""
@@ -2168,16 +2195,29 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
 
 
-    /*classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, 0.1, 10.0 )
-    classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, 0.1, 10.0)*/
+    val resVal1 = classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, threshold, tolerance)
+    val sb1 = resVal1._1
+    val isGoodValPrediction = resVal1._2
+    sb1.append("\n\n------\nValidation:\nmaxDepth: " + maxDepth + "\nmaxPhi: " + maxPhi + "\nsmoothing: " + smoothing + "\nprior: " + prior + "\nthreshold: " + threshold + "\ntolerance: " + tolerance)
+    //_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double
+    val file2 = new File(allStatsPath + "Validation_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
+    val bw2 = new BufferedWriter(new FileWriter(file2))
+    bw2.write(sb1.toString)
+    bw2.close()
 
-    classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, 1.0, 33.0 )
-    classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, 1.0, 33.0)
+    val resVal2 = classifyFiles(attackFiles, true, n1, attackPredictions, allStatsPath, threshold, tolerance)
+    val sb2 = resVal2._1
+    val isGoodAttackPrediction = resVal2._2
+    sb2.append("\n\n------\nAttack:\nmaxDepth: " + maxDepth + "\nmaxPhi: " + maxPhi + "\nsmoothing: " + smoothing + "\nprior: " + prior + "\nthreshold: " + threshold + "\ntolerance: " + tolerance)
+    val file3 = new File(allStatsPath + "Attack_" + maxDepth + "_" + maxPhi + "_" + smoothing + "_" + prior + "_" + threshold + "_" + tolerance + ".txt")
+    val bw3 = new BufferedWriter(new FileWriter(file3))
+    bw3.write(sb2.toString)
+    bw3.close()
 
-
+    (isGoodValPrediction && isGoodAttackPrediction)
   }
 
-  private def classifyFiles(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String, threshold: Double, tolerance: Double) {
+  private def classifyFiles(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String, threshold: Double, tolerance: Double): (StringBuilder,Boolean) = {
     try {
       var traceCount = 0
       var anomalousTraceCount = 0
@@ -2226,13 +2266,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           if (isAnomaly) anomalousTraceCount += 1 else normalTraceCount += 1
         }
       }
-      sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount)
-      val file2 = new File(allStatsPath + modeStr + ".txt")
+
+      var isGoodPrediction: Boolean = false
+      if(isAttack && ((anomalousTraceCount.toDouble/traceCount.toDouble)*100 > 75)) isGoodPrediction = true
+      else if(!isAttack && ((normalTraceCount.toDouble/traceCount.toDouble)*100 < 25)) isGoodPrediction = true
+
+      (sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount), isGoodPrediction)
+/*      val file2 = new File(allStatsPath + modeStr + ".txt")
       val bw2 = new BufferedWriter(new FileWriter(file2))
       bw2.write(sb.toString)
-      bw2.close()
+      bw2.close()*/
     } catch {
-      case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace())
+      case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace()); (new StringBuilder("EXCEPTION THROWN IN CLASSIFY FILES"), false)
     }
   }
 }
