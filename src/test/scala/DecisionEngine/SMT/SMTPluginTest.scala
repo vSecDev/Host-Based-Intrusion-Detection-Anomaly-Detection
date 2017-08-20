@@ -54,7 +54,7 @@ class SMTPluginTest extends  FunSuite {
 
   test("SMTPlugin - configuration works") {
 
-    val settings = new SMTSettings(maxDepth, maxPhi, maxSeqCount, smoothing, prior, ints)
+    val settings = new SMTSettings(maxDepth, maxPhi, maxSeqCount, smoothing, prior, ints, 0.0, 0.0)
     val config: DecisionEngineConfig = new SMTConfig
     config.asInstanceOf[SMTConfig].storeSettings(settings)
     assert(config.getSettings.get == settings)
@@ -86,7 +86,7 @@ class SMTPluginTest extends  FunSuite {
     assert(!plugin.configure(emptyConfig))
   }
   test("SMTPlugin - configure returns false if settings are invalid"){
-    val invalidSettings = new SMTSettings(0, maxPhi, maxSeqCount, smoothing, prior, ints)
+    val invalidSettings = new SMTSettings(0, maxPhi, maxSeqCount, smoothing, prior, ints, 0.0, 0.0)
     val invalidConfig = new SMTConfig
     invalidConfig.storeSettings(invalidSettings)
     val plugin = new SMTPlugin

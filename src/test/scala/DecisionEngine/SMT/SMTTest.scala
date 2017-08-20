@@ -14,6 +14,7 @@ import scala.collection.immutable.ListMap
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
   val isHome = true
+  val isWindows = false
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
 
   def time[T](block: => T): T = {
@@ -1714,11 +1715,12 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val maxSeqCount = 50
     val smoothing = 0.01
     val prior = 0.1
-    val threshold = 0.1
-    val tolerance = 20.0
-    val attackRatio = 94.0
-    val validationRatio = 88.0
-    var extensions = Array("GHC")
+    val threshold = 0.7
+    val tolerance = 30.0
+    val attackRatio = 72.0
+    val validationRatio = 71.0
+    //var extensions = Array("GHC")
+    var extensions = Array("txt")
     val trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
     val validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
     val attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
@@ -1737,7 +1739,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       println("Training")
       for (f <- trainingFiles) {
         counter += 1
-        //println("Training. Processing file " + counter + " - filename: " + f.getName)
+        println("Training. Processing file " + counter + " - filename: " + f.getName)
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
         val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
@@ -1768,7 +1770,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     if(isGoodValSettings && isGoodAttackSettings){
       println("Config good for validation AND attack!!")
       val sbAll = new StringBuilder
-      sbAll.append("Validation stats: \n")
+      sbAll.append("\nValidation stats: \n")
       sbAll.append(sb1.toString + "\n\n----------------\n")
       sbAll.append("\nAttack stats: \n" + sb2.toString)
       val file4 = new File(allStatsPath + "_VAL_ATTACK_STATS_Configs.txt")
@@ -1782,16 +1784,24 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
   test("Learn to learn"){
     val attackRatio = 70.0
-    val validationRatio = 80.0
+    val validationRatio = 75.0
 
     var allStatsPath = ""
     //Windows
     if (isHome) {
-      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\OSSMB\\allStats"
+      if(isWindows) {
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\allStats"
+      }else{
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\allStats"
+      }
     } else {
+      if(isWindows){
 /*
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
 */
+    }else{
+
+      }
     }
 
     var goodSettings: Array[String] = Array()
@@ -1813,7 +1823,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
 
     val sb4 = new StringBuilder
-    sb4.append(goodSettings.toString)
+    for(s <- goodSettings){
+      sb4.append("\n" + s)
+    }
+
     val file4 = new File(allStatsPath + "GOODSETTINGS_ALL.txt")
     val bw4 = new BufferedWriter(new FileWriter(file4, true))
     bw4.write(sb4.toString)
@@ -1830,9 +1843,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val tolerance = _tolerance
 
     //Windows
-    var extensions = Array("GHC")
+    //var extensions = Array("GHC")
     //Unix
-    /* var extensions = Array("txt")*/
+    var extensions = Array("txt")
     var trainingDir = ""
     var validationDir = ""
     var attackDir = ""
@@ -1841,12 +1854,21 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var attackPredictions = ""
     //Windows
     if (isHome) {
-      trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
-      validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
-      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
-      serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\SerialisedModels\\OSSMB\\"
-      valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\OSSMB\\"
-      attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\OSSMB\\"
+      if(isWindows) {
+        trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+        validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+        attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\SerialisedModels\\PMWiki\\"
+        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\"
+        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\"
+      }else {
+        trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Training_Data_Master\\"
+        validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Validation_Data_Master\\"
+        attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Attack_Data_Master\\Adduser\\"
+        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
+        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
+        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
+      }
     } else {
       trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
@@ -1894,7 +1916,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var allStatsPath = ""
     //Windows
     if (isHome) {
-      allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\OSSMB\\allStats"
+      if(isWindows) {
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\PMWiki\\allStats"
+      }else{
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\UnixAllStats"
+      }
     } else {
       /*
       allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\REPORTS\\allStats\\allStats"
@@ -1970,7 +1996,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           traceCount += 1
           val anomalyCount = quotVector.count(_ < threshold)
           val anomalyPercentage = (anomalyCount / quotVector.size.toDouble) * 100.00
-          var isAnomaly = if (anomalyPercentage < tolerance) false else true
+          var isAnomaly = if (anomalyPercentage > tolerance) true else false
           var result = if (isAnomaly)  "ANOMALY" else "NORMAL"
 
           sb.append("\nfile: " + f.getName + " - " + anomalyCount + " anomalous subtraces out of " + quotVector.size + ". - " + anomalyPercentage + "% anomalous. Classification: " + result)

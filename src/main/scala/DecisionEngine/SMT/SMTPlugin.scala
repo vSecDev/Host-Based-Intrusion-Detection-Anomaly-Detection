@@ -10,7 +10,10 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
   */
 class SMTPlugin extends DecisionEnginePlugin {
 
-  private var root: Option[Node[_, _]] = None
+  override val pluginName: String = "Sparse Markov Tree"
+  private var root: Option[Node[_,_]] = None
+  private var threshold: Option[Double] = None
+  private var tolerance: Option[Double] = None
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
@@ -19,9 +22,13 @@ class SMTPlugin extends DecisionEnginePlugin {
           case None => false
           case Some(s) => if (s.isIntTrace) {
             setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
+            setThreshold(s.threshold)
+            setTolerance(s.tolerance)
             true
           } else {
             setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
+            setThreshold(s.threshold)
+            setTolerance(s.tolerance)
             false
           }
         }
@@ -48,7 +55,7 @@ class SMTPlugin extends DecisionEnginePlugin {
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_, _] => learnHelper(data, node, ints)
+            case node: Node[_,_] => learnHelper(data, node, ints)
             case _ => None
           }
         }
@@ -105,12 +112,16 @@ class SMTPlugin extends DecisionEnginePlugin {
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
 
-  private def setRoot(node: Node[_, _]) = root = Some(node)
+  private def setRoot(node: Node[_,_]) = root = Some(node)
+
+  private def setThreshold(t: Double) = threshold = Some(t)
+
+  private def setTolerance(t: Double) = tolerance = Some(t)
 
   def loadModel(model: DataModel): Boolean = model.retrieve match {
     case None => false
     case Some(mod) => mod match {
-      case m: Node[_, _] => setRoot(m); true
+      case m: Node[_,_] => setRoot(m); true
       case _ => false
     }
   }
@@ -122,4 +133,11 @@ class SMTPlugin extends DecisionEnginePlugin {
       dm.store(m)
       Some(dm)
   }
+
+  def isTrained: Boolean = root match {
+    case None => false
+    //TODO - CHECK CONDITION!
+    case Some(x: Node[_,_]) => x.getChildren.nonEmpty
+  }
+
 }
