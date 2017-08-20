@@ -1891,7 +1891,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       println("Training")
       for (f <- trainingFiles) {
         counter += 1
-        //println("Training. Processing file " + counter + " - filename: " + f.getName)
+        println("Training. Processing file " + counter + " - filename: " + f.getName)
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
         val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
