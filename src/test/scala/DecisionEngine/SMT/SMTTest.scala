@@ -1792,7 +1792,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       if(isWindows) {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\allStats"
       }else{
-        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\allStats"
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\allStats"
       }
     } else {
       if(isWindows){
@@ -1864,10 +1864,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       }else {
         trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Training_Data_Master\\"
         validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Validation_Data_Master\\"
-        attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Attack_Data_Master\\Adduser\\"
-        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
-        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
-        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\"
+        attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Attack_Data_Master\\HydraFTP\\"
+        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\"
+        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\"
+        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\"
       }
     } else {
       trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
@@ -1919,7 +1919,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       if(isWindows) {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\PMWiki\\allStats"
       }else{
-        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\Adduser\\UnixAllStats"
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\UnixAllStats"
       }
     } else {
       /*
@@ -2257,7 +2257,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     } else {
       trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Training_Data_Master\\"
       validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Validation_Data_Master\\"
-      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Attack_Data_Master\\AddUser\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\ADFA-LD\\Attack_Data_Master\\HydraFTP\\"
       serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ADFA_LD_SMT\\serialised\\"
       //valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\valPredictions\\"
       //attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Serialised\\trainValClass\\attackPredictions\\"
