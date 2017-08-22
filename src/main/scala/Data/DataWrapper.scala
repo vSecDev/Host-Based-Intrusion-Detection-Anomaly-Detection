@@ -14,6 +14,7 @@ trait DataWrapper {
 case class StringDataWrapper() extends DataWrapper {
   override type T = String
   override var data: Option[String] = None
+
   override def store(_data: String): Unit = {data = Some(_data)}
   override def retrieve(): Option[String] = data
 }

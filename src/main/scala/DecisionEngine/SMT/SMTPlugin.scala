@@ -46,12 +46,10 @@ class SMTPlugin extends DecisionEnginePlugin {
         root match {
           case None => None //No model/SMT to train
           case Some(node) =>
-            //TODO - LEARN WITH NODE STORED IN ROOT HERE - delete None
             learnHelper(data, node, ints)
         }
       }
       case Some(w) => {
-        //TODO - LEARN WITH NODE PASSED IN HERE - delete None
         w.retrieve match {
           case None => None
           case Some(m) => m match {
@@ -64,40 +62,44 @@ class SMTPlugin extends DecisionEnginePlugin {
   }
 
   private def learnHelper(data: Vector[DataWrapper], node: Node[_,_], ints: Boolean): Option[DataModel] = {
-    data foreach(wrapper => wrapper match {
+    data foreach (wrapper => wrapper match {
       case w: StringDataWrapper => w.retrieve match {
         case None =>
         case Some(lines) => {
-          if(ints && node.isInstanceOf[Node[Int, Int]] && lines.nonEmpty){
-            //process as int trace
-            var wholeTrace: Vector[Int] = Vector.empty
-            val linesArray = lines.split("\\s")
-            if(linesArray.forall(_.matches("[0-9]*"))){
-              wholeTrace = linesArray.map(_.trim.toInt).toVector
-            }
 
-            var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-            for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
-              if (t.size == node.maxDepth)
-                trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
-            }
+          if (lines.nonEmpty) {
+            if (ints && node.isInstanceOf[Node[Int, Int]]) {
+              //process as int trace
+              var wholeTrace: Vector[Int] = Vector.empty
+              val linesArray = lines.split("\\s+")
+              if (linesArray.forall(_.matches("[0-9]*"))) {
+                wholeTrace = linesArray.map(_.trim.toInt).toVector
+              }
 
-            for (t <- trainingData_whole) {
-              node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
-            }
-          }else if(lines.nonEmpty) node match {
-            case value: Node[String, String] =>
-              //process as string trace
-              val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
-              var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+              var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
               for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
                 if (t.size == node.maxDepth)
                   trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
               }
+
               for (t <- trainingData_whole) {
-                value.learn(t._1, t._2)
+                // for (t <- getIntInput(node.maxDepth, lines)) {
+                node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
               }
-            case _ => //TODO - ADD LOGIC FOR OTHER TPYES
+            } else node match {
+              case n: Node[String, String] =>
+                //process as string trace
+                val wholeTrace: Vector[String] = lines.split("\\s+").map(_.trim).toVector
+                var trainingData_whole: Vector[(Vector[String], String)] = Vector[(Vector[String], String)]()
+                for (t <- wholeTrace.sliding(node.maxDepth, 1)) {
+                  if (t.size == node.maxDepth)
+                    trainingData_whole = trainingData_whole :+ (t.take(node.maxDepth - 1), t.takeRight(1)(0))
+                }
+                for (t <- trainingData_whole) {
+                  n.learn(t._1, t._2)
+                }
+              case _ => //TODO - ADD LOGIC FOR OTHER TYPES
+            }
           }
         }
       }
@@ -107,6 +109,21 @@ class SMTPlugin extends DecisionEnginePlugin {
     dm.store(node)
     Some(dm)
   }
+
+/*private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
+  var wholeTrace: Vector[Int] = Vector.empty
+  val linesArray = lines.split("\\s+")
+  if (linesArray.forall(_.matches("[0-9]*"))) {
+    wholeTrace = linesArray.map(_.trim.toInt).toVector
+  }
+
+  var input: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+  for (t <- wholeTrace.sliding(maxDepth, 1)) {
+    if (t.size == maxDepth)
+      input = input :+ (t.take(maxDepth - 1), t.takeRight(1)(0))
+  }
+  input
+}*/
 
   override def validate(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
 
