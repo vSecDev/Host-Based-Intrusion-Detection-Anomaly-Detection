@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = false
+  val isHome = true
   val isWindows = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   var extensions = if(isWindows) Array("GHC") else Array("txt")
@@ -1788,7 +1788,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 */
-  test("Learn to learn"){
+  /*test("Learn to learn"){
     val attackRatio = 60.0
     val validationRatio = 70.0
 
@@ -1836,7 +1836,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     bw4.write(sb4.toString)
     bw4.close()
   }
-
+*/
   def createReports(_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double, attackRatio: Double, validationRatio: Double): Boolean = {
     val maxDepth = _maxDepth
     val maxPhi = _maxPhi

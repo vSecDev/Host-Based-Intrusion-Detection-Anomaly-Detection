@@ -11,7 +11,7 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
 class SMTPlugin extends DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
-  private var root: Option[Node[_, _]] = None
+  private var root: Option[Node[_,_]] = None
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
 
@@ -53,7 +53,35 @@ class SMTPlugin extends DecisionEnginePlugin {
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_, _] => learnHelper(data, node, ints)
+            case node: Node[_,_] => learnHelper(data, node, ints)
+            case _ => None
+          }
+        }
+      }
+    }
+  }
+
+  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ???
+
+  override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
+    if (data.isEmpty) return None
+
+    model match {
+      case None => {
+        root match {
+          case None => None //No model/SMT to classify with
+          case Some(node) =>
+            //TODO - CLASSIFY WITH ROOT HERE
+            classifyHelper(data, node, ints)
+        }
+      }
+      case Some(w) => {
+        w.retrieve match {
+          case None => None
+          case Some(m) => m match {
+            case node: Node[_,_] =>
+            //TODO CLASSIFY WITH PASSED MODEL HERE
+              classifyHelper(data, node, ints)
             case _ => None
           }
         }
@@ -90,6 +118,8 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(dm)
   }
 
+  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = ???
+
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty
     val linesArray = lines.split("\\s+")
@@ -114,16 +144,6 @@ class SMTPlugin extends DecisionEnginePlugin {
     }
     input
   }
-
-
-  override def validate(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???
-
-  override def classify(data: Vector[DataWrapper], model: Option[DataModel]): DecisionEngineReport = ???/*{
-
-
-
-  }*/
-
 
   private def setRoot(node: Node[_, _]) = root = Some(node)
 
