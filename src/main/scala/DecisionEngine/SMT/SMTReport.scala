@@ -9,18 +9,12 @@ class SMTReport extends DecisionEngineReport {
   private val id = SMTReport.inc
   private var traceReports: Vector[SMTTraceReport] = Vector()
 
-
-
-
-  override type T = this.type
-  override var data: Option[SMTReport.this.type] = _
-
-  override def store(_data: SMTReport.this.type): Unit = ???
-
-  override def retrieve(): Option[SMTReport.this.type] = ???
+  override type T = (Vector[SMTTraceReport])
+  override def getReport(): Option[SMTReport.this.type] = (getTraceReports)
 
   //TODO - TEST CLASS
   def addTraceReport(report: SMTTraceReport) = traceReports :+ report
+  def getTraceReports: Vector[SMTTraceReport] = traceReports
   def traceCount: Int = traceReports.size
   def normalCount: Int = traceReports.count(!_.classification)
   def anomalyCount: Int = traceReports.count(_.classification)
@@ -62,6 +56,7 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
   def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount.toDouble / subtraceCnt) * 100.00)
   def normalCount: Int = subtraceCnt - anomalyCnt
   def getClassification: String = if(classification) "ANOMALY" else "NORMAL"
+  def getID = id
 
   override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + anomalyPercentage + " - Classification: " + getClassification
 }

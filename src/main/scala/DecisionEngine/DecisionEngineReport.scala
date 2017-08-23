@@ -5,8 +5,6 @@ package DecisionEngine
   */
 trait DecisionEngineReport {
   type T
-  var data: Option[T]
 
-  def store(_data: T): Unit
-  def retrieve(): Option[T]
+  def getReport(): Option[T]
 }
