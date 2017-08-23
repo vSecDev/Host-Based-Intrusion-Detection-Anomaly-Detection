@@ -64,7 +64,7 @@ class SMTPlugin extends DecisionEnginePlugin {
   override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ???
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
-    if (data.isEmpty) return None
+    if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
 
     model match {
       case None => {
@@ -79,8 +79,8 @@ class SMTPlugin extends DecisionEnginePlugin {
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_,_] =>
-            //TODO CLASSIFY WITH PASSED MODEL HERE
+            case node: Node[_, _] =>
+              //TODO CLASSIFY WITH PASSED MODEL HERE
               classifyHelper(data, node, ints)
             case _ => None
           }
@@ -118,7 +118,56 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(dm)
   }
 
-  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = ???
+  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = {
+    var report = new SMTReport
+
+    data foreach (wrapper => wrapper match {
+      case w: StringDataWrapper => w.retrieve match {
+        case None =>
+        case Some(lines) =>
+          if (lines.nonEmpty) {
+            if (ints && node.isInstanceOf[Node[Int, Int]]) {
+              //process as int trace
+              var quotients: Vector[Double] = Vector()
+              for (t <- getIntInput(node.maxDepth, lines)) {
+                val prediction = node.predict(t._1, t._2)
+                var quotient = 0.0
+                if (prediction._2 != 0.0) {
+                  quotient = prediction._1 / prediction._2
+                }
+                quotients = quotients :+ quotient
+              }
+
+
+              if (quotients.nonEmpty) {
+
+                val anomalyCount = quotients.count(_ < threshold.get)
+                val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
+                var isAnomaly = if (anomalyPercentage > tolerance.get) true else false
+
+
+              }
+
+
+
+            } else node match {
+              case n: Node[String, String] =>
+                //process as string trace
+                /*for (t <- getStrInput(n.maxDepth, lines)) {
+                  n.learn(t._1, t._2)
+                }*/
+              case _ => //TODO - ADD LOGIC FOR OTHER TYPES
+            }
+          }
+      }
+      case _ => //Handle other types of wrappers in future extensions here!
+    })
+
+
+
+
+
+  }
 
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty
