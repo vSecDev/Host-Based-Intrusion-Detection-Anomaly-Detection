@@ -7,7 +7,7 @@ import DecisionEngine.DecisionEngineReport
   */
 class SMTReport extends DecisionEngineReport {
   private val id = SMTReport.inc
-  private var traceReports: Vector[TraceReport] = Vector()
+  private var traceReports: Vector[SMTTraceReport] = Vector()
 
 
 
@@ -20,14 +20,14 @@ class SMTReport extends DecisionEngineReport {
   override def retrieve(): Option[SMTReport.this.type] = ???
 
   //TODO - TEST CLASS
-  def addTraceReport(report: TraceReport) = traceReports :+ report
+  def addTraceReport(report: SMTTraceReport) = traceReports :+ report
   def traceCount: Int = traceReports.size
   def normalCount: Int = traceReports.count(!_.classification)
   def anomalyCount: Int = traceReports.count(_.classification)
   def anomalyPercentage: Option[Double] = if(traceReports.isEmpty) None else Some((anomalyCount / traceReports.size.toDouble) * 100.00)
   def normalPercentage: Option[Double] = if(traceReports.isEmpty) None else Some((normalCount/traceReports.size.toDouble) * 100.00)
-  def getAnomalousTraces: Vector[TraceReport] = traceReports.filter(_.classification)
-  def getNormalTraces: Vector[TraceReport] = traceReports.filter(!_.classification)
+  def getAnomalousTraces: Vector[SMTTraceReport] = traceReports.filter(_.classification)
+  def getNormalTraces: Vector[SMTTraceReport] = traceReports.filter(!_.classification)
 
 
   override def toString: String = {
@@ -49,18 +49,24 @@ object SMTReport{
 
 
 //TODO - TEST CLASS
-class TraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean){
-  private val id = TraceReport.inc
+class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean){
+  private val id = SMTTraceReport.inc
+
+  require(subtraceCnt >= 0, "SMTTraceReport subtrace count must be non-negative!")
+  require(anomalyCnt >= 0, "SMTTraceReport anomalous subtrace count must be non-negative!")
+  require(anomalyCnt <= subtraceCnt, "SMTTraceReport anomalous subtrace count cannot be higher than overall subtrace count!")
+
 
   //Percentage of anomalous subtraces within one sequence of system calls
-  def anomalyPercentage: Double = (anomalyCnt / subtraceCnt) * 100.00
+  def anomalyPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((anomalyCnt / subtraceCnt) * 100.00)
+  def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount / subtraceCnt) * 100.00)
   def normalCount: Int = subtraceCnt - anomalyCnt
   def getClassification: String = if(classification) "ANOMALY" else "NORMAL"
 
   override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + anomalyPercentage + " - Classification: " + getClassification
 }
 
-object TraceReport{
+object SMTTraceReport{
   private var id = 0
   private def inc = {id+= 1; id}
 }
