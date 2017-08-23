@@ -10,10 +10,11 @@ class SMTReport extends DecisionEngineReport {
   private var traceReports: Vector[SMTTraceReport] = Vector()
 
   override type T = (Vector[SMTTraceReport])
-  override def getReport(): Option[SMTReport.this.type] = (getTraceReports)
+  override def getReport(): Option[Vector[SMTTraceReport]] = Some(getTraceReports)
 
   //TODO - TEST CLASS
-  def addTraceReport(report: SMTTraceReport) = traceReports :+ report
+  def getID = id
+  def addTraceReport(report: SMTTraceReport) = traceReports = traceReports :+ report
   def getTraceReports: Vector[SMTTraceReport] = traceReports
   def traceCount: Int = traceReports.size
   def normalCount: Int = traceReports.count(!_.classification)

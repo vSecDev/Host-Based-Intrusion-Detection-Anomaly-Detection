@@ -72,6 +72,36 @@ class SMTReportTest extends FunSuite {
   }
 
   //SMTReport
+  test("SMTReport - IDs are non-identical") {
+    val tr = new SMTReport
+    val tr2 = new SMTReport
+    val tr3 = new SMTReport
+    assert(tr.getID != tr2.getID)
+    assert(tr.getID != tr3.getID)
+    assert(tr2.getID != tr3.getID)
+  }
+  test("SMTReport - initialised with empty vector for trace reports") {
+    val tr = new SMTReport
+    assert(tr.getTraceReports.isEmpty)
+  }
+  test("SMTReport - addTraceReport works") {
+    val tr = new SMTReport
+    val tr2 = new SMTReport
+    assert(tr.getTraceReports.isEmpty)
+    assert(tr2.getTraceReports.isEmpty)
 
+    tr.addTraceReport(new SMTTraceReport("ReportName", 1, 0, true))
+    assert(tr.getTraceReports.size == 1)
+    assert(tr.getTraceReports(0).getClassification.equals("ANOMALY"))
+    assert(tr.getTraceReports(0).name.equals("ReportName"))
+    assert(tr2.getTraceReports.isEmpty)
+    tr2.addTraceReport(new SMTTraceReport("ReportName2", 1, 0, true))
+    tr2.addTraceReport(new SMTTraceReport("ReportName3", 1, 0, false))
+    assert(tr2.getTraceReports.size == 2)
+    assert(tr2.getTraceReports(0).getClassification.equals("ANOMALY"))
+    assert(tr2.getTraceReports(0).name.equals("ReportName2"))
+    assert(tr2.getTraceReports(1).getClassification.equals("NORMAL"))
+    assert(tr2.getTraceReports(1).name.equals("ReportName3"))
 
+  }
 }
