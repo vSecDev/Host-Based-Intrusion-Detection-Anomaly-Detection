@@ -126,7 +126,7 @@ class SMTReportTest extends FunSuite {
     assert(tr.anomalyCount == 2)
     assert(tr2.normalCount == 0)
   }
-  test("SMTReport - normal/anomalyPercentage works") {
+  test("SMTReport - normal/anomalyPercentage functions work") {
     val tr = new SMTReport
     val tr2 = new SMTReport
     assert(!tr.normalPercentage.isDefined)
@@ -146,6 +146,37 @@ class SMTReportTest extends FunSuite {
     tr.addTraceReport(new SMTTraceReport("ReportName5", 1, 0, false))
     assert(tr.normalPercentage.get == 3/5.0 * 100)
     assert(tr.anomalyPercentage.get == 2/5.0 * 100)
+  }
+  test("SMTReport - getNormal/AnomalousTraces functions work"){
+    val tr = new SMTReport
+
+    assert(tr.getNormalTraces.isEmpty)
+    assert(tr.getAnomalousTraces.isEmpty)
+    tr.addTraceReport(new SMTTraceReport("ReportName", 2, 1, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName2", 3, 2, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName3", 1, 0, false))
+
+    val n = tr.getNormalTraces
+    assert(n.size == 1)
+    assert(n(0).getID == 3)
+    assert(n(0).getClassification.equals("NORMAL"))
+    assert(n(0).subtraceCnt == 1)
+    assert(n(0).anomalyCnt == 0)
+    assert(n(0).normalCount == 1)
+
+    val a = tr.getAnomalousTraces
+    assert(a.size == 2)
+    assert(a(0).getID == 1)
+    assert(a(1).getID == 2)
+    assert(a(0).getClassification.equals("ANOMALY"))
+    assert(a(1).getClassification.equals("ANOMALY"))
+    assert(a(0).subtraceCnt == 2)
+    assert(a(0).anomalyCnt == 1)
+    assert(a(0).normalCount == 1)
+    assert(a(1).subtraceCnt == 3)
+    assert(a(1).anomalyCnt == 2)
+    assert(a(1).normalCount == 1)
+
   }
 
 }
