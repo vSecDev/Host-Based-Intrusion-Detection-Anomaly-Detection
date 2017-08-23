@@ -8,6 +8,7 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
 /**
   * Created by apinter on 08/08/2017.
   */
+//TODO REFACTOR TO AVOID REPETITION OF CODE!
 class SMTPlugin extends DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
@@ -63,7 +64,7 @@ class SMTPlugin extends DecisionEnginePlugin {
 
   override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ???
 
-  override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ??? /*{
+  override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
 
     model match {
@@ -87,7 +88,7 @@ class SMTPlugin extends DecisionEnginePlugin {
         }
       }
     }
-  }*/
+  }
 
   private def learnHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DataModel] = {
     data foreach (wrapper => wrapper match {
@@ -118,7 +119,7 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(dm)
   }
 
-/*  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = {
+  private def classifyHelper(data: Vector[DataWrapper], node: Node[_,_], ints: Boolean): Option[DecisionEngineReport] = {
     var report = new SMTReport
 
     data foreach (wrapper => wrapper match {
@@ -130,7 +131,7 @@ class SMTPlugin extends DecisionEnginePlugin {
               //process as int trace
               var quotients: Vector[Double] = Vector()
               for (t <- getIntInput(node.maxDepth, d._2)) {
-                val prediction = node.predict(t._1, t._2)
+                val prediction = node.asInstanceOf[Node[Int,Int]].predict(t._1, t._2)
                 var quotient = 0.0
                 if (prediction._2 != 0.0) {
                   quotient = prediction._1 / prediction._2
@@ -138,36 +139,59 @@ class SMTPlugin extends DecisionEnginePlugin {
                 quotients = quotients :+ quotient
               }
 
-
               if (quotients.nonEmpty) {
-
                 val anomalyCount = quotients.count(_ < threshold.get)
                 val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
-                var isAnomaly = if (anomalyPercentage > tolerance.get) true else false
-
-
+                var isAnomaly = anomalyPercentage > tolerance.get
+                report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly))
               }
-
-
-
             } else node match {
               case n: Node[String, String] =>
                 //process as string trace
-                /*for (t <- getStrInput(n.maxDepth, lines)) {
-                  n.learn(t._1, t._2)
-                }*/
+                var quotients: Vector[Double] = Vector()
+                for (t <- getStrInput(node.maxDepth, d._2)) {
+                  val prediction = node.asInstanceOf[Node[String,String]].predict(t._1, t._2)
+                  var quotient = 0.0
+                  if (prediction._2 != 0.0) {
+                    quotient = prediction._1 / prediction._2
+                  }
+                  quotients = quotients :+ quotient
+                }
+                if (quotients.nonEmpty) {
+                  val anomalyCount = quotients.count(_ < threshold.get)
+                  val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
+                  var isAnomaly = anomalyPercentage > tolerance.get
+                  report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly))
+                }
               case _ => //TODO - ADD LOGIC FOR OTHER TYPES
             }
           }
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
+    Some(report)
+  }
 
+  /*private def classifyTrace(node: Node[_,_], trace: (String, String), ints: Boolean) = {
+    var quotients: Vector[Double] = Vector()
+    var input = if(ints) getIntInput(node.maxDepth, trace._2) else getStrInput(node.maxDepth, trace._2)
 
+    for (t <- input) {
+      val prediction = if(ints) node.asInstanceOf[Node[Int,Int]].predict(t._1.asInstanceOf[Vector[Int]], t._2.asInstanceOf[Int]) else node.asInstanceOf[Node[String, String]].predict(t._1.asInstanceOf[Vector[String]], t._2.asInstanceOf[String])
+      var quotient = 0.0
+      if (prediction._2 != 0.0) {
+        quotient = prediction._1 / prediction._2
+      }
+      quotients = quotients :+ quotient
+    }
 
+    if (quotients.nonEmpty) {
+      val anomalyCount = quotients.count(_ < threshold.get)
+      val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
+      var isAnomaly = anomalyPercentage > tolerance.get
+      new SMTTraceReport(trace._1, quotients.size, anomalyCount, isAnomaly)
 
-
-  }*/
+  }}*/
 
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty

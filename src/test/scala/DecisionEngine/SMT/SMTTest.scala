@@ -2,7 +2,8 @@ package DecisionEngine.SMT
 
 import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException, _}
 
-import Data.DataException
+import Data.File.FileProcessor
+import Data.{DataException, DataModel}
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
@@ -13,10 +14,10 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val isWindows = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
-  var extensions = if(isWindows) Array("GHC") else Array("txt")
+  var extensions = if (isWindows) Array("GHC") else Array("txt")
 
 
   //var extensions = Array("GHC")
@@ -1712,56 +1713,57 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     val histogram = histo(bounds, data)
   }
-/*
+
+  /*
 
   test("Good configs double-check") {
 
-    val maxDepth = 6
-    val maxPhi = 2
-    val maxSeqCount = 50
-    val smoothing = 0.01
-    val prior = 0.1
-    val threshold = 0.1
-    val tolerance = 30.0
-    val attackRatio = 62.0
-    val validationRatio = 83.0
+      val maxDepth = 6
+      val maxPhi = 2
+      val maxSeqCount = 50
+      val smoothing = 0.01
+      val prior = 0.1
+      val threshold = 0.1
+      val tolerance = 30.0
+      val attackRatio = 62.0
+      val validationRatio = 83.0
 
-    val trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
-    val validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
-    val attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
-    val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck\\"
-    val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
-    val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
-    val allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
+      val trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+      val validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+      val attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
+      val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck\\"
+      val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
+      val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
+      val allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
 
-    val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
-    val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
-    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
+      val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
+      val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+      val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
 
-    var counter = 0
-    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+      var counter = 0
+      val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
 
-    try {
-      println("Training")
-      for (f <- trainingFiles) {
-        counter += 1
-       // println("Training. Processing file " + counter + " - filename: " + f.getName)
-        val source = scala.io.Source.fromFile(f)
-        val lines = try source.getLines mkString "\n" finally source.close()
-        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
-        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
-        for (t <- wholeTrace.sliding(n1.maxDepth, 1)) {
-          if (t.size == n1.maxDepth)
-            trainingData_whole = trainingData_whole :+ (t.take(n1.maxDepth - 1), t.takeRight(1)(0))
+      try {
+        println("Training")
+        for (f <- trainingFiles) {
+          counter += 1
+         // println("Training. Processing file " + counter + " - filename: " + f.getName)
+          val source = scala.io.Source.fromFile(f)
+          val lines = try source.getLines mkString "\n" finally source.close()
+          val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+          var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+          for (t <- wholeTrace.sliding(n1.maxDepth, 1)) {
+            if (t.size == n1.maxDepth)
+              trainingData_whole = trainingData_whole :+ (t.take(n1.maxDepth - 1), t.takeRight(1)(0))
+          }
+
+          for (t <- trainingData_whole) {
+            n1.learn(t._1, t._2)
+          }
         }
-
-        for (t <- trainingData_whole) {
-          n1.learn(t._1, t._2)
-        }
+      } catch {
+        case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
       }
-    } catch {
-      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
-    }
 
     val resVal = classifyFiles(validationFiles, false, n1, valPredictions, allStatsPath, threshold, tolerance,attackRatio, validationRatio)
     val sb1 = resVal._1
@@ -1788,32 +1790,32 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 */
-  /*test("Learn to learn"){
+  test("Learn to learn") {
     val attackRatio = 60.0
     val validationRatio = 70.0
 
     var allStatsPath = ""
     //Windows
     if (isHome) {
-      if(isWindows) {
+      if (isWindows) {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\allStats"
-      }else{
+      } else {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\allStats"
       }
     } else {
-      if(isWindows){
-      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\allStats"
-    }else{
+      if (isWindows) {
+        allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\allStats"
+      } else {
 
       }
     }
 
     var goodSettings: Array[String] = Array()
 
-    for(i <- 6 to 10 by 2; j <- 2 to 4; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.3; n <- 20.0 to 35.0 by 5.0){
+    for (i <- 6 to 10 by 2; j <- 2 to 4; k <- 0.01 to 3.1 by 0.10; l <- 0.1 to 2.0 by 0.1; m <- 0.1 to 1.0 by 0.3; n <- 20.0 to 35.0 by 5.0) {
 
       println("maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n)
-      if(createReports(i,j,k,l,m,n, attackRatio, validationRatio)){
+      if (createReports(i, j, k, l, m, n, attackRatio, validationRatio)) {
         println("Good configuration found: maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n)
         val goodSettStr = "maxDepth: " + i + " - maxPhi: " + j + " - smoothing: " + k + " - prior: " + l + " - threshold: " + m + " - tolerance: " + n
         goodSettings = goodSettings :+ goodSettStr
@@ -1827,7 +1829,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
 
     val sb4 = new StringBuilder
-    for(s <- goodSettings){
+    for (s <- goodSettings) {
       sb4.append("\n" + s)
     }
 
@@ -1836,7 +1838,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     bw4.write(sb4.toString)
     bw4.close()
   }
-*/
+
   def createReports(_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double, attackRatio: Double, validationRatio: Double): Boolean = {
     val maxDepth = _maxDepth
     val maxPhi = _maxPhi
@@ -1857,14 +1859,14 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var attackPredictions = ""
     //Windows
     if (isHome) {
-      if(isWindows) {
+      if (isWindows) {
         trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
         validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
         attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
         serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\SerialisedModels\\Tomcat\\"
         valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\"
         attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\"
-      }else {
+      } else {
         trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Training_Data_Master\\"
         validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Validation_Data_Master\\"
         attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Attack_Data_Master\\HydraFTP\\"
@@ -1873,7 +1875,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\"
       }
     } else {
-      if(isWindows) {
+      if (isWindows) {
         trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
         validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
         attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
@@ -1909,7 +1911,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           n1.learn(t._1, t._2)
         }
       }
-     // serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
+      // serialise(n1.asInstanceOf[SparseMarkovTree[Int, Int]], new File(serialiseDir + "SMT_" + maxDepth + "_" + maxPhi + "_" + smoothing + ".tmp"))
     } catch {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
     }
@@ -1920,9 +1922,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var allStatsPath = ""
     //Windows
     if (isHome) {
-      if(isWindows) {
+      if (isWindows) {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\Tomcat\\allStats"
-      }else{
+      } else {
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\UnixAllStats"
       }
     } else {
@@ -1941,7 +1943,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val isGoodAttackSettings = resAttack._2
     sb2.append("\n\n------\nAttack:\nmaxDepth: " + maxDepth + "\nmaxPhi: " + maxPhi + "\nsmoothing: " + smoothing + "\nprior: " + prior + "\nthreshold: " + threshold + "\ntolerance: " + tolerance)
 
-    if(isGoodValSettings && isGoodAttackSettings){
+    if (isGoodValSettings && isGoodAttackSettings) {
       val sbAll = new StringBuilder
       sbAll.append("Validation stats: \n")
       sbAll.append(sb1.toString + "\n\n----------------\n")
@@ -1952,15 +1954,11 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       bw4.close()
     }
 
-    (isGoodValSettings && isGoodAttackSettings)
+    isGoodValSettings && isGoodAttackSettings
   }
 
 
-
-
-
-
-  private def classifyFiles(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String, threshold: Double, tolerance: Double, attackRatio: Double, validationRatio: Double): (StringBuilder,Boolean) = {
+  private def classifyFiles(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String, threshold: Double, tolerance: Double, attackRatio: Double, validationRatio: Double): (StringBuilder, Boolean) = {
     try {
       var traceCount = 0
       var anomalousTraceCount = 0
@@ -1968,13 +1966,15 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       var modeStr = ""
       val sb = StringBuilder.newBuilder
       if (isAttack) {
-        sb.append("---- Attack traces ----\n"); modeStr = "Attack"
+        sb.append("---- Attack traces ----\n");
+        modeStr = "Attack"
       } else {
-        sb.append("---- Normal traces ----\n"); modeStr = "Validation"
+        sb.append("---- Normal traces ----\n");
+        modeStr = "Validation"
       }
 
       for (f <- srcFiles) {
-       // println(modeStr + ". Processing file " + traceCount + " - filename: " + f.getName)
+        // println(modeStr + ". Processing file " + traceCount + " - filename: " + f.getName)
 
         val source = scala.io.Source.fromFile(f)
         val lines = try source.getLines mkString "\n" finally source.close()
@@ -2001,7 +2001,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
           val anomalyCount = quotVector.count(_ < threshold)
           val anomalyPercentage = (anomalyCount / quotVector.size.toDouble) * 100.00
           var isAnomaly = if (anomalyPercentage > tolerance) true else false
-          var result = if (isAnomaly)  "ANOMALY" else "NORMAL"
+          var result = if (isAnomaly) "ANOMALY" else "NORMAL"
 
           sb.append("\nfile: " + f.getName + " - " + anomalyCount + " anomalous subtraces out of " + quotVector.size + ". - " + anomalyPercentage + "% anomalous. Classification: " + result)
           if (isAnomaly) anomalousTraceCount += 1 else normalTraceCount += 1
@@ -2013,10 +2013,14 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
 
       var isGoodPrediction: Boolean = false
-      if(isAttack && ((anomalousTraceCount.toDouble/traceCount.toDouble)*100 > attackRatio)){ isGoodPrediction = true}
-      else if(!isAttack && ((normalTraceCount.toDouble/traceCount.toDouble)*100 > validationRatio)){ isGoodPrediction = true}
+      if (isAttack && ((anomalousTraceCount.toDouble / traceCount.toDouble) * 100 > attackRatio)) {
+        isGoodPrediction = true
+      }
+      else if (!isAttack && ((normalTraceCount.toDouble / traceCount.toDouble) * 100 > validationRatio)) {
+        isGoodPrediction = true
+      }
 
-      (sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount + "\nAnomaly detection: " + ((anomalousTraceCount.toDouble/traceCount.toDouble)*100) + "%\nNormal detection: " + ((normalTraceCount.toDouble/traceCount.toDouble)*100) + "%\nisAttack: " + isAttack  ), isGoodPrediction)
+      (sb.append("\n--------\nFile count: " + traceCount + " - Normal: " + normalTraceCount + " - Anomalous: " + anomalousTraceCount + "\nAnomaly detection: " + ((anomalousTraceCount.toDouble / traceCount.toDouble) * 100) + "%\nNormal detection: " + ((normalTraceCount.toDouble / traceCount.toDouble) * 100) + "%\nisAttack: " + isAttack), isGoodPrediction)
       /*      val file2 = new File(allStatsPath + modeStr + ".txt")
             val bw2 = new BufferedWriter(new FileWriter(file2))
             bw2.write(sb.toString)
@@ -2027,19 +2031,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
- /* private def generateReport(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
+  /* private def generateReport(srcFiles: Stream[File], isAttack: Boolean, n1: Node[Int, Int], predictionsPath: String, allStatsPath: String) {
     try {
       var allStatsMap: Map[Double, Double] = Map()
       val allStatsBuilder = StringBuilder.newBuilder
@@ -2421,4 +2413,72 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case e: Exception => println("Exception: " + e.getMessage); println(e.printStackTrace()); (new StringBuilder("EXCEPTION THROWN IN CLASSIFY FILES"), false)
     }
   }*/
+
+
+  //TODO MOVE THIS TO SMTPluginTest
+
+
+  test("SMTPlugin - classify test") {
+    val maxDepth = 6
+    val maxPhi = 2
+    val maxSeqCount = 50
+    val smoothing = 0.01
+    val prior = 0.1
+    val threshold = 0.1
+    val tolerance = 30.0
+    val attackRatio = 62.0
+    val validationRatio = 83.0
+    val extensions = Array("GHC")
+
+    val trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+    val validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+    val attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+
+    val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
+    val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
+
+    var counter = 0
+    val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+
+    try {
+      println("Training")
+      for (f <- trainingFiles) {
+        counter += 1
+        // println("Training. Processing file " + counter + " - filename: " + f.getName)
+        val source = scala.io.Source.fromFile(f)
+        val lines = try source.getLines mkString "\n" finally source.close()
+        val wholeTrace: Vector[Int] = lines.split("\\s+").map(_.trim.toInt).toVector
+        var trainingData_whole: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
+        for (t <- wholeTrace.sliding(n1.maxDepth, 1)) {
+          if (t.size == n1.maxDepth)
+            trainingData_whole = trainingData_whole :+ (t.take(n1.maxDepth - 1), t.takeRight(1)(0))
+        }
+
+        for (t <- trainingData_whole) {
+          n1.learn(t._1, t._2)
+        }
+      }
+    } catch {
+      case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
+    }
+
+
+    val fp = new FileProcessor
+    val dm = new DataModel
+    dm.store(n1)
+    val wrapper = fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
+    val settings = new SMTSettings(1, 1, 1, 1.1, 1.1, true, threshold, tolerance)
+    val config = new SMTConfig
+    config.storeSettings(settings)
+    val plugin = new SMTPlugin
+    plugin.configure(config)
+    val report = plugin.classify(Vector(wrapper), Some(dm), true)
+    println(report)
+  }
+
 }
+
+
+
+

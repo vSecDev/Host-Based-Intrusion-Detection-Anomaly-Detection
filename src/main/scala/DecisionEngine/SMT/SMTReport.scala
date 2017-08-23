@@ -51,15 +51,22 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
   require(anomalyCnt >= 0, "SMTTraceReport anomalous subtrace count must be non-negative!")
   require(anomalyCnt <= subtraceCnt, "SMTTraceReport anomalous subtrace count cannot be higher than overall subtrace count!")
 
-
   //Percentage of anomalous subtraces within one sequence of system calls
   def anomalyPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((anomalyCnt.toDouble / subtraceCnt) * 100.00)
   def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount.toDouble / subtraceCnt) * 100.00)
   def normalCount: Int = subtraceCnt - anomalyCnt
   def getClassification: String = if(classification) "ANOMALY" else "NORMAL"
   def getID = id
+  private def aPercentStr: String = anomalyPercentage match {
+    case None => "N/A"
+    case Some(x) => x.toString
+  }
+  private def nPercentStr: String = normalPercentage match {
+    case None => "N/A"
+    case Some(x) => x.toString
+  }
 
-  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + anomalyPercentage + " - Classification: " + getClassification
+  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
 }
 
 object SMTTraceReport{

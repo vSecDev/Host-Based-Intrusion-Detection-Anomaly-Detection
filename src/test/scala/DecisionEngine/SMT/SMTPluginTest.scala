@@ -499,4 +499,7 @@ class SMTPluginTest extends  FunSuite {
     assert(r6._1 == 2.0 && r6._2 == 2.0)
     assert(r7._1 == 1.0 && r7._2 == 2.0)
   }
+
+
+
 }
