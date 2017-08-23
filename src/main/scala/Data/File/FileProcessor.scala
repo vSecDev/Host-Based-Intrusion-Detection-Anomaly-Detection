@@ -82,7 +82,7 @@ class FileProcessor extends DataProcessor {
       val src = scala.io.Source.fromFile(f)
       val lines = try src.getLines mkString "\n" finally src.close()
       val wrapper = new StringDataWrapper
-      wrapper.store(lines)
+      wrapper.store((f.getName, lines))
       Some(wrapper)
     } else {
       None
@@ -98,7 +98,7 @@ class FileProcessor extends DataProcessor {
         val src = scala.io.Source.fromFile(f)
         val lines = try src.getLines mkString "\n" finally src.close()
         val wrapper = new StringDataWrapper
-        wrapper.store(lines)
+        wrapper.store((f.getName, lines))
         ws = ws :+ wrapper
       })
       Some(ws)

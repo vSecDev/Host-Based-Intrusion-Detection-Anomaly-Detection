@@ -146,7 +146,7 @@ class FileProcessorTest extends FunSuite {
     val f = new File(testSource + "main\\source\\2\\getDataTest.GHC")
     val w = fp.getData(f, e)
     assert(w isDefined)
-    assert(w.get.retrieve.get == "kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b")
+    assert(w.get.retrieve.get._2 == "kernel32.dll+0xc939 ntdll.dll+0x10b63 kernel32.dll+0xb50b")
   }
   test("FileProcessor - getAllData returns content of all files") {
     val s = new File(testSource)
@@ -159,7 +159,7 @@ class FileProcessorTest extends FunSuite {
     val w = fp.getAllData(f,e)
     assert(w isDefined)
     val vect = w.get
-    for (i <- vect.indices) assert(vect(i).retrieve.get.equals(traces(i)))
+    for (i <- vect.indices) assert(vect(i).retrieve.get._2.equals(traces(i)))
   }
   test("FileProcessor - processNew creates new file and returns updated system call map"){
     val s = new File(testSource + "\\unseenTest\\source")

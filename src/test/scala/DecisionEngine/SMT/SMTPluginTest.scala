@@ -113,7 +113,7 @@ class SMTPluginTest extends  FunSuite {
 
     val dw = new StringDataWrapper
     //storing condition1, event2
-    dw.store("1 2 3 777")
+    dw.store("filename", "1 2 3 777")
     plugin.learn(Vector(dw), None, ints)
     val returnedModel2 = plugin.getModel.get.retrieve.get
     val retNode2 = returnedModel2.asInstanceOf[Node[Int, Int]]
@@ -127,7 +127,7 @@ class SMTPluginTest extends  FunSuite {
     assert(r7._1 == 1.0 && r7._2 == 2.0)
 
     //storing condition2, event1
-    dw.store("4    5 6 666")
+    dw.store("filename2", "4    5 6 666")
 
     plugin.learn(Vector(dw), None, ints)
     val returnedModel3 = plugin.getModel.get.retrieve.get
@@ -153,7 +153,7 @@ class SMTPluginTest extends  FunSuite {
     n2Wrapper.store(n2)
     val dw2 = new StringDataWrapper
     //store condition1, event1
-    dw2.store("1 2 3 666")
+    dw2.store("filename3", "1 2 3 666")
 
     //DataModel stored as root in DecisionEngine should not change. Only the new tree passed in should be trained.
     val newDM = plugin.learn(Vector(dw2), Some(n2Wrapper), ints)
@@ -213,7 +213,7 @@ class SMTPluginTest extends  FunSuite {
 
     val dw = new StringDataWrapper
     //storing strCondition1, eventStr2
-    dw.store("one two three eventStr2")
+    dw.store("filename1", "one two three eventStr2")
     plugin.learn(Vector(dw), None, ints2)
     val returnedModel2 = plugin.getModel.get.retrieve.get
     val retNode2 = returnedModel2.asInstanceOf[Node[String, String]]
@@ -227,7 +227,7 @@ class SMTPluginTest extends  FunSuite {
     assert(r7._1 == 1.0 && r7._2 == 2.0)
 
     //storing condition2, eventStr1
-    dw.store("four five six eventStr1")
+    dw.store("filename2", "four five six eventStr1")
 
     plugin.learn(Vector(dw), None, ints2)
     val returnedModel3 = plugin.getModel.get.retrieve.get
@@ -253,7 +253,7 @@ class SMTPluginTest extends  FunSuite {
     n2Wrapper.store(n2)
     val dw2 = new StringDataWrapper
     //store strCondition1, eventStr1
-    dw2.store("one two three eventStr1")
+    dw2.store("filename3", "one two three eventStr1")
 
     //DataModel stored as root in DecisionEngine should not change. Only the new tree passed in should be trained.
     val newDM = plugin.learn(Vector(dw2), Some(n2Wrapper), ints2)
@@ -344,7 +344,7 @@ class SMTPluginTest extends  FunSuite {
     val plugin = new SMTPlugin
     assert(plugin.getModel().isEmpty)
     val dw = new StringDataWrapper
-    dw.store("1 2 3 666")
+    dw.store("filename", "1 2 3 666")
     assert(plugin.learn(Vector(dw), None, ints).isEmpty)
   }
   test("SMTPlugin - passing empty DataWrapper to learn returns DataModel") {
@@ -382,7 +382,7 @@ class SMTPluginTest extends  FunSuite {
     val dm = new DataModel
     dm.store(n1)
     val wrapper = new StringDataWrapper
-    wrapper.store("")
+    wrapper.store("filename", "")
     val plugin = new SMTPlugin
     val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
@@ -405,7 +405,7 @@ class SMTPluginTest extends  FunSuite {
     val dm = new DataModel
     dm.store(n1)
     val wrapper = new StringDataWrapper
-    wrapper.store("1 2 3 nonNumeric")
+    wrapper.store("filename", "1 2 3 nonNumeric")
     val plugin = new SMTPlugin
     val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
@@ -427,9 +427,9 @@ class SMTPluginTest extends  FunSuite {
     val dm = new DataModel
     dm.store(n1)
     val wrapper = new StringDataWrapper
-    wrapper.store("1 2 3 nonNumeric")
+    wrapper.store("filename", "1 2 3 nonNumeric")
     val wrapper2 = new StringDataWrapper
-    wrapper2.store("1 2 3 777")
+    wrapper2.store("filename2", "1 2 3 777")
     val plugin = new SMTPlugin
     val returnedModel = plugin.learn(Vector(wrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
@@ -456,9 +456,9 @@ class SMTPluginTest extends  FunSuite {
     val dm = new DataModel
     dm.store(n1)
     val shortWrapper = new StringDataWrapper
-    shortWrapper.store("1")
+    shortWrapper.store("filename", "1")
     val wrapper2 = new StringDataWrapper
-    wrapper2.store("1 2 3 777")
+    wrapper2.store("filename", "1 2 3 777")
     val plugin = new SMTPlugin
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
@@ -485,9 +485,9 @@ class SMTPluginTest extends  FunSuite {
     val dm = new DataModel
     dm.store(n1)
     val shortWrapper = new StringDataWrapper
-    shortWrapper.store("shortStr")
+    shortWrapper.store("filename", "shortStr")
     val wrapper2 = new StringDataWrapper
-    wrapper2.store("one two three eventStr2")
+    wrapper2.store("filename", "one two three eventStr2")
     val plugin = new SMTPlugin
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints2).get.retrieve.get.asInstanceOf[Node[String, String]]
     val retNode = returnedModel.asInstanceOf[Node[String, String]]

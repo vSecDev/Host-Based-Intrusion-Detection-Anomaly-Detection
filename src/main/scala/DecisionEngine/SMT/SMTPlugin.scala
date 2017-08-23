@@ -63,7 +63,7 @@ class SMTPlugin extends DecisionEnginePlugin {
 
   override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ???
 
-  override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
+  override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ??? /*{
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
 
     model match {
@@ -87,24 +87,24 @@ class SMTPlugin extends DecisionEnginePlugin {
         }
       }
     }
-  }
+  }*/
 
   private def learnHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DataModel] = {
     data foreach (wrapper => wrapper match {
       case w: StringDataWrapper => w.retrieve match {
         case None =>
-        case Some(lines) =>
+        case Some(d) =>
 
-          if (lines.nonEmpty) {
+          if (d._2.nonEmpty) {
             if (ints && node.isInstanceOf[Node[Int, Int]]) {
               //process as int trace
-              for (t <- getIntInput(node.maxDepth, lines)) {
+              for (t <- getIntInput(node.maxDepth, d._2)) {
                 node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
               }
             } else node match {
               case n: Node[String, String] =>
                 //process as string trace
-                for (t <- getStrInput(n.maxDepth, lines)) {
+                for (t <- getStrInput(n.maxDepth, d._2)) {
                   n.learn(t._1, t._2)
                 }
               case _ => //TODO - ADD LOGIC FOR OTHER TYPES
@@ -118,18 +118,18 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(dm)
   }
 
-  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = {
+/*  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = {
     var report = new SMTReport
 
     data foreach (wrapper => wrapper match {
       case w: StringDataWrapper => w.retrieve match {
         case None =>
-        case Some(lines) =>
-          if (lines.nonEmpty) {
+        case Some(d) =>
+          if (d._2.nonEmpty) {
             if (ints && node.isInstanceOf[Node[Int, Int]]) {
               //process as int trace
               var quotients: Vector[Double] = Vector()
-              for (t <- getIntInput(node.maxDepth, lines)) {
+              for (t <- getIntInput(node.maxDepth, d._2)) {
                 val prediction = node.predict(t._1, t._2)
                 var quotient = 0.0
                 if (prediction._2 != 0.0) {
@@ -167,7 +167,7 @@ class SMTPlugin extends DecisionEnginePlugin {
 
 
 
-  }
+  }*/
 
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty
