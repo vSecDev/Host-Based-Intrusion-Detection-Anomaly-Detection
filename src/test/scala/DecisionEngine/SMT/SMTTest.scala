@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val isWindows = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   var extensions = if(isWindows) Array("GHC") else Array("txt")
@@ -1729,10 +1729,10 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
     val validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
     val attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
-    val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\DoubleCheck\\"
-    val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\DoubleCheck"
-    val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\DoubleCheck"
-    val allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\DoubleCheck"
+    val serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck\\"
+    val valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
+    val attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
+    val allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\DoubleCheck"
 
     val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
     val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
@@ -1788,22 +1788,21 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     }
   }
 */
-/*
   test("Learn to learn"){
     val attackRatio = 60.0
-    val validationRatio = 60.0
+    val validationRatio = 70.0
 
     var allStatsPath = ""
     //Windows
     if (isHome) {
       if(isWindows) {
-        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\allStats"
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\allStats"
       }else{
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\allStats"
       }
     } else {
       if(isWindows){
-      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\allStats"
+      allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\allStats"
     }else{
 
       }
@@ -1837,7 +1836,6 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     bw4.write(sb4.toString)
     bw4.close()
   }
-*/
 
   def createReports(_maxDepth: Int, _maxPhi: Int, _smoothing: Double, _prior: Double, _threshold: Double, _tolerance: Double, attackRatio: Double, validationRatio: Double): Boolean = {
     val maxDepth = _maxDepth
@@ -1863,9 +1861,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
         validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
         attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
-        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\SerialisedModels\\PMWiki\\"
-        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\"
-        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\PMWiki\\"
+        serialiseDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\SerialisedModels\\Tomcat\\"
+        valPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\"
+        attackPredictions = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Windows\\Tomcat\\"
       }else {
         trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Training_Data_Master\\"
         validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\ADFA-LD\\Validation_Data_Master\\"
@@ -1879,9 +1877,9 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
         trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Training_Data\\"
         validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
         attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\Main\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
-        serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\"
-        valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\"
-        attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\"
+        serialiseDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\"
+        valPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\"
+        attackPredictions = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\"
       }
     }
     val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
@@ -1923,13 +1921,13 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     //Windows
     if (isHome) {
       if(isWindows) {
-        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\PMWiki\\allStats"
+        allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\allStats\\Tomcat\\allStats"
       }else{
         allStatsPath = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Reports\\LearnToLearn\\Unix\\HydraFTP\\UnixAllStats"
       }
     } else {
       if (isWindows) {
-        allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\OSSMB\\allSts"
+        allStatsPath = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\reports\\LearnToLearn\\Windows\\Tomcat\\allSts"
       }
     }
 
