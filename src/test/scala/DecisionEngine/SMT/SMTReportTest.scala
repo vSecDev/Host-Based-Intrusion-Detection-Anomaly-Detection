@@ -51,5 +51,13 @@ class SMTReportTest extends FunSuite{
     assert(tr2.anomalyPercentage.get == 100.0)
     assert(tr2.normalPercentage.get == 0.0)
   }
+  test("SMTTraceReport - anomaly/normalPercentage correct for non zero subtraces - 2"){
+    val tr = new SMTTraceReport("ReportName", 100, 50, true)
+    assert(tr.anomalyPercentage.get == 50.0)
+    assert(tr.normalPercentage.get == 50.0)
+    val tr2 = new SMTTraceReport("ReportName", 100, 60, true)
+    assert(tr2.anomalyPercentage.get == 60.0)
+    assert(tr2.normalPercentage.get == 40.0)
+  }
 
 }

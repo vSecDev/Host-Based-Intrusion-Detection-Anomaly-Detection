@@ -58,8 +58,8 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
 
 
   //Percentage of anomalous subtraces within one sequence of system calls
-  def anomalyPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((anomalyCnt / subtraceCnt) * 100.00)
-  def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount / subtraceCnt) * 100.00)
+  def anomalyPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((anomalyCnt.toDouble / subtraceCnt) * 100.00)
+  def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount.toDouble / subtraceCnt) * 100.00)
   def normalCount: Int = subtraceCnt - anomalyCnt
   def getClassification: String = if(classification) "ANOMALY" else "NORMAL"
 
