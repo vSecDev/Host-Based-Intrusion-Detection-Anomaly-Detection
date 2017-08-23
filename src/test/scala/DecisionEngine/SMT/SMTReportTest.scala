@@ -84,12 +84,11 @@ class SMTReportTest extends FunSuite {
     val tr = new SMTReport
     assert(tr.getTraceReports.isEmpty)
   }
-  test("SMTReport - addTraceReport works") {
+  test("SMTReport - add/getTraceReport works") {
     val tr = new SMTReport
     val tr2 = new SMTReport
     assert(tr.getTraceReports.isEmpty)
     assert(tr2.getTraceReports.isEmpty)
-
     tr.addTraceReport(new SMTTraceReport("ReportName", 1, 0, true))
     assert(tr.getTraceReports.size == 1)
     assert(tr.getTraceReports(0).getClassification.equals("ANOMALY"))
@@ -102,6 +101,51 @@ class SMTReportTest extends FunSuite {
     assert(tr2.getTraceReports(0).name.equals("ReportName2"))
     assert(tr2.getTraceReports(1).getClassification.equals("NORMAL"))
     assert(tr2.getTraceReports(1).name.equals("ReportName3"))
-
   }
+  test("SMTReport - traceCount works") {
+    val tr = new SMTReport
+    val tr2 = new SMTReport
+    assert(tr.traceCount == 0)
+    assert(tr2.traceCount == 0)
+    tr.addTraceReport(new SMTTraceReport("ReportName", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName2", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName3", 1, 0, false))
+    assert(tr.traceCount == 3)
+    assert(tr2.traceCount == 0)
+  }
+  test("SMTReport - normal/anomalyCount works") {
+    val tr = new SMTReport
+    val tr2 = new SMTReport
+    assert(tr.normalCount == 0)
+    assert(tr2.normalCount == 0)
+    tr.addTraceReport(new SMTTraceReport("ReportName", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName2", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName3", 1, 0, false))
+    assert(tr.traceCount == 3)
+    assert(tr.normalCount == 1)
+    assert(tr.anomalyCount == 2)
+    assert(tr2.normalCount == 0)
+  }
+  test("SMTReport - normal/anomalyPercentage works") {
+    val tr = new SMTReport
+    val tr2 = new SMTReport
+    assert(!tr.normalPercentage.isDefined)
+    assert(!tr.anomalyPercentage.isDefined)
+    assert(!tr2.normalPercentage.isDefined)
+    assert(!tr2.anomalyPercentage.isDefined)
+    tr.addTraceReport(new SMTTraceReport("ReportName", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName2", 1, 0, true))
+    tr.addTraceReport(new SMTTraceReport("ReportName3", 1, 0, false))
+    assert(tr.normalPercentage.get == 1/3.0 * 100)
+    assert(tr.anomalyPercentage.get == 2/3.0 * 100)
+    assert(!tr2.normalPercentage.isDefined)
+    assert(!tr2.anomalyPercentage.isDefined)
+    tr.addTraceReport(new SMTTraceReport("ReportName4", 1, 0, false))
+    assert(tr.normalPercentage.get == 2/4.0 * 100)
+    assert(tr.anomalyPercentage.get == 2/4.0 * 100)
+    tr.addTraceReport(new SMTTraceReport("ReportName5", 1, 0, false))
+    assert(tr.normalPercentage.get == 3/5.0 * 100)
+    assert(tr.anomalyPercentage.get == 2/5.0 * 100)
+  }
+
 }
