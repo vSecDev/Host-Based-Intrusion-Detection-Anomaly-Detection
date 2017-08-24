@@ -143,7 +143,7 @@ class SMTPlugin extends DecisionEnginePlugin {
                 val anomalyCount = quotients.count(_ < threshold.get)
                 val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
                 var isAnomaly = anomalyPercentage > tolerance.get
-                report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly))
+                report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get))
               }
             } else node match {
               case n: Node[String, String] =>
@@ -161,7 +161,7 @@ class SMTPlugin extends DecisionEnginePlugin {
                   val anomalyCount = quotients.count(_ < threshold.get)
                   val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
                   var isAnomaly = anomalyPercentage > tolerance.get
-                  report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly))
+                  report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get))
                 }
               case _ => //TODO - ADD LOGIC FOR OTHER TYPES
             }

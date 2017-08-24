@@ -23,11 +23,18 @@ class SMTReport extends DecisionEngineReport {
   def normalPercentage: Option[Double] = if(traceReports.isEmpty) None else Some((normalCount/traceReports.size.toDouble) * 100.00)
   def getAnomalousTraces: Vector[SMTTraceReport] = traceReports.filter(_.classification)
   def getNormalTraces: Vector[SMTTraceReport] = traceReports.filter(!_.classification)
-
+  private def aPercentStr: String = anomalyPercentage match {
+    case None => "N/A"
+    case Some(x) => x.toString
+  }
+  private def nPercentStr: String = normalPercentage match {
+    case None => "N/A"
+    case Some(x) => x.toString
+  }
 
   override def toString: String = {
     val sb = new StringBuilder
-    sb.append("\nSMT Report ID: " + id + " - Trace Count: " + traceCount + " - Anomalous traces: " + anomalyCount + " - Normal traces: " + normalCount + " - Anomaly percentage: " + anomalyPercentage + " - Normal percentage: " + normalPercentage + "\nClassified traces: ")
+    sb.append("\nSMT Report ID: " + id + " - Trace Count: " + traceCount + " - Anomalous traces: " + anomalyCount + " - Normal traces: " + normalCount + " - Anomaly percentage: " + aPercentStr + " - Normal percentage: " + nPercentStr + "\nClassified traces: ")
 
     for(tr <- traceReports){
       sb.append(tr.toString)
@@ -44,19 +51,27 @@ object SMTReport{
 
 
 //TODO - TEST CLASS
-class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean){
+class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean, quotients: Vector[Double], threshold: Double, tolerance: Double){
   private val id = SMTTraceReport.inc
 
   require(subtraceCnt >= 0, "SMTTraceReport subtrace count must be non-negative!")
   require(anomalyCnt >= 0, "SMTTraceReport anomalous subtrace count must be non-negative!")
   require(anomalyCnt <= subtraceCnt, "SMTTraceReport anomalous subtrace count cannot be higher than overall subtrace count!")
+  require(threshold >= 0.0, "SMTSettings threshold must be non-negative!")
+  require(tolerance >= 0.0 && tolerance <= 100.0, "SMTSettings tolerance must be between 0-100%!")
 
+  def getID = id
   //Percentage of anomalous subtraces within one sequence of system calls
   def anomalyPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((anomalyCnt.toDouble / subtraceCnt) * 100.00)
+
   def normalPercentage: Option[Double] = if(subtraceCnt == 0) None else Some((normalCount.toDouble / subtraceCnt) * 100.00)
+
   def normalCount: Int = subtraceCnt - anomalyCnt
+
   def getClassification: String = if(classification) "ANOMALY" else "NORMAL"
-  def getID = id
+
+  def getHistogram = Distribution(10, quotients.toList).histogram
+
   private def aPercentStr: String = anomalyPercentage match {
     case None => "N/A"
     case Some(x) => x.toString
@@ -66,7 +81,24 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
     case Some(x) => x.toString
   }
 
-  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
+  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification + " - Threshold: " + threshold + " - Tolerance: " + tolerance
+
+  case class Distribution(nBins: Int, data: List[Double]) {
+    require(data.length > nBins)
+
+    val Epsilon = 0.000001
+    val (max, min) = (data.max, data.min)
+    val binWidth = (max - min) / nBins + Epsilon
+    val bounds = (1 to nBins).map { x => min + binWidth * x }.toList
+
+    def histo(bounds: List[Double], data: List[Double]): List[List[Double]] =
+      bounds match {
+        case h :: Nil => List(data)
+        case h :: t => val (l, r) = data.partition(_ < h); l :: histo(t, r)
+      }
+
+    val histogram = histo(bounds, data)
+  }
 }
 
 object SMTTraceReport{

@@ -3,7 +3,7 @@ package DecisionEngine.SMT
 import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException, _}
 
 import Data.File.FileProcessor
-import Data.{DataException, DataModel}
+import Data.{DataException, DataModel, StringDataWrapper}
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
@@ -2429,14 +2429,23 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val attackRatio = 62.0
     val validationRatio = 83.0
     val extensions = Array("GHC")
+    var trainingDir = ""
+    var validationDir = ""
+    var attackDir = ""
 
-    val trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
-    val validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
-    val attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+    if(isHome) {
+      trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
+    }else{
+      trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Training_Data\\"
+      validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
+      attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
+    }
 
     val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
-    val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
-    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)
+   /* val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+    val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)*/
 
     var counter = 0
     val n1 = new Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
@@ -2463,19 +2472,25 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
       case _: Exception => println("Exception. maxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - smoothing: " + smoothing)
     }
 
-
     val fp = new FileProcessor
     val dm = new DataModel
     dm.store(n1)
-    val wrapper = fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
+    var wrapper: StringDataWrapper = if (isHome) {
+      fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
+    }
+    else {
+      fp.getData(new File(validationDir + "Validation-Tomcat-Part1_488_INT.GHC"), extensions).get
+    }
+
     val settings = new SMTSettings(1, 1, 1, 1.1, 1.1, true, threshold, tolerance)
     val config = new SMTConfig
     config.storeSettings(settings)
     val plugin = new SMTPlugin
     plugin.configure(config)
     val report = plugin.classify(Vector(wrapper), Some(dm), true)
-    println(report)
+    println(report.get)
   }
+
 
 }
 
