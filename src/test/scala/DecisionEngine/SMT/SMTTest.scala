@@ -2481,13 +2481,19 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     else {
       fp.getData(new File(validationDir + "Validation-Tomcat-Part1_488_INT.GHC"), extensions).get
     }
+    var wrapper2: StringDataWrapper = if (isHome) {
+      fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
+    }
+    else {
+      fp.getData(new File(validationDir + "Validation-Tomcat-Part2_784_INT.GHC"), extensions).get
+    }
 
     val settings = new SMTSettings(1, 1, 1, 1.1, 1.1, true, threshold, tolerance)
     val config = new SMTConfig
     config.storeSettings(settings)
     val plugin = new SMTPlugin
     plugin.configure(config)
-    val report = plugin.classify(Vector(wrapper), Some(dm), true)
+    val report = plugin.classify(Vector(wrapper, wrapper2), Some(dm), true)
     println(report.get)
   }
 

@@ -120,7 +120,7 @@ class SMTPlugin extends DecisionEnginePlugin {
   }
 
   private def classifyHelper(data: Vector[DataWrapper], node: Node[_,_], ints: Boolean): Option[DecisionEngineReport] = {
-    var report = new SMTReport
+    var report = new SMTReport(threshold.get, tolerance.get)
 
     data foreach (wrapper => wrapper match {
       case w: StringDataWrapper => w.retrieve match {
