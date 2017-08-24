@@ -62,7 +62,13 @@ class SMTPlugin extends DecisionEnginePlugin {
     }
   }
 
-  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = ???
+  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
+
+    classify(data, model, ints) match {
+      case None => None
+      case Some(report: SMTReport) => Some(new SMTValidationReport(report))
+    }
+  }
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
@@ -169,7 +175,7 @@ class SMTPlugin extends DecisionEnginePlugin {
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
-    Some(report)
+    if(report.getTraceReports.isEmpty) None else Some(report)
   }
 
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {

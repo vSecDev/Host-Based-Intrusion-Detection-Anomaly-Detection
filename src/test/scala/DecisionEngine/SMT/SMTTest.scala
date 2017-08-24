@@ -2433,18 +2433,18 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     var validationDir = ""
     var attackDir = ""
 
-    if(isHome) {
+    if (isHome) {
       trainingDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Validation_Data\\"
       attackDir = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Main\\Full_Process_Traces_Int\\Full_Trace_Attack_Data\\"
-    }else{
+    } else {
       trainingDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Training_Data\\"
       validationDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Validation_Data\\"
       attackDir = "C:\\Users\\apinter\\Documents\\Andras docs\\Other\\Uni\\BBK_PROJECT\\Datasets\\ClassifyTest\\Full_Process_Traces\\Full_Trace_Attack_Data\\"
     }
 
     val trainingFiles = fileStreamNoDirs(new File(trainingDir), extensions)
-   /* val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
+    /* val validationFiles = fileStreamNoDirs(new File(validationDir), extensions)
     val attackFiles = fileStreamNoDirs(new File(attackDir), extensions)*/
 
     var counter = 0
@@ -2475,29 +2475,29 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val fp = new FileProcessor
     val dm = new DataModel
     dm.store(n1)
-    var wrapper: StringDataWrapper = if (isHome) {
-      fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
-    }
-    else {
-      fp.getData(new File(validationDir + "Validation-Tomcat-Part1_488_INT.GHC"), extensions).get
-    }
-    var wrapper2: StringDataWrapper = if (isHome) {
-      fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get
-    }
-    else {
-      fp.getData(new File(validationDir + "Validation-Tomcat-Part2_784_INT.GHC"), extensions).get
-    }
-
+    var wrapper: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "Validation-Tomcat-Part1_488_INT.GHC"), extensions).get
+    var wrapper2: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "Validation-Tomcat-Part2_784_INT.GHC"), extensions).get
     val settings = new SMTSettings(1, 1, 1, 1.1, 1.1, true, threshold, tolerance)
+
     val config = new SMTConfig
     config.storeSettings(settings)
     val plugin = new SMTPlugin
     plugin.configure(config)
-    val report = plugin.classify(Vector(wrapper, wrapper2), Some(dm), true)
-    println(report.get)
+
+    val report = plugin.classify(Vector(wrapper, wrapper2), Some(dm), true).get.asInstanceOf[SMTReport]
+    assert(report.getTraceReports.size == 2)
+
+    println(report)
+    val valReport = plugin.validate(Vector(wrapper, wrapper2), Some(dm), true).get.asInstanceOf[SMTValidationReport]
+    assert(valReport.getReport.get.getTraceReports.size == 2)
+    assert(valReport.classificationError.get == 50.0)
+
+    var wrapper3: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "TooShort1.GHC"), extensions).get
+    var wrapper4: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "TooShort2.GHC"), extensions).get
+
+    assert(plugin.classify(Vector(wrapper3, wrapper4), Some(dm), true).isEmpty)
+    assert(plugin.validate(Vector(wrapper3, wrapper4), Some(dm), true).isEmpty)
   }
-
-
 }
 
 
