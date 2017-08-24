@@ -1,7 +1,6 @@
 package DecisionEngine.SMT
 
 import java.text.DecimalFormat
-
 import DecisionEngine.DecisionEngineReport
 
 /**
@@ -11,7 +10,6 @@ class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineRepo
   private val id = SMTReport.inc
   private val df: DecimalFormat = new DecimalFormat("##.##")
   private var traceReports: Vector[SMTTraceReport] = Vector()
-
 
   override type T = (Vector[SMTTraceReport])
   override def getReport(): Option[Vector[SMTTraceReport]] = Some(getTraceReports)
@@ -62,8 +60,6 @@ object SMTReport{
   private var id = 0
   private def inc = {id+= 1; id}
 }
-
-
 
 //TODO - TEST CLASS
 class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean, quotients: Vector[Double], threshold: Double, tolerance: Double){

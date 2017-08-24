@@ -172,27 +172,6 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(report)
   }
 
-  /*private def classifyTrace(node: Node[_,_], trace: (String, String), ints: Boolean) = {
-    var quotients: Vector[Double] = Vector()
-    var input = if(ints) getIntInput(node.maxDepth, trace._2) else getStrInput(node.maxDepth, trace._2)
-
-    for (t <- input) {
-      val prediction = if(ints) node.asInstanceOf[Node[Int,Int]].predict(t._1.asInstanceOf[Vector[Int]], t._2.asInstanceOf[Int]) else node.asInstanceOf[Node[String, String]].predict(t._1.asInstanceOf[Vector[String]], t._2.asInstanceOf[String])
-      var quotient = 0.0
-      if (prediction._2 != 0.0) {
-        quotient = prediction._1 / prediction._2
-      }
-      quotients = quotients :+ quotient
-    }
-
-    if (quotients.nonEmpty) {
-      val anomalyCount = quotients.count(_ < threshold.get)
-      val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
-      var isAnomaly = anomalyPercentage > tolerance.get
-      new SMTTraceReport(trace._1, quotients.size, anomalyCount, isAnomaly)
-
-  }}*/
-
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty
     val linesArray = lines.split("\\s+")
