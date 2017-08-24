@@ -11,7 +11,7 @@ class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineRepo
   private val df: DecimalFormat = new DecimalFormat("##.##")
   private var traceReports: Vector[SMTTraceReport] = Vector()
 
-  override type T = (Vector[SMTTraceReport])
+  override type T = Vector[SMTTraceReport]
   override def getReport(): Option[Vector[SMTTraceReport]] = Some(getTraceReports)
 
   //TODO - TEST CLASS
