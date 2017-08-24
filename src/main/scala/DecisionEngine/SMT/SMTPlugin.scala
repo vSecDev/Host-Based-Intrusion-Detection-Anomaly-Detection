@@ -19,7 +19,7 @@ class SMTPlugin extends DecisionEnginePlugin {
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
       try
-        c.asInstanceOf[SMTConfig].getSettings match {
+        c.getSettings match {
           case None => false
           case Some(s) => if (s.isIntTrace) {
             setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
@@ -43,56 +43,44 @@ class SMTPlugin extends DecisionEnginePlugin {
     if (data.isEmpty) return model
 
     model match {
-      case None => {
+      case None =>
         root match {
           case None => None //No model/SMT to train
-          case Some(node) =>
-            learnHelper(data, node, ints)
+          case Some(node) => learnHelper(data, node, ints)
         }
-      }
-      case Some(w) => {
+      case Some(w) =>
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_,_] => learnHelper(data, node, ints)
+            case node: Node[_, _] => learnHelper(data, node, ints)
             case _ => None
           }
         }
-      }
     }
   }
 
-  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
-
-    classify(data, model, ints) match {
-      case None => None
-      case Some(report: SMTReport) => Some(new SMTValidationReport(report))
-    }
+  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = classify(data, model, ints) match {
+    case None => None
+    case Some(report: SMTReport) => Some(new SMTValidationReport(report))
   }
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
 
     model match {
-      case None => {
+      case None =>
         root match {
           case None => None //No model/SMT to classify with
-          case Some(node) =>
-            //TODO - CLASSIFY WITH ROOT HERE
-            classifyHelper(data, node, ints)
+          case Some(node) => classifyHelper(data, node, ints)
         }
-      }
-      case Some(w) => {
+      case Some(w) =>
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_, _] =>
-              //TODO CLASSIFY WITH PASSED MODEL HERE
-              classifyHelper(data, node, ints)
+            case node: Node[_, _] => classifyHelper(data, node, ints)
             case _ => None
           }
         }
-      }
     }
   }
 
@@ -148,7 +136,7 @@ class SMTPlugin extends DecisionEnginePlugin {
               if (quotients.nonEmpty) {
                 val anomalyCount = quotients.count(_ < threshold.get)
                 val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
-                var isAnomaly = anomalyPercentage > tolerance.get
+                val isAnomaly = anomalyPercentage > tolerance.get
                 report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get))
               }
             } else node match {
@@ -181,9 +169,7 @@ class SMTPlugin extends DecisionEnginePlugin {
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
     var wholeTrace: Vector[Int] = Vector.empty
     val linesArray = lines.split("\\s+")
-    if (linesArray.forall(_.matches("[0-9]*"))) {
-      wholeTrace = linesArray.map(_.trim.toInt).toVector
-    }
+    if (linesArray.forall(_.matches("[0-9]*"))) wholeTrace = linesArray.map(_.trim.toInt).toVector
 
     var input: Vector[(Vector[Int], Int)] = Vector[(Vector[Int], Int)]()
     for (t <- wholeTrace.sliding(maxDepth, 1)) {

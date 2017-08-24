@@ -7,6 +7,7 @@ import DecisionEngine.DecisionEngineReport
   * Created by apinter on 11/08/2017.
   */
 class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineReport {
+
   private val id = SMTReport.inc
   private val df: DecimalFormat = new DecimalFormat("##.##")
   private var traceReports: Vector[SMTTraceReport] = Vector()
@@ -14,7 +15,6 @@ class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineRepo
   override type T = Vector[SMTTraceReport]
   override def getReport(): Option[Vector[SMTTraceReport]] = Some(getTraceReports)
 
-  //TODO - TEST CLASS
   def getID = id
 
   def addTraceReport(report: SMTTraceReport): Unit = traceReports = traceReports :+ report
@@ -47,21 +47,20 @@ class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineRepo
 
   override def toString: String = {
     val sb = new StringBuilder
-    sb.append("\nSMT Report ID: " + id + " - Trace Count: " + traceCount + " - Anomalous traces: " + anomalyCount + " - Normal traces: " + normalCount + " - Anomaly percentage: " + aPercentStr + " - Normal percentage: " + nPercentStr + " - Threshold: " + threshold + " - Tolerance: " + tolerance + "\nClassified traces: ")
+    sb.append("SMT Report ID: " + id + " - Trace Count: " + traceCount + " - Anomalous traces: " + anomalyCount + " - Normal traces: " + normalCount + " - Anomaly percentage: " + aPercentStr + " - Normal percentage: " + nPercentStr + " - Threshold: " + threshold + " - Tolerance: " + tolerance + "\nClassified traces: ")
 
     for(tr <- traceReports){
       sb.append(tr.toString)
     }
     sb.toString
   }
-
 }
+
 object SMTReport{
   private var id = 0
   private def inc = {id+= 1; id}
 }
 
-//TODO - TEST CLASS
 class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int, val classification: Boolean, quotients: Vector[Double], threshold: Double, tolerance: Double){
 
   private val id = SMTTraceReport.inc

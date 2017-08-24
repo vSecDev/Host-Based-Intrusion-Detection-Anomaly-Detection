@@ -2491,7 +2491,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     val valReport = plugin.validate(Vector(wrapper, wrapper2), Some(dm), true).get.asInstanceOf[SMTValidationReport]
     assert(valReport.getReport.get.getTraceReports.size == 2)
     assert(valReport.classificationError.get == 50.0)
-
+    //println("\nVALREP: \n" + valReport)
     var wrapper3: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "TooShort1.GHC"), extensions).get
     var wrapper4: StringDataWrapper = if (isHome) fp.getData(new File(validationDir + "Validation-PMWiki_628_INT.GHC"), extensions).get else fp.getData(new File(validationDir + "TooShort2.GHC"), extensions).get
 
