@@ -1,5 +1,7 @@
 package GUI;
 
+import Data.DataModel;
+import Data.DataProcessor;
 import DecisionEngine.DecisionEnginePlugin;
 import javax.swing.*;
 import java.awt.*;
@@ -13,20 +15,28 @@ import java.util.Properties;
 
 public class HIDS {
 
-    private List<DecisionEnginePlugin> plugins = new ArrayList<DecisionEnginePlugin>();
+    private static final String configPath =  new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
+    private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
+    private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
+    private DecisionEnginePlugin currentDecisionEngine = null;
+    private DataProcessor currentDataModule = null;
+
+
+    //TODO - ADD FILEPROCESSOR DATA MODULE TO CONFIG + INIT LOGIC
+
+    public HIDS(){
+        this.initialise();
+    }
+
+
 
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
+
         String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
         //System.out.println(System.getProperty("user.dir"));
-        Properties props = hids.loadProperties(configPath);
-        if (props != null) {
-            loadPlugins(hids, props);
-        }
-        for (DecisionEnginePlugin de : hids.plugins) {
-            System.out.println("de in main: " + de.pluginName());
-        }
+
 
 
         /*javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -64,24 +74,20 @@ public class HIDS {
         frame.setVisible(true);
     }
 
-    private static void loadPlugins(HIDS hids, Properties props) {
-
-        ClassLoader classLoader = HIDS.class.getClassLoader();
-        try {
-            String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
-            for (String s : decisionEngines) {
-                Class c = classLoader.loadClass(s);
-                DecisionEnginePlugin smtPlugin = (DecisionEnginePlugin) c.newInstance();
-                hids.plugins.add(smtPlugin);
-            }
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
+    private boolean initialise(){
+        Properties props = this.loadProperties(configPath);
+        if (props != null) {
+            loadPlugins(this, props);
+            loadDataModules(this, props);
         }
+        for (DecisionEnginePlugin de : decisionEngines) {
+            System.out.println("de in main: " + de.pluginName());
+        }
+        for(DataProcessor dp : dataModules){
+            System.out.println("dm in main: " + dp.getClass().getName());
+        }
+        return decisionEngines != null && dataModules != null;
+
     }
 
     private Properties loadProperties(String path) {
@@ -105,4 +111,45 @@ public class HIDS {
         }
         return null;
     }
+    //TODO - EXCEPTION HANDLING!!!
+    private void loadPlugins(HIDS hids, Properties props) {
+
+        ClassLoader classLoader = HIDS.class.getClassLoader();
+        try {
+            String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
+            for (String s : decisionEngines) {
+                Class c = classLoader.loadClass(s);
+                DecisionEnginePlugin smtPlugin = (DecisionEnginePlugin) c.newInstance();
+                hids.decisionEngines.add(smtPlugin);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+    private void loadDataModules(HIDS hids, Properties props) {
+
+        ClassLoader classLoader = HIDS.class.getClassLoader();
+        try {
+            String[] dataModules = props.getProperty("dataModule").trim().split("\\s*,\\s*");
+            for (String s : dataModules) {
+                Class c = classLoader.loadClass(s);
+                DataProcessor dataProcessor = (DataProcessor) c.newInstance();
+                hids.dataModules.add(dataProcessor);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
