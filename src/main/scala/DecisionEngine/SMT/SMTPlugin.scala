@@ -12,7 +12,7 @@ import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngin
 class SMTPlugin extends DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
-  private var root: Option[Node[_,_]] = None
+  private var root: Option[Node[_, _]] = None
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
 
@@ -38,6 +38,14 @@ class SMTPlugin extends DecisionEnginePlugin {
       }
     case _ => false
   }
+
+  override def getConfiguration: Option[DecisionEngineConfig] = if (isConfigured) {
+    val config = new SMTConfig
+    val r = root.get
+    val settings = new SMTSettings(r.maxDepth, r.maxPhi, r.maxSeqCount, r.smoothing, r.prior, r.isInstanceOf[Node[Int, Int]], threshold.get, tolerance.get)
+    config.storeSettings(settings)
+    Some(config)
+  } else None
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     if (data.isEmpty) return model
@@ -113,7 +121,7 @@ class SMTPlugin extends DecisionEnginePlugin {
     Some(dm)
   }
 
-  private def classifyHelper(data: Vector[DataWrapper], node: Node[_,_], ints: Boolean): Option[DecisionEngineReport] = {
+  private def classifyHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DecisionEngineReport] = {
     var report = new SMTReport(threshold.get, tolerance.get)
 
     data foreach (wrapper => wrapper match {
@@ -125,7 +133,7 @@ class SMTPlugin extends DecisionEnginePlugin {
               //process as int trace
               var quotients: Vector[Double] = Vector()
               for (t <- getIntInput(node.maxDepth, d._2)) {
-                val prediction = node.asInstanceOf[Node[Int,Int]].predict(t._1, t._2)
+                val prediction = node.asInstanceOf[Node[Int, Int]].predict(t._1, t._2)
                 var quotient = 0.0
                 if (prediction._2 != 0.0) {
                   quotient = prediction._1 / prediction._2
@@ -144,7 +152,7 @@ class SMTPlugin extends DecisionEnginePlugin {
                 //process as string trace
                 var quotients: Vector[Double] = Vector()
                 for (t <- getStrInput(node.maxDepth, d._2)) {
-                  val prediction = node.asInstanceOf[Node[String,String]].predict(t._1, t._2)
+                  val prediction = node.asInstanceOf[Node[String, String]].predict(t._1, t._2)
                   var quotient = 0.0
                   if (prediction._2 != 0.0) {
                     quotient = prediction._1 / prediction._2
@@ -163,7 +171,7 @@ class SMTPlugin extends DecisionEnginePlugin {
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
-    if(report.getTraceReports.isEmpty) None else Some(report)
+    if (report.getTraceReports.isEmpty) None else Some(report)
   }
 
   private def getIntInput(maxDepth: Int, lines: String): Vector[(Vector[Int], Int)] = {
@@ -194,6 +202,8 @@ class SMTPlugin extends DecisionEnginePlugin {
   private def setThreshold(t: Double) = threshold = Some(t)
 
   private def setTolerance(t: Double) = tolerance = Some(t)
+
+  private def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def loadModel(model: DataModel): Boolean = model.retrieve match {
     case None => false
