@@ -15,6 +15,28 @@ public class HIDS {
 
     private List<DecisionEnginePlugin> plugins = new ArrayList<DecisionEnginePlugin>();
 
+    public static void main(String[] args) {
+
+        HIDS hids = new HIDS();
+        String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
+        //System.out.println(System.getProperty("user.dir"));
+        Properties props = hids.loadProperties(configPath);
+        if (props != null) {
+            loadPlugins(hids, props);
+        }
+        for (DecisionEnginePlugin de : hids.plugins) {
+            System.out.println("de in main: " + de.pluginName());
+        }
+
+
+        /*javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                startGUI();
+            }
+        });*/
+    }
+
+
     private static void startGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame("HIDS");
@@ -40,27 +62,6 @@ public class HIDS {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        HIDS hids = new HIDS();
-        String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
-        //System.out.println(System.getProperty("user.dir"));
-        Properties props = hids.loadProperties(configPath);
-        if (props != null) {
-            loadPlugins(hids, props);
-        }
-
-        for (DecisionEnginePlugin de : hids.plugins) {
-            System.out.println("de in main: " + de.pluginName());
-        }
-
-
-       /* javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                startGUI();
-            }
-        });*/
     }
 
     private static void loadPlugins(HIDS hids, Properties props) {
