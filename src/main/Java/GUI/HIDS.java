@@ -1,34 +1,25 @@
 package GUI;
 
 import DecisionEngine.DecisionEnginePlugin;
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-
-/* HIDS.java requires no other files. */
 public class HIDS {
 
-
-    //private List plugins = new ArrayList<DecisionEnginePlugin>();
-
-
-
-
-
-
+    private List<DecisionEnginePlugin> plugins = new ArrayList<DecisionEnginePlugin>();
 
     private static void startGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame("HIDS");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800,500);
+        frame.setSize(800, 500);
 
         //Create the menu bar.  Make it have a green background.
         JMenuBar greenMenuBar = new JMenuBar();
@@ -52,58 +43,54 @@ public class HIDS {
     }
 
     public static void main(String[] args) {
+        HIDS hids = new HIDS();
         String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
         //System.out.println(System.getProperty("user.dir"));
-        System.out.println("configPath: " + configPath);
-        Properties props = loadProperties(configPath);
-        if(props != null){
-            loadPlugins(props);
+        Properties props = hids.loadProperties(configPath);
+        if (props != null) {
+            loadPlugins(hids, props);
+        }
+
+        for (DecisionEnginePlugin de : hids.plugins) {
+            System.out.println("de in main: " + de.pluginName());
         }
 
 
-
-
-
-
-
-      /*  javax.swing.SwingUtilities.invokeLater(new Runnable() {
+       /* javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 startGUI();
             }
         });*/
     }
 
-    private static void loadPlugins(Properties props){
+    private static void loadPlugins(HIDS hids, Properties props) {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
-
         try {
-            System.out.println(System.getProperty("user.dir"));
-            //
-             Class aClass = classLoader.loadClass(props.getProperty("dePlugin"));
-             System.out.println("aClass name: " + aClass.getName());
+            String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
+            for (String s : decisionEngines) {
+                Class c = classLoader.loadClass(s);
+                DecisionEnginePlugin smtPlugin = (DecisionEnginePlugin) c.newInstance();
+                hids.plugins.add(smtPlugin);
+            }
 
-            System.out.println(Class.forName(props.getProperty("dePlugin")).getName());
-            //System.out.println(Class.forName("DecisionEngine.SMT.SparseMarkovTree"));
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
     }
 
-    private static Properties loadProperties(String path){
+    private Properties loadProperties(String path) {
         Properties prop = new Properties();
         InputStream input = null;
 
         try {
-
             input = new FileInputStream(path);
-
-            // load a properties file
             prop.load(input);
             return prop;
-            // get the property value and print it out
-            //System.out.println(prop.getProperty("dePlugin"));
-
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -117,6 +104,4 @@ public class HIDS {
         }
         return null;
     }
-
-
 }
