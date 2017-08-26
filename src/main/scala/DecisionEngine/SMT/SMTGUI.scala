@@ -1,8 +1,10 @@
 package DecisionEngine.SMT
 
+import java.awt.event.{ItemEvent, ItemListener}
 import java.awt.{Toolkit, _}
 import javax.swing.{JFormattedTextField, _}
 import javax.swing.text._
+
 import DecisionEngine.DecisionEngineGUI
 
 
@@ -37,13 +39,14 @@ class SMTGUI extends DecisionEngineGUI {
   private final val toleranceLabel = new JLabel(toleranceStr)
   private final val isIntLabel = new JLabel(isIntStr)
 
+  private var isInts: Boolean = false
 
   override def getGUIComponent: Option[JPanel] = {
     pluginInstance match {
       case None => None
       case Some(smt) =>{
         if(smt.isConfigured){
-          val config = smt.getConfiguration.get.getSettings.get.asInstanceOf[SMTConfig].getSettings.get
+          val config = smt.getConfiguration.get.getSettings.get.asInstanceOf[SMTSettings]
           //TODO - INITIALISE TEXT FIELDS HERE - MAKE SURE UPDATES ARE REFLECTED
         }else{
 
@@ -68,29 +71,37 @@ class SMTGUI extends DecisionEngineGUI {
 
 
   //TODO - DELETE TEST
-  def test(panel: JPanel): Unit ={
+  def test(panel: JPanel): Unit = {
     val frame = new JFrame("HIDS")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.setSize(800, 500)
 
     panel.add(new JLabel(maxDepthStr))
-    addNonNegNumTextField(panel,maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    addNonNegNumTextField(panel, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
     panel.add(new JLabel(maxPhiStr))
     addNonNegNumTextField(panel, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
     panel.add(new JLabel(maxSeqCntStr))
-    addNonNegNumTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr , 3, isPositive = true, isDouble = false, isPercent = false)
+    addNonNegNumTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
     panel.add(new JLabel(thresholdStr))
     addNonNegNumTextField(panel, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
     panel.add(new JLabel(toleranceStr))
     addNonNegNumTextField(panel, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
 
+    val intsCheckBox = new JCheckBox("Integer traces")
+    intsCheckBox.addItemListener(new ItemListener {
+      override def itemStateChanged(e: ItemEvent): Unit = {
+        val isIntsBox = e.getSource.asInstanceOf[JCheckBox]
+        isInts = isIntsBox.isSelected
+        println("intbox state: " + isInts)
+      }
+    })
+    panel.add(intsCheckBox)
 
     val cp = frame.getContentPane
     cp.setLayout(new FlowLayout(FlowLayout.LEFT))
     cp.add(panel)
     frame.pack()
     frame.setVisible(true)
-
 
 
   }
