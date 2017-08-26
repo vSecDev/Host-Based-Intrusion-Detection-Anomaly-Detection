@@ -199,11 +199,11 @@ class SMTPlugin extends DecisionEnginePlugin {
 
   private def setRoot(node: Node[_, _]) = root = Some(node)
 
-  private def setThreshold(t: Double) = threshold = Some(t)
+  def setThreshold(t: Double) = threshold = Some(t)
 
-  private def setTolerance(t: Double) = tolerance = Some(t)
+  def setTolerance(t: Double) = tolerance = Some(t)
 
-  private def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
+  def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def loadModel(model: DataModel): Boolean = model.retrieve match {
     case None => false
