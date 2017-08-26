@@ -48,10 +48,6 @@ class SMTGUI extends DecisionEngineGUI {
   private final val isIntLabel = new JLabel(isIntStr)
 
 
-
-
-
-
   override def getGUIComponent: Option[JPanel] = {
     pluginInstance match {
       case None => None
@@ -79,20 +75,16 @@ class SMTGUI extends DecisionEngineGUI {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.setSize(800, 500)
 
-
     panel.add(new JLabel(maxDepthStr))
-    addNonNegNumTextField(panel,maxDepthStr, maxDepthToolTipStr, 3, true, false)
+    addNonNegNumTextField(panel,maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
     panel.add(new JLabel(maxPhiStr))
-    addNonNegNumTextField(panel, maxPhiStr, maxPhiToolTipStr, 3, false, false)
+    addNonNegNumTextField(panel, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
     panel.add(new JLabel(maxSeqCntStr))
-    addNonNegNumTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr , 3, true, false)
-
-
-
+    addNonNegNumTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr , 3, isPositive = true, isDouble = false, isPercent = false)
     panel.add(new JLabel(thresholdStr))
-    addNonNegNumTextField(panel, thresholdStr, thresholdToolTipStr, 5, false, true)
+    addNonNegNumTextField(panel, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
     panel.add(new JLabel(toleranceStr))
-    addNonNegNumTextField(panel, toleranceStr, toleranceToolTipStr, 5, false, true)
+    addNonNegNumTextField(panel, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
 
 
     val cp = frame.getContentPane
@@ -105,7 +97,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   }
 
-   private def addNonNegNumTextField(panel: JPanel,fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean) = {
+   private def addNonNegNumTextField(panel: JPanel,fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean) = {
 
      //val integerNumberInstance = NumberFormat.getIntegerInstance
      //val field = new JFormattedTextField(integerNumberInstance)
@@ -115,7 +107,7 @@ class SMTGUI extends DecisionEngineGUI {
      field.createToolTip()
      field.setToolTipText(tooltipStr)
      val doc = field.getDocument.asInstanceOf[PlainDocument]
-     doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble))
+     doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble, isPercent))
      panel.add(field)
    }
 
@@ -123,7 +115,7 @@ class SMTGUI extends DecisionEngineGUI {
 
 
 
-private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean) extends DocumentFilter {
+private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean, isPercent: Boolean) extends DocumentFilter {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
@@ -132,19 +124,23 @@ private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean) extends Do
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.insert(offset, string)
-      if (test(sb.toString, isDouble)) super.insertString(fb, offset, string, attr)
+      if (test(sb.toString, isDouble, isPercent)) super.insertString(fb, offset, string, attr)
       else {
         // warn the user and don't allow the insert
         println("insertString test failed. removing new char")
-        Toolkit.getDefaultToolkit.beep()      }
+        Toolkit.getDefaultToolkit.beep     }
     }
 
-    private def test(text: String, isDouble: Boolean) = try {
+    private def test(text: String, isDouble: Boolean, isPercent: Boolean) = try {
       println("in test")
+
       if(isDouble){
         val input = text.toDouble
-        (isPositive && input > 0.0) || (!isPositive && input >= 0.0)
-
+        if(isPercent){
+          (isPositive && input > 0.0 && input <= 100.0) || (!isPositive && input >= 0.0 && input <= 100.0)
+        }else {
+          (isPositive && input > 0.0) || (!isPositive && input >= 0.0)
+        }
       }else {
         val input = text.toInt
         (isPositive && input > 0) || (!isPositive && input >= 0)
@@ -162,8 +158,9 @@ private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean) extends Do
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.replace(offset, offset + length, text)
-      if (test(sb.toString, isDouble)) super.replace(fb, offset, length, text, attrs)
+      if (test(sb.toString, isDouble, isPercent)) super.replace(fb, offset, length, text, attrs)
       else {
+        Toolkit.getDefaultToolkit.beep
       }
     }
 
@@ -174,9 +171,10 @@ private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean) extends Do
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.delete(offset, offset + length)
-      if (test(sb.toString, isDouble)) super.remove(fb, offset, length)
+      if(sb.toString().length() == 0) super.replace(fb, offset, length, "", null)
+      else if (test(sb.toString, isDouble, isPercent)) super.remove(fb, offset, length)
       else {
-
+        Toolkit.getDefaultToolkit.beep
       }
     }
   }
