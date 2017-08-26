@@ -10,6 +10,7 @@ import java.text.NumberFormat
 import java.util.Locale
 import java.text.NumberFormat
 import java.awt.Toolkit
+import java.beans.{PropertyChangeEvent, PropertyChangeListener}
 
 import DecisionEngine.DecisionEngineGUI
 import javax.swing.JFormattedTextField
@@ -46,12 +47,6 @@ class SMTGUI extends DecisionEngineGUI {
   private final val toleranceLabel = new JLabel(toleranceStr)
   private final val isIntLabel = new JLabel(isIntStr)
 
-    /*private var posIntFormatter: NumberFormatter = _
-  private var posDoubleFormatter: NumberFormatter = _
-  private var percentFormat = null*/
-
-
-  //setupFormats
 
 
 
@@ -80,21 +75,25 @@ class SMTGUI extends DecisionEngineGUI {
 
   //TODO - DELETE TEST
   def test(panel: JPanel): Unit ={
-    //Create and set up the window.
     val frame = new JFrame("HIDS")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.setSize(800, 500)
 
 
     panel.add(new JLabel(maxDepthStr))
-    addNonNegIntTextField(panel,maxDepthStr, maxDepthToolTipStr, 3, true)
+    addNonNegNumTextField(panel,maxDepthStr, maxDepthToolTipStr, 3, true, false)
     panel.add(new JLabel(maxPhiStr))
-    addNonNegIntTextField(panel, maxPhiStr, maxPhiToolTipStr, 3, false)
+    addNonNegNumTextField(panel, maxPhiStr, maxPhiToolTipStr, 3, false, false)
     panel.add(new JLabel(maxSeqCntStr))
-    addNonNegIntTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr , 3, true)
+    addNonNegNumTextField(panel, maxSeqCntStr, maxSeqCntToolTipStr , 3, true, false)
 
-    /*panel.add(new JLabel(maxPhiStr))
-    addNonNegIntTextField(panel, 1)*/
+
+
+    panel.add(new JLabel(thresholdStr))
+    addNonNegNumTextField(panel, thresholdStr, thresholdToolTipStr, 5, false, true)
+    panel.add(new JLabel(toleranceStr))
+    addNonNegNumTextField(panel, toleranceStr, toleranceToolTipStr, 5, false, true)
+
 
     val cp = frame.getContentPane
     cp.setLayout(new FlowLayout(FlowLayout.LEFT))
@@ -104,34 +103,9 @@ class SMTGUI extends DecisionEngineGUI {
 
 
 
-
   }
 
-
-/*  private def setupFormats(): Unit = {
-
-    val posIntFormat = NumberFormat.getIntegerInstance
-    posIntFormatter = new NumberFormatter(posIntFormat)
-    posIntFormatter.setValueClass(classOf[Integer])
-    posIntFormatter.setMinimum(0)
-    posIntFormatter.setMaximum(Integer.MAX_VALUE)
-    posIntFormatter.setAllowsInvalid(false)
-    posIntFormatter.setCommitsOnValidEdit(true)
-
-    val posDoubleFormat = NumberFormat.getNumberInstance
-    posDoubleFormatter = new NumberFormatter(posDoubleFormat)
-    posDoubleFormatter.setValueClass(classOf[Double])
-    posDoubleFormatter.setValueClass(classOf[Integer])
-    posDoubleFormatter.setMinimum(0)
-    posDoubleFormatter.setMaximum(Double.MaxValue)
-    posDoubleFormatter.setAllowsInvalid(false)
-    posDoubleFormatter.setCommitsOnValidEdit(true)
-  }*/
-
-
-
-
-   private def addNonNegIntTextField(panel: JPanel,fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean) = {
+   private def addNonNegNumTextField(panel: JPanel,fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean) = {
 
      //val integerNumberInstance = NumberFormat.getIntegerInstance
      //val field = new JFormattedTextField(integerNumberInstance)
@@ -141,7 +115,7 @@ class SMTGUI extends DecisionEngineGUI {
      field.createToolTip()
      field.setToolTipText(tooltipStr)
      val doc = field.getDocument.asInstanceOf[PlainDocument]
-     doc.setDocumentFilter(new NonNegIntFilter(isPositive))
+     doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble))
      panel.add(field)
    }
 
@@ -149,7 +123,7 @@ class SMTGUI extends DecisionEngineGUI {
 
 
 
-private class NonNegIntFilter(isPositive: Boolean) extends DocumentFilter {
+private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean) extends DocumentFilter {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
@@ -158,19 +132,25 @@ private class NonNegIntFilter(isPositive: Boolean) extends DocumentFilter {
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.insert(offset, string)
-      if (test(sb.toString)) super.insertString(fb, offset, string, attr)
+      if (test(sb.toString, isDouble)) super.insertString(fb, offset, string, attr)
       else {
         // warn the user and don't allow the insert
         println("insertString test failed. removing new char")
         Toolkit.getDefaultToolkit.beep()      }
     }
 
-    private def test(text: String) = try {
+    private def test(text: String, isDouble: Boolean) = try {
       println("in test")
-      val input = text.toInt
-      (isPositive && input > 0) || (!isPositive && input >= 0)
+      if(isDouble){
+        val input = text.toDouble
+        (isPositive && input > 0.0) || (!isPositive && input >= 0.0)
+
+      }else {
+        val input = text.toInt
+        (isPositive && input > 0) || (!isPositive && input >= 0)
+      }
     } catch {
-      case e: NumberFormatException =>
+      case e: Throwable =>
         println("EXCEPTION: " + e.getMessage)
         false
     }
@@ -182,7 +162,7 @@ private class NonNegIntFilter(isPositive: Boolean) extends DocumentFilter {
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.replace(offset, offset + length, text)
-      if (test(sb.toString)) super.replace(fb, offset, length, text, attrs)
+      if (test(sb.toString, isDouble)) super.replace(fb, offset, length, text, attrs)
       else {
       }
     }
@@ -194,7 +174,7 @@ private class NonNegIntFilter(isPositive: Boolean) extends DocumentFilter {
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.delete(offset, offset + length)
-      if (test(sb.toString)) super.remove(fb, offset, length)
+      if (test(sb.toString, isDouble)) super.remove(fb, offset, length)
       else {
 
       }
