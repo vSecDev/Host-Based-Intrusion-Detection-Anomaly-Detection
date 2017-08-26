@@ -24,18 +24,24 @@ public class HIDS {
 
     //TODO - ADD FILEPROCESSOR DATA MODULE TO CONFIG + INIT LOGIC
 
-    public HIDS(){
-        this.initialise();
-    }
-
-
 
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
+        if(!hids.initialise()){
+            //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
 
-        String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
-        //System.out.println(System.getProperty("user.dir"));
+        }
+        for (DecisionEnginePlugin de : hids.decisionEngines) {
+            System.out.println("de in main: " + de.pluginName());
+        }
+        for(DataProcessor dp : hids.dataModules){
+            System.out.println("dm in main: " + dp.getClass().getName());
+        }
+        System.out.println("current de: " + hids.currentDecisionEngine.getClass().getName());
+        System.out.println("current dm: " + hids.currentDataModule.getClass().getName());
+
+
 
 
 
@@ -77,17 +83,8 @@ public class HIDS {
     private boolean initialise(){
         Properties props = this.loadProperties(configPath);
         if (props != null) {
-            loadPlugins(this, props);
-            loadDataModules(this, props);
-        }
-        for (DecisionEnginePlugin de : decisionEngines) {
-            System.out.println("de in main: " + de.pluginName());
-        }
-        for(DataProcessor dp : dataModules){
-            System.out.println("dm in main: " + dp.getClass().getName());
-        }
-        return decisionEngines != null && dataModules != null;
-
+           return(loadPlugins(this, props) && loadDataModules(this, props));
+        }else {return false;}
     }
 
     private Properties loadProperties(String path) {
@@ -112,7 +109,7 @@ public class HIDS {
         return null;
     }
     //TODO - EXCEPTION HANDLING!!!
-    private void loadPlugins(HIDS hids, Properties props) {
+    private boolean loadPlugins(HIDS hids, Properties props) {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
         try {
@@ -122,16 +119,24 @@ public class HIDS {
                 DecisionEnginePlugin smtPlugin = (DecisionEnginePlugin) c.newInstance();
                 hids.decisionEngines.add(smtPlugin);
             }
-
+            if(hids.decisionEngines.size() > 0){
+                hids.currentDecisionEngine = hids.decisionEngines.get(0);
+                return true;
+            }else{
+                return false;
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            return false;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+            return false;
         } catch (InstantiationException e) {
             e.printStackTrace();
+            return false;
         }
     }
-    private void loadDataModules(HIDS hids, Properties props) {
+    private boolean loadDataModules(HIDS hids, Properties props) {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
         try {
@@ -142,12 +147,22 @@ public class HIDS {
                 hids.dataModules.add(dataProcessor);
             }
 
+            if(hids.dataModules.size() > 0){
+                hids.currentDataModule = hids.dataModules.get(0);
+                return true;
+            }else{
+                return false;
+            }
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            return false;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+            return false;
         } catch (InstantiationException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
