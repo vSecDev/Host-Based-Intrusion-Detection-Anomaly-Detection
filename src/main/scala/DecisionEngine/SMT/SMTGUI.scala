@@ -1,19 +1,9 @@
 package DecisionEngine.SMT
 
-import java.awt._
-import java.text.{DecimalFormat, NumberFormat}
-import java.util.Locale
+import java.awt.{Toolkit, _}
+import javax.swing.{JFormattedTextField, _}
 import javax.swing.text._
-import javax.swing._
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
-import java.text.NumberFormat
-import java.awt.Toolkit
-import java.beans.{PropertyChangeEvent, PropertyChangeListener}
-
 import DecisionEngine.DecisionEngineGUI
-import javax.swing.JFormattedTextField
 
 
 class SMTGUI extends DecisionEngineGUI {
@@ -51,7 +41,13 @@ class SMTGUI extends DecisionEngineGUI {
   override def getGUIComponent: Option[JPanel] = {
     pluginInstance match {
       case None => None
-      case Some(x) =>{
+      case Some(smt) =>{
+        if(smt.isConfigured){
+          val config = smt.getConfiguration.get.getSettings.get.asInstanceOf[SMTConfig].getSettings.get
+          //TODO - INITIALISE TEXT FIELDS HERE - MAKE SURE UPDATES ARE REFLECTED
+        }else{
+
+        }
 
         val panel: JPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
         test(panel)
@@ -68,6 +64,8 @@ class SMTGUI extends DecisionEngineGUI {
       }
     }
   }
+
+
 
   //TODO - DELETE TEST
   def test(panel: JPanel): Unit ={
