@@ -201,7 +201,11 @@ class SMTPlugin extends DecisionEnginePlugin {
 
   def setThreshold(t: Double) = threshold = Some(t)
 
+  def getThreshold: Option[Double] = threshold
+
   def setTolerance(t: Double) = tolerance = Some(t)
+
+  def getTolerance: Option[Double] = tolerance
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
@@ -226,5 +230,4 @@ class SMTPlugin extends DecisionEnginePlugin {
     //TODO - CHECK CONDITION!
     case Some(x: Node[_, _]) => x.getChildren.nonEmpty
   }
-
 }
