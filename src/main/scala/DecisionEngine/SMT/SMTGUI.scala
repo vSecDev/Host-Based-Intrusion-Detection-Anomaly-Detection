@@ -68,22 +68,20 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def initialise(): Unit = {
     //Add components
-    panel.add(maxDepthLabel)
-    addNonNegNumTextField(panel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-    panel.add(maxPhiLabel)
-    addNonNegNumTextField(panel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
-    panel.add(maxSeqCntLabel)
-    addNonNegNumTextField(panel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-    panel.add(smoothingLabel)
-    addNonNegNumTextField(panel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-    panel.add(priorLabel)
+
+    val rootPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    rootPanel.add(maxDepthLabel)
+    addNonNegNumTextField(rootPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    rootPanel.add(maxPhiLabel)
+    addNonNegNumTextField(rootPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
+    rootPanel.add(maxSeqCntLabel)
+    addNonNegNumTextField(rootPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    rootPanel.add(smoothingLabel)
+    addNonNegNumTextField(rootPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    rootPanel.add(priorLabel)
     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-    addNonNegNumTextField(panel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-    panel.add(thresholdLabel)
-    addNonNegNumTextField(panel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
-    panel.add(toleranceLabel)
-    addNonNegNumTextField(panel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
-    panel.add(isIntCheckBox)
+    addNonNegNumTextField(rootPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    rootPanel.add(isIntCheckBox)
     isIntCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
         println("checkbox. paramsChanged before: " + paramsChanged)
@@ -91,11 +89,16 @@ class SMTGUI extends DecisionEngineGUI {
         println("checkbox. paramsChanged after: " + paramsChanged)
       }
     })
+    rootPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    panel.add(rootPanel)
 
-
-
-
-
+    val classifyParamsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    classifyParamsPanel.add(thresholdLabel)
+    addNonNegNumTextField(classifyParamsPanel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
+    classifyParamsPanel.add(toleranceLabel)
+    addNonNegNumTextField(classifyParamsPanel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
+    classifyParamsPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    panel.add(classifyParamsPanel)
 
 
   }
