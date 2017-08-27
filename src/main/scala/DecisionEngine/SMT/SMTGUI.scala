@@ -11,7 +11,7 @@ import DecisionEngine.DecisionEngineGUI
 
 class SMTGUI extends DecisionEngineGUI {
 
-  private val panel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+  private val mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = Some(new SMTPlugin)
   private var paramsChanged = false
@@ -62,26 +62,26 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   override def getGUIComponent: Option[JPanel] = {
-        test(panel)
-        Some(panel)
+        test(mainPanel)
+        Some(mainPanel)
       }
 
   private def initialise(): Unit = {
     //Add components
 
-    val rootPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    rootPanel.add(maxDepthLabel)
-    addNonNegNumTextField(rootPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-    rootPanel.add(maxPhiLabel)
-    addNonNegNumTextField(rootPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
-    rootPanel.add(maxSeqCntLabel)
-    addNonNegNumTextField(rootPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-    rootPanel.add(smoothingLabel)
-    addNonNegNumTextField(rootPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-    rootPanel.add(priorLabel)
+    val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    smtPanel.add(maxDepthLabel)
+    addNonNegNumTextField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    smtPanel.add(maxPhiLabel)
+    addNonNegNumTextField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
+    smtPanel.add(maxSeqCntLabel)
+    addNonNegNumTextField(smtPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    smtPanel.add(smoothingLabel)
+    addNonNegNumTextField(smtPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    smtPanel.add(priorLabel)
     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-    addNonNegNumTextField(rootPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-    rootPanel.add(isIntCheckBox)
+    addNonNegNumTextField(smtPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    smtPanel.add(isIntCheckBox)
     isIntCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
         println("checkbox. paramsChanged before: " + paramsChanged)
@@ -89,16 +89,16 @@ class SMTGUI extends DecisionEngineGUI {
         println("checkbox. paramsChanged after: " + paramsChanged)
       }
     })
-    rootPanel.setBorder(BorderFactory.createLineBorder(Color.black))
-    panel.add(rootPanel)
+    smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    mainPanel.add(smtPanel)
 
-    val classifyParamsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    classifyParamsPanel.add(thresholdLabel)
-    addNonNegNumTextField(classifyParamsPanel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
-    classifyParamsPanel.add(toleranceLabel)
-    addNonNegNumTextField(classifyParamsPanel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
-    classifyParamsPanel.setBorder(BorderFactory.createLineBorder(Color.black))
-    panel.add(classifyParamsPanel)
+    val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    classifyParamsP.add(thresholdLabel)
+    addNonNegNumTextField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
+    classifyParamsP.add(toleranceLabel)
+    addNonNegNumTextField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
+    classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    mainPanel.add(classifyParamsP)
 
 
   }
