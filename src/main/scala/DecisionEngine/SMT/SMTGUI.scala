@@ -50,9 +50,8 @@ class SMTGUI extends DecisionEngineGUI {
   private final val thresholdField = new JFormattedTextField
   private final val toleranceField = new JFormattedTextField
 
+  //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val isIntCheckBox = new JCheckBox("Integer traces")
-
-  //private var isInts: Boolean = false
 
   initialise
 
@@ -155,7 +154,7 @@ class SMTGUI extends DecisionEngineGUI {
   private def setPluginRoot(model: DataModel): Boolean = {
     pluginInstance match {
       case None => false
-      case Some(plugin) => plugin.loadModel(model)
+      case Some(plugin) => if(plugin.loadModel(model)) paramChanged = false; true
     }
   }
 
