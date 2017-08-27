@@ -14,7 +14,7 @@ class SMTGUI extends DecisionEngineGUI {
   private val mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = Some(new SMTPlugin)
-  private var paramsChanged = false
+  private var paramChanged = false
 
   private final val maxDepthStr = "Max Depth:"
   private final val maxDepthToolTipStr = "Maximum Depth (sliding window size) of the Sparse Markov Tree. Must be a positive integer!"
@@ -71,22 +71,22 @@ class SMTGUI extends DecisionEngineGUI {
 
     val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
     smtPanel.add(maxDepthLabel)
-    addNonNegNumTextField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    addTxtField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(maxPhiLabel)
-    addNonNegNumTextField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
+    addTxtField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(maxSeqCntLabel)
-    addNonNegNumTextField(smtPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+    addTxtField(smtPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(smoothingLabel)
-    addNonNegNumTextField(smtPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    addTxtField(smtPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     smtPanel.add(priorLabel)
     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-    addNonNegNumTextField(smtPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+    addTxtField(smtPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     smtPanel.add(isIntCheckBox)
     isIntCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
-        println("checkbox. paramsChanged before: " + paramsChanged)
-        paramsChanged = true
-        println("checkbox. paramsChanged after: " + paramsChanged)
+        println("checkbox. paramsChanged before: " + paramChanged)
+        paramChanged = hasRoot //If root is already set, manual change of SMT parameters is registered!
+        println("checkbox. paramsChanged after: " + paramChanged)
       }
     })
     smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
@@ -94,9 +94,9 @@ class SMTGUI extends DecisionEngineGUI {
 
     val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
     classifyParamsP.add(thresholdLabel)
-    addNonNegNumTextField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
+    addTxtField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false, registerChange = false)
     classifyParamsP.add(toleranceLabel)
-    addNonNegNumTextField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
+    addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
     classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(classifyParamsP)
 
@@ -159,7 +159,7 @@ class SMTGUI extends DecisionEngineGUI {
     }
   }
 
-  private def isModelReady: Boolean = {
+  private def hasRoot: Boolean = {
     pluginInstance match {
       case None => false
       case Some(plugin) => {
@@ -178,20 +178,30 @@ class SMTGUI extends DecisionEngineGUI {
   private def isConfigured = ???
   def reset() = ???
 
-  private def addNonNegNumTextField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean) = {
+  private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
     field.setColumns(col)
     field.setName(fieldName)
     field.createToolTip()
     field.setToolTipText(tooltipStr)
     val doc = field.getDocument.asInstanceOf[PlainDocument]
     doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble, isPercent))
-    doc.addDocumentListener(new DocumentListener {
-      override def removeUpdate(e: DocumentEvent): Unit = { println ("in documentlistener removeUpdate. paramschanged before: " + paramsChanged); paramsChanged = true; println("paramschanged after: " + paramsChanged)}
+   if(registerChange) {
+     doc.addDocumentListener(new DocumentListener {
+       override def removeUpdate(e: DocumentEvent): Unit = {
+         println("in documentlistener removeUpdate. paramschanged before: " + paramChanged); paramChanged = hasRoot; println("paramschanged after: " + paramChanged)
+       }
 
 
-      override def changedUpdate(e: DocumentEvent): Unit = { println ("in documentlistener changedUpdate"); paramsChanged = true }
-      override def insertUpdate(e: DocumentEvent): Unit = { println ("in documentlistener insertUpdate. paramschanged before: " + paramsChanged);  paramsChanged = true }})
+       override def changedUpdate(e: DocumentEvent): Unit = {
+         println("in documentlistener changedUpdate"); paramChanged = hasRoot
+       }
 
+       override def insertUpdate(e: DocumentEvent): Unit = {
+         println("in documentlistener insertUpdate. paramschanged before: " + paramChanged);
+         paramChanged = hasRoot
+       }
+     })
+   }
 
 
     panel.add(field)

@@ -37,7 +37,12 @@ class SMTGUITest extends FunSuite{
     gui.setPluginInstance(plugin)
     gui.getGUIComponent
 
-    Thread.sleep(50000)
+    val plugin2 = new SMTPlugin
+    val gui2 = new SMTGUI
+    gui2.setPluginInstance(plugin2)
+    gui2.getGUIComponent
+
+    Thread.sleep(100000)
 
 
   }
