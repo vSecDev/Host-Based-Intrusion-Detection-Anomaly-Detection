@@ -2,17 +2,19 @@ package DecisionEngine.SMT
 
 import java.awt.event.{ItemEvent, ItemListener}
 import java.awt.{Toolkit, _}
+import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JFormattedTextField, _}
 import javax.swing.text._
 
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
 
-
 class SMTGUI extends DecisionEngineGUI {
 
+  private val panel = new JPanel(new FlowLayout(FlowLayout.LEFT))
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = Some(new SMTPlugin)
+  private var paramsChanged = false
 
   private final val maxDepthStr = "Max Depth:"
   private final val maxDepthToolTipStr = "Maximum Depth (sliding window size) of the Sparse Markov Tree. Must be a positive integer!"
@@ -50,46 +52,22 @@ class SMTGUI extends DecisionEngineGUI {
 
   private final val isIntCheckBox = new JCheckBox("Integer traces")
 
+  //private var isInts: Boolean = false
 
-  private var isInts: Boolean = false
-
+  initialise
 
   override def setPluginInstance(plugin: SMTPlugin): Unit = {
     super.setPluginInstance(plugin)
+    //TODO - RENDER HERE!
   }
 
   override def getGUIComponent: Option[JPanel] = {
-    pluginInstance match {
-      case None => None
-      case Some(smt) => {
-        if (smt.isConfigured) {
-          val config = smt.getConfiguration.get.getSettings.get.asInstanceOf[SMTSettings]
-          //TODO - INITIALISE TEXT FIELDS HERE - MAKE SURE UPDATES ARE REFLECTED
-        } else {
-
-        }
-
-        val panel: JPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
         test(panel)
         Some(panel)
-        /* panel.add(new JLabel("Maximum Tree Depth"))
-        addIntTextField(panel, 3)*/
-
-
-        //maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _smoothing: Double, private val _prior: Double, threshold: Double, tolerance: Double (percentage), isInt: Boolean
-
-
       }
-    }
-  }
 
-
-  //TODO - DELETE TEST
-  def test(panel: JPanel): Unit = {
-    val frame = new JFrame("HIDS")
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.setSize(800, 500)
-
+  private def initialise(): Unit = {
+    //Add components
     panel.add(maxDepthLabel)
     addNonNegNumTextField(panel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
     panel.add(maxPhiLabel)
@@ -99,38 +77,98 @@ class SMTGUI extends DecisionEngineGUI {
     panel.add(smoothingLabel)
     addNonNegNumTextField(panel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
     panel.add(priorLabel)
-    addNonNegNumTextField(panel, priorField, priorStr, priorToolTipStr, 3, isPositive = true, isDouble = true, isPercent = false)
+    //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
+    addNonNegNumTextField(panel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
     panel.add(thresholdLabel)
     addNonNegNumTextField(panel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
     panel.add(toleranceLabel)
     addNonNegNumTextField(panel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)
-
+    panel.add(isIntCheckBox)
     isIntCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
-        val isIntsBox = e.getSource.asInstanceOf[JCheckBox]
-        isInts = isIntsBox.isSelected
-        println("intbox state: " + isInts)
+        println("checkbox. paramsChanged before: " + paramsChanged)
+        paramsChanged = true
+        println("checkbox. paramsChanged after: " + paramsChanged)
       }
     })
-    panel.add(isIntCheckBox)
 
 
 
 
 
-    val cp = frame.getContentPane
-    cp.setLayout(new FlowLayout(FlowLayout.LEFT))
-    cp.add(panel)
-    frame.pack()
-    frame.setVisible(true)
 
 
   }
+
+/*  private def renderSMT(): Unit = {
+
+    pluginInstance match {
+      case None => None
+      case Some(plugin) => {
+
+        plugin.getConfiguration match {
+          case Some(c) => {
+            val settings = c.asInstanceOf[SMTConfig].getSettings.get
+            maxDepthField.setValue(settings.maxDepth)
+            maxPhiField.setValue(settings.maxPhi)
+            maxSeqCntField.setValue(settings.maxSeqCount)
+            smoothingField.setValue(settings.smoothing)
+            priorField.setValue(settings.)
+
+          }
+          case None =>
+        }
+
+
+
+
+
+        plugin.getModel match{
+          case None => //
+          case Some(dm) =>{
+            dm.retrieve.get.asInstanceOf[Node[_, _]]
+          }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+      }}
+  }*/
+
+
+
 
   private def setPluginRoot(model: DataModel): Boolean = {
     pluginInstance match {
       case None => false
       case Some(plugin) => plugin.loadModel(model)
+    }
+  }
+
+  private def isModelReady: Boolean = {
+    pluginInstance match {
+      case None => false
+      case Some(plugin) => {
+        plugin.getModel match {
+          case None => false
+          case Some(dataModel) => dataModel.retrieve match {
+            case None => false
+            case Some(n: Node[_,_]) => true
+            case _ => false
+          }
+        }
+      }
     }
   }
 
@@ -144,6 +182,15 @@ class SMTGUI extends DecisionEngineGUI {
     field.setToolTipText(tooltipStr)
     val doc = field.getDocument.asInstanceOf[PlainDocument]
     doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble, isPercent))
+    doc.addDocumentListener(new DocumentListener {
+      override def removeUpdate(e: DocumentEvent): Unit = { println ("in documentlistener removeUpdate. paramschanged before: " + paramsChanged); paramsChanged = true; println("paramschanged after: " + paramsChanged)}
+
+
+      override def changedUpdate(e: DocumentEvent): Unit = { println ("in documentlistener changedUpdate"); paramsChanged = true }
+      override def insertUpdate(e: DocumentEvent): Unit = { println ("in documentlistener insertUpdate. paramschanged before: " + paramsChanged);  paramsChanged = true }})
+
+
+
     panel.add(field)
   }
 
@@ -212,4 +259,49 @@ class SMTGUI extends DecisionEngineGUI {
     }
   }
 
+  //TODO - DELETE TEST
+  def test(panel: JPanel): Unit = {
+    val frame = new JFrame("HIDS")
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    frame.setSize(800, 500)
+
+    /* panel.add(maxDepthLabel)
+     addNonNegNumTextField(panel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+     panel.add(maxPhiLabel)
+     addNonNegNumTextField(panel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
+     panel.add(maxSeqCntLabel)
+     addNonNegNumTextField(panel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
+
+
+     panel.add(smoothingLabel)
+     addNonNegNumTextField(panel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+     panel.add(priorLabel)
+     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
+     addNonNegNumTextField(panel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
+     panel.add(thresholdLabel)
+     addNonNegNumTextField(panel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
+     panel.add(toleranceLabel)
+     addNonNegNumTextField(panel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)*/
+
+    /*    isIntCheckBox.addItemListener(new ItemListener {
+          override def itemStateChanged(e: ItemEvent): Unit = {
+            val isIntsBox = e.getSource.asInstanceOf[JCheckBox]
+            isInts = isIntsBox.isSelected
+            println("intbox state: " + isInts)
+          }
+        })*/
+    /* panel.add(isIntCheckBox)*/
+
+
+
+
+
+    val cp = frame.getContentPane
+    cp.setLayout(new FlowLayout(FlowLayout.LEFT))
+    cp.add(panel)
+    frame.pack()
+    frame.setVisible(true)
+
+
+  }
 }

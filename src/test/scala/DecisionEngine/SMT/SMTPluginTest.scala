@@ -499,7 +499,19 @@ class SMTPluginTest extends  FunSuite {
     assert(r6._1 == 2.0 && r6._2 == 2.0)
     assert(r7._1 == 1.0 && r7._2 == 2.0)
   }
+  test("SMTPlugin isTrained works") {
+    val settings = new SMTSettings(maxDepth, maxPhi, maxSeqCount, smoothing, prior, ints, 1.0, 0.0)
+    val config = new SMTConfig
+    config.storeSettings(settings)
+    val plugin = new SMTPlugin
+    plugin.configure(config)
 
-
-
+    assert(plugin.getModel.get.retrieve.get.asInstanceOf[Node[Int, Int]].getChildren.size == 0)
+    assert(!plugin.isTrained)
+    val wrapper = new StringDataWrapper
+    wrapper.store("filename", "1 2 3 4")
+    assert(plugin.classify(Vector(wrapper), None, ints).get.asInstanceOf[SMTReport].anomalyPercentage.get == 100.0)
+    assert(plugin.learn(Vector(wrapper), None, ints).get.retrieve.get.asInstanceOf[Node[Int, Int]].getChildren.nonEmpty)
+    assert(plugin.isTrained)
+  }
 }

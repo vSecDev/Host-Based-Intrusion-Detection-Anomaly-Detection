@@ -2418,7 +2418,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
   //TODO MOVE THIS TO SMTPluginTest
 
 
-  test("SMTPlugin - classify test") {
+  /*test("SMTPlugin - classify test") {
     val maxDepth = 6
     val maxPhi = 2
     val maxSeqCount = 50
@@ -2497,7 +2497,7 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
 
     assert(plugin.classify(Vector(wrapper3, wrapper4), Some(dm), true).isEmpty)
     assert(plugin.validate(Vector(wrapper3, wrapper4), Some(dm), true).isEmpty)
-  }
+  }*/
 }
 
 

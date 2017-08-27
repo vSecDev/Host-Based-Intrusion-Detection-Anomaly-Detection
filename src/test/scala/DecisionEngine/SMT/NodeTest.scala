@@ -213,4 +213,20 @@ class NodeTest extends FunSuite{
     assert(n.getProbability("ntdll.dll+0xeac7") == 2.0/6)
     assert(n.getProbability("kernel32.dll+0x15568") == 1.0/6)
   }
+  test("Predict with untrained node"){
+
+    val condition1 = Vector(1, 2, 3)
+    val condition2 = Vector(4, 5, 6)
+    val condition3 = Vector(7, 8, 9)
+    val event1 = 666
+    val event2 = 777
+    val event3 = 888
+
+    val n = new Node[Int, Int](1,1,1, 0.0, 1.0)
+    var r1 = n.predict(condition1, event1)
+    var r2 = n.predict(condition1, event2)
+    println("r1: " + r1)
+    println("r2: " + r2)
+  }
+
 }
