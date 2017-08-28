@@ -182,7 +182,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canClassify: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => plugin.isTrained
+    case Some(plugin) => plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty
   }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
