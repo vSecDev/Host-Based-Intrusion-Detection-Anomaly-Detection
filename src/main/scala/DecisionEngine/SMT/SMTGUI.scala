@@ -110,6 +110,8 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(mlParamsP, learnBtn, learnBtn.getText)
     setupButton(mlParamsP, classifyBtn, classifyBtn.getText)
     setupButton(mlParamsP, validateBtn, validateBtn.getText)
+    mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    mainPanel.add(mlParamsP)
   }
 
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
