@@ -50,6 +50,10 @@ class SMTGUI extends DecisionEngineGUI {
   private final val thresholdField = new JFormattedTextField
   private final val toleranceField = new JFormattedTextField
 
+  private final val learnBtn = new JButton("Learn")
+  private final val classifyBtn = new JButton("Classify")
+  private final val validateBtn = new JButton("Validate")
+
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val intCheckBox = new JCheckBox("Integer traces")
 
@@ -66,8 +70,7 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   private def initialise(): Unit = {
-    //Add components
-
+    //SMT param components
     val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
     smtPanel.add(maxDepthLabel)
     addTxtField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 2, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
@@ -93,6 +96,7 @@ class SMTGUI extends DecisionEngineGUI {
     smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(smtPanel)
 
+    //Classification params
     val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
     classifyParamsP.add(thresholdLabel)
     addTxtField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false, registerChange = false)
@@ -100,56 +104,22 @@ class SMTGUI extends DecisionEngineGUI {
     addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 2, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
     classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(classifyParamsP)
+
+    //ML buttons
+    val mlParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    setupButton(mlParamsP, learnBtn, learnBtn.getText)
+    setupButton(mlParamsP, classifyBtn, classifyBtn.getText)
+    setupButton(mlParamsP, validateBtn, validateBtn.getText)
   }
 
-  /*  private def renderSMT(): Unit = {
+  private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
+    panel.add(btn)
+    btn.setActionCommand(btnTxt)
+    //TODO - LISTEN TO ALL BUTTON TEXT UPDATES ->  CALCULATE CANLEARN/CANCLASSIFY -> ENABLA/DISABLE BUTTON ACCORDINGLY!
+    //maxDepthField.getDocument.asInstanceOf[PlainDocument].getDocumentFilter.
+  }
 
-    pluginInstance match {
-      case None => None
-      case Some(plugin) => {
-
-        plugin.getConfiguration match {
-          case Some(c) => {
-            val settings = c.asInstanceOf[SMTConfig].getSettings.get
-            maxDepthField.setValue(settings.maxDepth)
-            maxPhiField.setValue(settings.maxPhi)
-            maxSeqCntField.setValue(settings.maxSeqCount)
-            smoothingField.setValue(settings.smoothing)
-            priorField.setValue(settings.)
-
-          }
-          case None =>
-        }
-
-
-
-
-
-        plugin.getModel match{
-          case None => //
-          case Some(dm) =>{
-            dm.retrieve.get.asInstanceOf[Node[_, _]]
-          }
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-      }}
-  }*/
-
-
-  def createPluginRoot: Option[Node[_,_]] = {
+  private def createPluginRoot: Option[Node[_,_]] = {
     if(canCreateRoot){
       if(intCheckBox.isSelected){
         Some(new Node[Int, Int](
