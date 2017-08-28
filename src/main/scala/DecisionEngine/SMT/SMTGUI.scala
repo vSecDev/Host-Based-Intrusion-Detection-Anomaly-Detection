@@ -117,6 +117,7 @@ class SMTGUI extends DecisionEngineGUI {
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
+
     //TODO - LISTEN TO ALL BUTTON TEXT UPDATES ->  CALCULATE CANLEARN/CANCLASSIFY -> ENABLA/DISABLE BUTTON ACCORDINGLY!
     //maxDepthField.getDocument.asInstanceOf[PlainDocument].getDocumentFilter.
   }
