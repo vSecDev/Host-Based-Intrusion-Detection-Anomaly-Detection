@@ -51,7 +51,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val toleranceField = new JFormattedTextField
 
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
-  private final val isIntCheckBox = new JCheckBox("Integer traces")
+  private final val intCheckBox = new JCheckBox("Integer traces")
 
   initialise
 
@@ -70,20 +70,20 @@ class SMTGUI extends DecisionEngineGUI {
 
     val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
     smtPanel.add(maxDepthLabel)
-    addTxtField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
+    addTxtField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 2, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(maxPhiLabel)
-    addTxtField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false, registerChange = true)
+    addTxtField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 2, isPositive = false, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(maxSeqCntLabel)
     addTxtField(smtPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
     smtPanel.add(smoothingLabel)
     addTxtField(smtPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     smtPanel.add(priorLabel)
     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-    addTxtField(smtPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
+    addTxtField(smtPanel, priorField, priorStr, priorToolTipStr, 2, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     priorField.setText("1.0")
     priorField.setEditable(false)
-    smtPanel.add(isIntCheckBox)
-    isIntCheckBox.addItemListener(new ItemListener {
+    smtPanel.add(intCheckBox)
+    intCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
         println("checkbox. paramsChanged before: " + paramChanged)
         paramChanged = hasRoot //If root is already set, manual change of SMT parameters is registered!
@@ -97,7 +97,7 @@ class SMTGUI extends DecisionEngineGUI {
     classifyParamsP.add(thresholdLabel)
     addTxtField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false, registerChange = false)
     classifyParamsP.add(toleranceLabel)
-    addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
+    addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 2, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
     classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(classifyParamsP)
   }
@@ -149,11 +149,26 @@ class SMTGUI extends DecisionEngineGUI {
   }*/
 
 
-  /*def createPluginRoot: Option[Node[_,_]] = {
-
-    else
-
-  }*/
+  def createPluginRoot: Option[Node[_,_]] = {
+    if(canCreateRoot){
+      if(intCheckBox.isSelected){
+        Some(new Node[Int, Int](
+          maxDepthField.getText.toInt,
+          maxPhiField.getText.toInt,
+          maxSeqCntField.getText.toInt,
+          smoothingField.getText.toDouble,
+          priorField.getText.toDouble))
+      }else{
+        //TODO - EXTEND FOR OTHER NODE TYPES
+        Some(new Node[String, String](
+          maxDepthField.getText.toInt,
+          maxPhiField.getText.toInt,
+          maxSeqCntField.getText.toInt,
+          smoothingField.getText.toDouble,
+          priorField.getText.toDouble))
+      }
+    }else return None
+  }
 
   private def canCreateRoot: Boolean =
     maxDepthField.getText.nonEmpty &&
