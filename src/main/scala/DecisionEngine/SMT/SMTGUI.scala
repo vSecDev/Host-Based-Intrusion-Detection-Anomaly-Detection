@@ -157,34 +157,10 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canCreateRoot: Boolean =
     maxDepthField.getText.nonEmpty &&
-    maxPhiField.getText.nonEmpty &&
-    maxSeqCntField.getText.nonEmpty &&
-    smoothingField.getText.nonEmpty &&
-    priorField.getText.nonEmpty
-
-
-
-
-  def setPluginRoot(model: DataModel): Boolean = {
-    pluginInstance match {
-      case None => false
-      case Some(plugin) => {
-        if (plugin.loadModel(model)) {
-          val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
-
-          maxDepthField.setText(newRoot.maxDepth.toString)
-          maxPhiField.setText(newRoot.maxPhi.toString)
-          maxSeqCntField.setText(newRoot.maxSeqCount.toString)
-          smoothingField.setText(newRoot.smoothing.toString)
-          priorField.setText(newRoot.prior.toString)
-          paramChanged = false
-          true
-        } else {
-          false
-        }
-      }
-    }
-  }
+      maxPhiField.getText.nonEmpty &&
+      maxSeqCntField.getText.nonEmpty &&
+      smoothingField.getText.nonEmpty &&
+      priorField.getText.nonEmpty
 
   private def hasRoot: Boolean = {
     pluginInstance match {
@@ -200,6 +176,13 @@ class SMTGUI extends DecisionEngineGUI {
         }
       }
     }
+  }
+
+  private def canLearn: Boolean = hasRoot || canCreateRoot
+
+  private def canClassify: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) => plugin.isTrained
   }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
@@ -295,6 +278,28 @@ class SMTGUI extends DecisionEngineGUI {
       }
     }
   }
+
+  def setPluginRoot(model: DataModel): Boolean = {
+    pluginInstance match {
+      case None => false
+      case Some(plugin) => {
+        if (plugin.loadModel(model)) {
+          val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
+
+          maxDepthField.setText(newRoot.maxDepth.toString)
+          maxPhiField.setText(newRoot.maxPhi.toString)
+          maxSeqCntField.setText(newRoot.maxSeqCount.toString)
+          smoothingField.setText(newRoot.smoothing.toString)
+          priorField.setText(newRoot.prior.toString)
+          paramChanged = false
+          true
+        } else {
+          false
+        }
+      }
+    }
+  }
+
 
   //TODO - DELETE TEST
   private def test(panel: JPanel): Unit = {
