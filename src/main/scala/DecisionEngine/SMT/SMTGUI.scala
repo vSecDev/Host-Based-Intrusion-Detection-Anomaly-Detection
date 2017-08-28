@@ -61,9 +61,9 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   override def getGUIComponent: Option[JPanel] = {
-        test(mainPanel)
-        Some(mainPanel)
-      }
+    test(mainPanel)
+    Some(mainPanel)
+  }
 
   private def initialise(): Unit = {
     //Add components
@@ -80,6 +80,8 @@ class SMTGUI extends DecisionEngineGUI {
     smtPanel.add(priorLabel)
     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
     addTxtField(smtPanel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
+    priorField.setText("1.0")
+    priorField.setEditable(false)
     smtPanel.add(isIntCheckBox)
     isIntCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
@@ -98,11 +100,9 @@ class SMTGUI extends DecisionEngineGUI {
     addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
     classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(classifyParamsP)
-
-
   }
 
-/*  private def renderSMT(): Unit = {
+  /*  private def renderSMT(): Unit = {
 
     pluginInstance match {
       case None => None
@@ -149,12 +149,40 @@ class SMTGUI extends DecisionEngineGUI {
   }*/
 
 
+  /*def createPluginRoot: Option[Node[_,_]] = {
+
+    else
+
+  }*/
+
+  private def canCreateRoot: Boolean =
+    maxDepthField.getText.nonEmpty &&
+    maxPhiField.getText.nonEmpty &&
+    maxSeqCntField.getText.nonEmpty &&
+    smoothingField.getText.nonEmpty &&
+    priorField.getText.nonEmpty
 
 
-  private def setPluginRoot(model: DataModel): Boolean = {
+
+
+  def setPluginRoot(model: DataModel): Boolean = {
     pluginInstance match {
       case None => false
-      case Some(plugin) => if(plugin.loadModel(model)) paramChanged = false; true
+      case Some(plugin) => {
+        if (plugin.loadModel(model)) {
+          val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
+
+          maxDepthField.setText(newRoot.maxDepth.toString)
+          maxPhiField.setText(newRoot.maxPhi.toString)
+          maxSeqCntField.setText(newRoot.maxSeqCount.toString)
+          smoothingField.setText(newRoot.smoothing.toString)
+          priorField.setText(newRoot.prior.toString)
+          paramChanged = false
+          true
+        } else {
+          false
+        }
+      }
     }
   }
 
@@ -166,7 +194,7 @@ class SMTGUI extends DecisionEngineGUI {
           case None => false
           case Some(dataModel) => dataModel.retrieve match {
             case None => false
-            case Some(n: Node[_,_]) => true
+            case Some(n: Node[_, _]) => true
             case _ => false
           }
         }
@@ -174,39 +202,36 @@ class SMTGUI extends DecisionEngineGUI {
     }
   }
 
-  private def isConfigured = ???
-  def reset() = ???
-
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
     field.setColumns(col)
     field.setName(fieldName)
     field.createToolTip()
     field.setToolTipText(tooltipStr)
     val doc = field.getDocument.asInstanceOf[PlainDocument]
-    doc.setDocumentFilter(new NonNegIntFilter(isPositive, isDouble, isPercent))
-   if(registerChange) {
-     doc.addDocumentListener(new DocumentListener {
-       override def removeUpdate(e: DocumentEvent): Unit = {
-         println("in documentlistener removeUpdate. paramschanged before: " + paramChanged); paramChanged = hasRoot; println("paramschanged after: " + paramChanged)
-       }
+    doc.setDocumentFilter(new NonNegNumFilter(isPositive, isDouble, isPercent))
+    if (registerChange) {
+      doc.addDocumentListener(new DocumentListener {
+        override def removeUpdate(e: DocumentEvent): Unit = {
+          println("in documentlistener removeUpdate. paramschanged before: " + paramChanged);
+          paramChanged = hasRoot;
+          println("paramschanged after: " + paramChanged)
+        }
 
+        override def changedUpdate(e: DocumentEvent): Unit = {
+          println("in documentlistener changedUpdate");
+          paramChanged = hasRoot
+        }
 
-       override def changedUpdate(e: DocumentEvent): Unit = {
-         println("in documentlistener changedUpdate"); paramChanged = hasRoot
-       }
-
-       override def insertUpdate(e: DocumentEvent): Unit = {
-         println("in documentlistener insertUpdate. paramschanged before: " + paramChanged);
-         paramChanged = hasRoot
-       }
-     })
-   }
-
-
+        override def insertUpdate(e: DocumentEvent): Unit = {
+          println("in documentlistener insertUpdate. paramschanged before: " + paramChanged);
+          paramChanged = hasRoot
+        }
+      })
+    }
     panel.add(field)
   }
 
-  private class NonNegIntFilter(isPositive: Boolean, isDouble: Boolean, isPercent: Boolean) extends DocumentFilter {
+  private class NonNegNumFilter(isPositive: Boolean, isDouble: Boolean, isPercent: Boolean) extends DocumentFilter {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
@@ -272,7 +297,7 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   //TODO - DELETE TEST
-  def test(panel: JPanel): Unit = {
+  private def test(panel: JPanel): Unit = {
     val frame = new JFrame("HIDS")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.setSize(800, 500)
@@ -303,9 +328,6 @@ class SMTGUI extends DecisionEngineGUI {
           }
         })*/
     /* panel.add(isIntCheckBox)*/
-
-
-
 
 
     val cp = frame.getContentPane

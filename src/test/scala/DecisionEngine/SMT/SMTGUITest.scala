@@ -29,22 +29,26 @@ class SMTGUITest extends FunSuite{
     n1.learn(condition1, event1)
     val dm = new DataModel
     dm.store(n1)
-    val plugin = new SMTPlugin
+    /*val plugin = new SMTPlugin
     plugin.loadModel(dm)
     plugin.setThreshold(0.5)
     plugin.setTolerance(20)
     val gui = new SMTGUI
     gui.setPluginInstance(plugin)
-    gui.getGUIComponent
+    gui.getGUIComponent*/
 
     val plugin2 = new SMTPlugin
     val gui2 = new SMTGUI
     gui2.setPluginInstance(plugin2)
     gui2.getGUIComponent
+    println("20 sleep to change maxDepth")
+    Thread.sleep(20000)
+    gui2.setPluginRoot(dm)
+    println("After setplugin root .20 sleep to change maxDepth")
+    Thread.sleep(20000)
 
-    Thread.sleep(100000)
 
-
+    Thread.sleep(1000000)
 
 
   }
