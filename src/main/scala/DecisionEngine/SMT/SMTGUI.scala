@@ -13,7 +13,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   private val mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
   override type T = SMTPlugin
-  override var pluginInstance: Option[SMTPlugin] = Some(new SMTPlugin)
+  override var pluginInstance: Option[SMTPlugin] = None
   private var paramChanged = false
 
   private final val maxDepthStr = "Max Depth:"

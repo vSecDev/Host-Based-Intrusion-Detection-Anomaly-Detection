@@ -3,18 +3,20 @@ package DecisionEngine.SMT
 import java.io.File
 
 import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
-import DecisionEngine.{DecisionEngineConfig, DecisionEnginePlugin, DecisionEngineReport}
+import DecisionEngine.{DecisionEngineConfig, DecisionEngineGUI, DecisionEnginePlugin, DecisionEngineReport}
 
 /**
   * Created by apinter on 08/08/2017.
   */
 //TODO REFACTOR TO AVOID REPETITION OF CODE!
-class SMTPlugin extends DecisionEnginePlugin {
+class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
   private var root: Option[Node[_, _]] = None
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
+
+  gui.setPluginInstance(this)
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
@@ -46,6 +48,8 @@ class SMTPlugin extends DecisionEnginePlugin {
     config.storeSettings(settings)
     Some(config)
   } else None
+
+  override def getGUI: Option[DecisionEngineGUI] = Some(gui)
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     if (data.isEmpty) return model

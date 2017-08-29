@@ -1,6 +1,7 @@
 package DecisionEngine.SMT
 
 import Data.DataModel
+import DecisionEngine.{DecisionEngineGUI, DecisionEnginePlugin}
 import org.scalatest.FunSuite
 
 //TODO -DELETE CLASS
@@ -37,20 +38,20 @@ class SMTGUITest extends FunSuite{
     gui.setPluginInstance(plugin)
     gui.getGUIComponent*/
 
-    val plugin2 = new SMTPlugin
-    val gui2 = new SMTGUI
-    gui2.setPluginInstance(plugin2)
+    val guiToAdd = new SMTGUI
+    val plugin2: DecisionEnginePlugin = new SMTPlugin(guiToAdd)
+    val gui2 = plugin2.getGUI.get
     gui2.getGUIComponent
     println("20 sleep to change maxDepth")
     Thread.sleep(20000)
-    gui2.setPluginRoot(dm)
+    gui2.asInstanceOf[SMTGUI].setPluginRoot(dm)
     println("After setplugin root .20 sleep to change maxDepth")
     Thread.sleep(20000)
 
     val untrainedRoot = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val dm2 = new DataModel
     dm2.store(untrainedRoot)
-    gui2.setPluginRoot(dm2)
+    gui2.asInstanceOf[SMTGUI].setPluginRoot(dm2)
 
     Thread.sleep(1000000)
 
