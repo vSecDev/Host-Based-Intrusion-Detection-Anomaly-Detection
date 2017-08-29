@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -115,17 +118,38 @@ public class HIDS {
         ClassLoader classLoader = HIDS.class.getClassLoader();
         try {
             String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
-            for (String s : decisionEngines) {
-                Class c = classLoader.loadClass(s);
-                DecisionEnginePlugin smtPlugin = (DecisionEnginePlugin) c.newInstance();
-                hids.decisionEngines.add(smtPlugin);
+            for (String de : decisionEngines) {
+                //get constructor params
+                String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
+
+                List<Class> classList = new ArrayList<>();
+                List<Object> args = new ArrayList<>();
+                for(String p : params){
+                    Class pClass = classLoader.loadClass(p);
+                    classList.add(pClass);
+                    Object instance = pClass.newInstance();
+                    args.add(instance);
+                }
+
+                Class[] classArr = classList.toArray(new Class[classList.size()]);
+                Object[] objArr = args.toArray(new Object[args.size()]);
+
+                //Class<?> clazz = Class.forName(de);
+                Class<?> clazz = classLoader.loadClass(de);
+                Constructor<?> ctor = clazz.getConstructor(classArr);
+                DecisionEnginePlugin plugin = (DecisionEnginePlugin) ctor.newInstance(objArr);
+
+                hids.decisionEngines.add(plugin);
             }
             if(hids.decisionEngines.size() > 0){
                 hids.currentDecisionEngine = hids.decisionEngines.get(0);
                 return true;
             }else{
                 return false;
+
+
             }
+
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -133,6 +157,12 @@ public class HIDS {
             e.printStackTrace();
             return false;
         } catch (InstantiationException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return false;
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
             return false;
         }

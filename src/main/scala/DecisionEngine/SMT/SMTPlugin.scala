@@ -16,6 +16,7 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
 
+
   gui.setPluginInstance(this)
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
