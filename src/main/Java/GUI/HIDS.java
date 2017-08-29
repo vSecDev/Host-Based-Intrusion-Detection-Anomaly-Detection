@@ -120,11 +120,14 @@ public class HIDS {
             String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
             for (String de : decisionEngines) {
                 //get constructor params
+                if(props.containsKey(de)){
                 String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
 
-                List<Class> classList = new ArrayList<>();
+                if (params.length > 0){
+
+                    List<Class> classList = new ArrayList<>();
                 List<Object> args = new ArrayList<>();
-                for(String p : params){
+                for (String p : params) {
                     Class pClass = classLoader.loadClass(p);
                     classList.add(pClass);
                     Object instance = pClass.newInstance();
@@ -138,8 +141,14 @@ public class HIDS {
                 Class<?> clazz = classLoader.loadClass(de);
                 Constructor<?> ctor = clazz.getConstructor(classArr);
                 DecisionEnginePlugin plugin = (DecisionEnginePlugin) ctor.newInstance(objArr);
+                    hids.decisionEngines.add(plugin);}
+            }else {
 
-                hids.decisionEngines.add(plugin);
+                Class c = classLoader.loadClass(de);
+
+                DecisionEnginePlugin plugin = (DecisionEnginePlugin) c.newInstance();
+                    hids.decisionEngines.add(plugin);
+                }
             }
             if(hids.decisionEngines.size() > 0){
                 hids.currentDecisionEngine = hids.decisionEngines.get(0);
