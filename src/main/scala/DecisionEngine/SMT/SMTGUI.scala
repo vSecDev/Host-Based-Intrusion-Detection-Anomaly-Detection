@@ -114,44 +114,28 @@ class SMTGUI extends DecisionEngineGUI {
     mainPanel.add(mlParamsP)
   }
 
-  private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
-    panel.add(btn)
-    btn.setActionCommand(btnTxt)
-    learnBtn.setEnabled(canLearn)
-    classifyBtn.setEnabled(canClassify)
-    validateBtn.setEnabled(canClassify)
-    addFieldDocListener(maxDepthField)
-    addFieldDocListener(maxPhiField)
-    addFieldDocListener(maxSeqCntField)
-    addFieldDocListener(smoothingField)
-    addFieldDocListener(thresholdField)
-    addFieldDocListener(toleranceField)
-
-    //TODO - LISTEN TO ALL BUTTON TEXT UPDATES ->  CALCULATE CANLEARN/CANCLASSIFY -> ENABLA/DISABLE BUTTON ACCORDINGLY!
-
+  private def hasRoot: Boolean = {
+    pluginInstance match {
+      case None => false
+      case Some(plugin) => {
+        plugin.getModel match {
+          case None => false
+          case Some(dataModel) => dataModel.retrieve match {
+            case None => false
+            case Some(n: Node[_, _]) => true
+            case _ => false
+          }
+        }
+      }
+    }
   }
 
-  private def addFieldDocListener(field: JFormattedTextField) = {
-    field.getDocument.asInstanceOf[PlainDocument].addDocumentListener(new DocumentListener {
-      override def insertUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
-      }
-
-      override def changedUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
-      }
-
-      override def removeUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
-      }
-    })
-  }
+  private def canCreateRoot: Boolean =
+    maxDepthField.getText.nonEmpty &&
+      maxPhiField.getText.nonEmpty &&
+      maxSeqCntField.getText.nonEmpty &&
+      smoothingField.getText.nonEmpty &&
+      priorField.getText.nonEmpty
 
   private def createPluginRoot: Option[Node[_,_]] = {
     if(canCreateRoot){
@@ -174,34 +158,47 @@ class SMTGUI extends DecisionEngineGUI {
     }else return None
   }
 
-  private def canCreateRoot: Boolean =
-    maxDepthField.getText.nonEmpty &&
-      maxPhiField.getText.nonEmpty &&
-      maxSeqCntField.getText.nonEmpty &&
-      smoothingField.getText.nonEmpty &&
-      priorField.getText.nonEmpty
-
-  private def hasRoot: Boolean = {
-    pluginInstance match {
-      case None => false
-      case Some(plugin) => {
-        plugin.getModel match {
-          case None => false
-          case Some(dataModel) => dataModel.retrieve match {
-            case None => false
-            case Some(n: Node[_, _]) => true
-            case _ => false
-          }
-        }
-      }
-    }
-  }
-
   private def canLearn: Boolean = hasRoot || canCreateRoot
 
   private def canClassify: Boolean = pluginInstance match {
     case None => false
     case Some(plugin) => plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty
+  }
+
+  private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
+    panel.add(btn)
+    btn.setActionCommand(btnTxt)
+    learnBtn.setEnabled(canLearn)
+    classifyBtn.setEnabled(canClassify)
+    validateBtn.setEnabled(canClassify)
+    addFieldDocListener(maxDepthField)
+    addFieldDocListener(maxPhiField)
+    addFieldDocListener(maxSeqCntField)
+    addFieldDocListener(smoothingField)
+    addFieldDocListener(thresholdField)
+    addFieldDocListener(toleranceField)
+  }
+
+  private def addFieldDocListener(field: JFormattedTextField) = {
+    field.getDocument.asInstanceOf[PlainDocument].addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+
+      override def changedUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+
+      override def removeUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+    })
   }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
@@ -298,6 +295,7 @@ class SMTGUI extends DecisionEngineGUI {
     }
   }
 
+  //TODO - MAKE SETPLUGINROOT PRIVATE
   def setPluginRoot(model: DataModel): Boolean = {
     pluginInstance match {
       case None => false
