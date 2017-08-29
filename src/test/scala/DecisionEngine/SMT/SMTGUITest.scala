@@ -47,6 +47,10 @@ class SMTGUITest extends FunSuite{
     println("After setplugin root .20 sleep to change maxDepth")
     Thread.sleep(20000)
 
+    val untrainedRoot = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
+    val dm2 = new DataModel
+    dm2.store(untrainedRoot)
+    gui2.setPluginRoot(dm2)
 
     Thread.sleep(1000000)
 

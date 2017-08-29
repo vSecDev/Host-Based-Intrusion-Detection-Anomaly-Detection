@@ -117,9 +117,40 @@ class SMTGUI extends DecisionEngineGUI {
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
+    learnBtn.setEnabled(canLearn)
+    classifyBtn.setEnabled(canClassify)
+    validateBtn.setEnabled(canClassify)
+    addFieldDocListener(maxDepthField)
+    addFieldDocListener(maxPhiField)
+    addFieldDocListener(maxSeqCntField)
+    addFieldDocListener(smoothingField)
+    addFieldDocListener(thresholdField)
+    addFieldDocListener(toleranceField)
 
     //TODO - LISTEN TO ALL BUTTON TEXT UPDATES ->  CALCULATE CANLEARN/CANCLASSIFY -> ENABLA/DISABLE BUTTON ACCORDINGLY!
-    //maxDepthField.getDocument.asInstanceOf[PlainDocument].getDocumentFilter.
+
+  }
+
+  private def addFieldDocListener(field: JFormattedTextField) = {
+    field.getDocument.asInstanceOf[PlainDocument].addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+
+      override def changedUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+
+      override def removeUpdate(e: DocumentEvent) = {
+        learnBtn.setEnabled(canLearn)
+        classifyBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)
+      }
+    })
   }
 
   private def createPluginRoot: Option[Node[_,_]] = {
