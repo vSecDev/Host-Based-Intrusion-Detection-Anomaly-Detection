@@ -1,15 +1,15 @@
 package GUI;
 
-import Data.DataModel;
 import Data.DataProcessor;
 import DecisionEngine.DecisionEnginePlugin;
+import javafx.util.Pair;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -24,6 +24,11 @@ public class HIDS {
     private DecisionEnginePlugin currentDecisionEngine = null;
     private DataProcessor currentDataModule = null;
 
+    private File srcFile = null;
+    private File trgtFile = null;
+    private File srcDir = null;
+    private File trgtDir = null;
+
 
     //TODO - ADD FILEPROCESSOR DATA MODULE TO CONFIG + INIT LOGIC
 
@@ -31,11 +36,11 @@ public class HIDS {
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
-        if(!hids.initialise()){
+        if(!hids.moduleInit()){
             //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
-
+            System.out.println("Initialisation unsuccessful!");
         }
-        //TODO LOAD CLASS WTH CONSTRUCTOR PARAMS
+
         for (DecisionEnginePlugin de : hids.decisionEngines) {
             System.out.println("de in main: " + de.pluginName());
         }
@@ -84,17 +89,18 @@ public class HIDS {
         frame.setVisible(true);
     }
 
-    private boolean initialise(){
+    private boolean moduleInit(){
         Properties props = this.loadProperties(configPath);
         if (props != null) {
-           return(loadPlugins(this, props) && loadDataModules(this, props));
+          // return(loadModules(this, props) && loadDataModules(this, props));
+            return(loadModules(this, props, "dePlugin") &&
+            loadModules(this, props, "dataModule"));
         }else {return false;}
     }
 
     private Properties loadProperties(String path) {
         Properties prop = new Properties();
         InputStream input = null;
-
         try {
             input = new FileInputStream(path);
             prop.load(input);
@@ -113,52 +119,52 @@ public class HIDS {
         return null;
     }
     //TODO - EXCEPTION HANDLING!!!
-    private boolean loadPlugins(HIDS hids, Properties props) {
+    private boolean loadModules(HIDS hids, Properties props, String propName) {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
         try {
-            String[] decisionEngines = props.getProperty("dePlugin").trim().split("\\s*,\\s*");
+            String[] decisionEngines = props.getProperty(propName).trim().split("\\s*,\\s*");
             for (String de : decisionEngines) {
                 //get constructor params
-                if(props.containsKey(de)){
-                String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
-
-                if (params.length > 0){
-
-                    List<Class> classList = new ArrayList<>();
-                List<Object> args = new ArrayList<>();
-                for (String p : params) {
-                    Class pClass = classLoader.loadClass(p);
-                    classList.add(pClass);
-                    Object instance = pClass.newInstance();
-                    args.add(instance);
-                }
-
-                Class[] classArr = classList.toArray(new Class[classList.size()]);
-                Object[] objArr = args.toArray(new Object[args.size()]);
-
-                //Class<?> clazz = Class.forName(de);
-                Class<?> clazz = classLoader.loadClass(de);
-                Constructor<?> ctor = clazz.getConstructor(classArr);
-                DecisionEnginePlugin plugin = (DecisionEnginePlugin) ctor.newInstance(objArr);
-                    hids.decisionEngines.add(plugin);}
-            }else {
-
-                Class c = classLoader.loadClass(de);
-
-                DecisionEnginePlugin plugin = (DecisionEnginePlugin) c.newInstance();
-                    hids.decisionEngines.add(plugin);
+                if (props.containsKey(de)) {
+                    String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
+                    if (params.length > 0) {
+                      Pair<Constructor<?>, Object[]> pair = getMultParamConst(de,params, classLoader);
+                      if(pair == null){
+                          return false;
+                      }
+                        if(propName == "dePlugin") {
+                            DecisionEnginePlugin plugin = (DecisionEnginePlugin) pair.getKey().newInstance(pair.getValue());
+                            hids.decisionEngines.add(plugin);
+                        }else if(propName == "dataModule"){
+                            DataProcessor dataProcessor = (DataProcessor) pair.getKey().newInstance(pair.getValue());
+                            hids.dataModules.add(dataProcessor);
+                        }
+                    }
+                } else {
+                    Class c = classLoader.loadClass(de);
+                    if(propName == "dePlugin") {
+                        DecisionEnginePlugin plugin = (DecisionEnginePlugin) c.newInstance();
+                        hids.decisionEngines.add(plugin);
+                    }else if(propName == "dataModule"){
+                        DataProcessor dataProcessor = (DataProcessor)c.newInstance();
+                        hids.dataModules.add(dataProcessor);
+                    }
                 }
             }
-            if(hids.decisionEngines.size() > 0){
-                hids.currentDecisionEngine = hids.decisionEngines.get(0);
-                return true;
-            }else{
-                return false;
 
-
+            if(propName == "dePlugin") {
+                if (hids.decisionEngines.size() > 0) {
+                    hids.currentDecisionEngine = hids.decisionEngines.get(0);
+                    return true;
+                }
+            }else if(propName == "dataModule"){
+                if (hids.dataModules.size() > 0) {
+                    hids.currentDataModule = hids.dataModules.get(0);
+                    return true;
+                }
             }
-
+            return false;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -166,9 +172,6 @@ public class HIDS {
             e.printStackTrace();
             return false;
         } catch (InstantiationException e) {
-            e.printStackTrace();
-            return false;
-        } catch (NoSuchMethodException e) {
             e.printStackTrace();
             return false;
         } catch (InvocationTargetException e) {
@@ -176,35 +179,37 @@ public class HIDS {
             return false;
         }
     }
-    private boolean loadDataModules(HIDS hids, Properties props) {
 
-        ClassLoader classLoader = HIDS.class.getClassLoader();
+    private Pair<Constructor<?>, Object[]> getMultParamConst(String deName, String[] params, ClassLoader classLoader){
         try {
-            String[] dataModules = props.getProperty("dataModule").trim().split("\\s*,\\s*");
-            for (String s : dataModules) {
-                Class c = classLoader.loadClass(s);
-                DataProcessor dataProcessor = (DataProcessor) c.newInstance();
-                hids.dataModules.add(dataProcessor);
+            List<Class> classes = new ArrayList<>();
+            List<Object> args = new ArrayList<>();
+            for (String p : params) {
+                Class pClass = classLoader.loadClass(p);
+                classes.add(pClass);
+                Object instance = pClass.newInstance();
+                args.add(instance);
             }
 
-            if(hids.dataModules.size() > 0){
-                hids.currentDataModule = hids.dataModules.get(0);
-                return true;
-            }else{
-                return false;
-            }
+            Class[] classArr = classes.toArray(new Class[classes.size()]);
+            Object[] objArr = args.toArray(new Object[args.size()]);
 
-        } catch (ClassNotFoundException e) {
+            Class<?> c = classLoader.loadClass(deName);
+            Constructor<?> ctor = c.getConstructor(classArr);
+            return new Pair<>(ctor, objArr);
+        }catch (IllegalAccessException e) {
             e.printStackTrace();
-            return false;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return false;
+            return null;
         } catch (InstantiationException e) {
             e.printStackTrace();
-            return false;
+            return null;
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
     }
-
 
 }
