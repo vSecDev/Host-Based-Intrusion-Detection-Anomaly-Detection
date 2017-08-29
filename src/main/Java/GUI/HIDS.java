@@ -32,6 +32,7 @@ public class HIDS {
             //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
 
         }
+        //TODO LOAD CLASS WTH CONSTRUCTOR PARAMS
         for (DecisionEnginePlugin de : hids.decisionEngines) {
             System.out.println("de in main: " + de.pluginName());
         }
