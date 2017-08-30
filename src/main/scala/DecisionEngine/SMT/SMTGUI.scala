@@ -66,7 +66,7 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   override def getGUIComponent: Option[JPanel] = {
-    test(mainPanel)
+//    test(mainPanel)
     Some(mainPanel)
   }
 
@@ -335,7 +335,7 @@ class SMTGUI extends DecisionEngineGUI {
 
 
   //TODO - DELETE TEST
-  private def test(panel: JPanel): Unit = {
+ /* private def test(panel: JPanel): Unit = {
     val frame = new JFrame("HIDS")
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.setSize(800, 500)
@@ -375,7 +375,7 @@ class SMTGUI extends DecisionEngineGUI {
     frame.setVisible(true)
 
 
-  }
+  } */
 
   def render = { renderBtns }
 }

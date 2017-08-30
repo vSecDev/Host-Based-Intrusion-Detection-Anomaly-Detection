@@ -1,6 +1,7 @@
 package GUI;
 
 import Data.DataProcessor;
+import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 
 import java.util.*;
@@ -16,9 +17,11 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import scala.Option;
 
 //public class HIDS extends Observable implements Observer {
 public class HIDS extends Observable{
+
     private static final String configPath =  new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
     private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
@@ -28,6 +31,18 @@ public class HIDS extends Observable{
     //Observed by DEs
     private File source = null;
     private File target = null;
+
+    //Observed by HIDS here
+
+
+    //GUI
+    private final JFrame frame = new JFrame("HIDS");
+    private final JButton sourceBtn = new JButton("Source");
+    private final JButton targetBtn = new JButton("Target");
+    private final JButton preProcBtn = new JButton("Pre-process");
+    private final JTextField sourcePathF = new JTextField();
+    private final JTextField targetPathF = new JTextField();
+
 
 
     //Observed field in DEs
@@ -71,7 +86,7 @@ public class HIDS extends Observable{
             System.out.println("Initialisation unsuccessful!");
         }
 
-        for (DecisionEnginePlugin de : hids.decisionEngines) {
+        /*for (DecisionEnginePlugin de : hids.decisionEngines) {
             System.out.println("de in main: " + de.pluginName());
         }
         for(DataProcessor dp : hids.dataModules){
@@ -81,20 +96,17 @@ public class HIDS extends Observable{
         System.out.println("current dm: " + hids.currentDataModule.getClass().getName());
 
 
-
-
-
         hids.setSource(new File(configPath));
-        hids.setTarget(new File(configPath + "1"));
+        hids.setTarget(new File(configPath + "1"));*/
 
 
 
 
-        /*javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                startGUI();
+                hids.initGUI();
             }
-        });*/
+        });
     }
 
     private boolean moduleInit(){
@@ -151,7 +163,7 @@ public class HIDS extends Observable{
                 if (props.containsKey(de)) {
                     String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
                     if (params.length > 0) {
-                      Pair<Constructor<?>, Object[]> pair = getMultParamConst(de,params, classLoader);
+                      Pair<Constructor<?>, Object[]> pair = getMultiParamConst(de,params, classLoader);
                       if(pair == null){
                           return false;
                       }
@@ -202,7 +214,7 @@ public class HIDS extends Observable{
         }
     }
 
-    private Pair<Constructor<?>, Object[]> getMultParamConst(String deName, String[] params, ClassLoader classLoader){
+    private Pair<Constructor<?>, Object[]> getMultiParamConst(String deName, String[] params, ClassLoader classLoader){
         try {
             List<Class> classes = new ArrayList<>();
             List<Object> args = new ArrayList<>();
@@ -244,27 +256,79 @@ public class HIDS extends Observable{
 
 
 
-    private static void startGUI() {
-        //Create and set up the window.
-        JFrame frame = new JFrame("HIDS");
+    private void initGUI() {
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 500);
+        frame.setSize(1600, 800);
+        frame.setLayout(new BorderLayout(3,3));
 
-        //Create the menu bar.  Make it have a green background.
-        JMenuBar greenMenuBar = new JMenuBar();
-        greenMenuBar.setOpaque(true);
-        greenMenuBar.setBackground(new Color(154, 165, 127));
-        greenMenuBar.setPreferredSize(new Dimension(800, 25));
+        JLabel blueLabel = new JLabel();
+        blueLabel.setOpaque(true);
+        blueLabel.setBackground(new Color(70, 130, 180));
+        blueLabel.setPreferredSize(new Dimension(800, 500));
 
-        //Create a yellow label to put in the content pane.
-        JLabel yellowLabel = new JLabel();
-        yellowLabel.setOpaque(true);
-        yellowLabel.setBackground(new Color(248, 213, 131));
-        yellowLabel.setPreferredSize(new Dimension(800, 500));
+
+        JPanel buttonP = new JPanel();
+        buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
+
+
+
+        Container srcCont = new Container();
+        srcCont.setLayout(new FlowLayout(FlowLayout.LEFT));
+        sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
+        srcCont.add(sourceBtn);
+        srcCont.add(sourcePathF);
+        sourcePathF.setColumns(30);
+        sourcePathF.setEditable(false);
+      //  srcCont.setSize(new Dimension(100,50));
+        buttonP.add(srcCont);
+
+        Container targetCont = new Container();
+        targetCont.setLayout(new FlowLayout(FlowLayout.LEFT));
+        targetCont.add(targetBtn);
+        targetCont.add(targetPathF);
+        targetPathF.setColumns(30);
+        targetPathF.setEditable(false);
+//        targetCont.setSize(new Dimension(100,50));
+        buttonP.add(targetCont);
+
+        Container preprocCont = new Container();
+        preprocCont.setLayout(new FlowLayout(FlowLayout.LEFT));
+        preprocCont.add(preProcBtn);
+  //      preprocCont.setSize(new Dimension(100,50));
+        buttonP.add(preprocCont);
+
+
+
+
+    /*    //setup buttons here
+        sourceBtn.setPreferredSize(new Dimension(10,5));
+
+        //sourceBtn.setActionCommand(sourceBtn.getText());
+
+        buttonP.add(sourceBtn);
+        buttonP.add(sourcePathF);
+        buttonP.add(targetBtn);
+        buttonP.add(targetPathF);
+        buttonP.add(preProcBtn);
+
+        */
+        buttonP.setBorder(BorderFactory.createLineBorder(Color.black));
+        frame.add(buttonP, BorderLayout.NORTH);
+
+        frame.getContentPane().add(blueLabel, BorderLayout.CENTER);
+
+        Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();
+
+        if(de.nonEmpty()) {
+            frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
+        }
+
+
 
         //Set the menu bar and add the label to the content pane.
-        frame.setJMenuBar(greenMenuBar);
-        frame.getContentPane().add(yellowLabel, BorderLayout.CENTER);
+
+
 
         //Display the window.
         frame.pack();
