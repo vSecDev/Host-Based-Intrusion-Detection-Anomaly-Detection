@@ -193,9 +193,6 @@ class SMTGUI extends DecisionEngineGUI {
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
-   /* learnBtn.setEnabled(canLearn)
-    classifyBtn.setEnabled(canClassify)
-    validateBtn.setEnabled(canClassify)*/
     addFieldDocListener(maxDepthField)
     addFieldDocListener(maxPhiField)
     addFieldDocListener(maxSeqCntField)
@@ -208,23 +205,14 @@ class SMTGUI extends DecisionEngineGUI {
   private def addFieldDocListener(field: JFormattedTextField) = {
     field.getDocument.asInstanceOf[PlainDocument].addDocumentListener(new DocumentListener {
       override def insertUpdate(e: DocumentEvent) = {
-      /*  learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)*/
         renderBtns
       }
 
       override def changedUpdate(e: DocumentEvent) = {
-      /*  learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)*/
         renderBtns
       }
 
       override def removeUpdate(e: DocumentEvent) = {
-        /*learnBtn.setEnabled(canLearn)
-        classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)*/
         renderBtns
       }
     })
@@ -272,7 +260,7 @@ class SMTGUI extends DecisionEngineGUI {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
-      println("in insertString")
+     // println("in insertString")
       val doc = fb.getDocument
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
@@ -355,50 +343,6 @@ class SMTGUI extends DecisionEngineGUI {
       }
     }
   }
-
-
-  //TODO - DELETE TEST
- /* private def test(panel: JPanel): Unit = {
-    val frame = new JFrame("HIDS")
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.setSize(800, 500)
-
-    /* panel.add(maxDepthLabel)
-     addNonNegNumTextField(panel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-     panel.add(maxPhiLabel)
-     addNonNegNumTextField(panel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 3, isPositive = false, isDouble = false, isPercent = false)
-     panel.add(maxSeqCntLabel)
-     addNonNegNumTextField(panel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false)
-
-
-     panel.add(smoothingLabel)
-     addNonNegNumTextField(panel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-     panel.add(priorLabel)
-     //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-     addNonNegNumTextField(panel, priorField, priorStr, priorToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false)
-     panel.add(thresholdLabel)
-     addNonNegNumTextField(panel, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false)
-     panel.add(toleranceLabel)
-     addNonNegNumTextField(panel, toleranceField, toleranceStr, toleranceToolTipStr, 5, isPositive = false, isDouble = true, isPercent = true)*/
-
-    /*    isIntCheckBox.addItemListener(new ItemListener {
-          override def itemStateChanged(e: ItemEvent): Unit = {
-            val isIntsBox = e.getSource.asInstanceOf[JCheckBox]
-            isInts = isIntsBox.isSelected
-            println("intbox state: " + isInts)
-          }
-        })*/
-    /* panel.add(isIntCheckBox)*/
-
-
-    val cp = frame.getContentPane
-    cp.setLayout(new FlowLayout(FlowLayout.LEFT))
-    cp.add(panel)
-    frame.pack()
-    frame.setVisible(true)
-
-
-  } */
 
   def render = { renderBtns }
 }

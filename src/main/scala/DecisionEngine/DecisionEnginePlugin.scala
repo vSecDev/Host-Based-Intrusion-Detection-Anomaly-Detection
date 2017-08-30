@@ -18,9 +18,9 @@ trait DecisionEnginePlugin extends Observer{
 
   override def update(o: Observable, arg: scala.Any): Unit = {
    arg match {
-     case "source" => source = Some(o.asInstanceOf[HIDS].getSource); println("srcFile in DE: " + source.get)
-     case "target" => target = Some(o.asInstanceOf[HIDS].getTarget); println("trgtFile in DE: " + target.get)
-     case _ => println("couldnt identify arg") //TODO - CHANGE THIS!
+     case "source" => source = Some(o.asInstanceOf[HIDS].getSource)
+     case "target" => target = Some(o.asInstanceOf[HIDS].getTarget)
+     case _ =>
    }
   }
 
