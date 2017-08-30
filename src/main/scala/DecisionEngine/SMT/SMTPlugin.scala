@@ -1,6 +1,7 @@
 package DecisionEngine.SMT
 
 import java.io.File
+import java.util.Observable
 
 import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
 import DecisionEngine.{DecisionEngineConfig, DecisionEngineGUI, DecisionEnginePlugin, DecisionEngineReport}
@@ -18,6 +19,9 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
 
 
   gui.setPluginInstance(this)
+
+
+  override def update(o: Observable, arg: scala.Any): Unit = ???
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
