@@ -25,11 +25,16 @@ public class HIDS extends Observable{
     private DecisionEnginePlugin currentDecisionEngine = null;
     private DataProcessor currentDataModule = null;
 
+    //Observed by DEs
     private File srcFile = null;
     private File trgtFile = null;
     private File srcDir = null;
     private File trgtDir = null;
     private File loadModelFile = null;
+
+    //Observed field in DEs
+    private
+
 
 
 

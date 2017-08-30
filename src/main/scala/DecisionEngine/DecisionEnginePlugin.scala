@@ -26,8 +26,6 @@ trait DecisionEnginePlugin extends Observer{
      case "loadModelFile" => loadModelFile = Some(o.asInstanceOf[HIDS].getLoadModelFile); println("loadModelFile in DE: " + loadModelFile.get)
      case _ => println("couldnt identify arg")
    }
-
-
   }
 
   def configure(config: DecisionEngineConfig): Boolean
