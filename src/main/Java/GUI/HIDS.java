@@ -69,12 +69,8 @@ public class HIDS extends Observable {
 
         HIDS hids = new HIDS();
         if (!hids.moduleInit()) {
-            //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
-
-            JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
             JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
 
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -163,22 +159,15 @@ public class HIDS extends Observable {
             }
 
             if (propName == "dePlugin") {
-                if (hids.decisionEngines.size() > 0) {
-                    //hids.currentDecisionEngine = hids.decisionEngines.get(0);
-                    return true;
-                }
+                return hids.decisionEngines.size() > 0;
             } else if (propName == "dataModule") {
-                if (hids.dataModules.size() > 0) {
-                    //hids.currentDataModule = hids.dataModules.get(0);
-                    return true;
-                }
+                return hids.dataModules.size() > 0;
             }
             return false;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NullPointerException e) {
             e.printStackTrace();
             return false;
         }
-
     }
 
     private Pair<Constructor<?>, Object[]> getMultiParamConst(String deName, String[] params, ClassLoader classLoader) {
@@ -198,21 +187,11 @@ public class HIDS extends Observable {
             Class<?> c = classLoader.loadClass(deName);
             Constructor<?> ctor = c.getConstructor(classArr);
             return new Pair<>(ctor, objArr);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
     private void initGUI() {
 
@@ -244,10 +223,6 @@ public class HIDS extends Observable {
             frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
         }
 
-
-        //Set the menu bar and add the label to the content pane.
-
-
         //Display the window.
         frame.pack();
         frame.setVisible(true);
@@ -255,7 +230,7 @@ public class HIDS extends Observable {
 
 
     private Boolean canPreProcess(){
-        return (getSource() != null && getTarget() != null);
+        return (getSource() != null && getTarget() != null && currentDataModule != null);
     }
     private void renderBtns(){
         preProcBtn.setEnabled(canPreProcess());
@@ -269,18 +244,13 @@ public class HIDS extends Observable {
         if (hasField) {
             cnt.add(label);
             label.setText("...");
-            //label.setEditable(false);
         }
         return cnt;
     }
 
-
-
     private class BtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent evt) {
-            // Need to determine which button fired the event.
-            // the getActionCommand() returns the Button's label
             System.out.println("evt src: " + evt.getSource());
             String btnLabel = evt.getActionCommand();
             btnHandler(btnLabel);
