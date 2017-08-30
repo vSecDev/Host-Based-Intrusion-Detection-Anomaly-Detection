@@ -250,62 +250,18 @@ public class HIDS extends Observable {
         blueLabel.setBackground(new Color(70, 130, 180));
         blueLabel.setPreferredSize(new Dimension(800, 500));
 
-
         JPanel buttonP = new JPanel();
         buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
 
-
-
-
-
-        /*Container srcCont = new Container();
-        srcCont.setLayout(new FlowLayout(FlowLayout.LEFT));
-        //sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
-        srcCont.add(sourceBtn);
-        srcCont.add(sourcePathL);
-        sourcePathL.setColumns(50);
-        sourcePathL.setEditable(false);*/
-
-        //buttonP.add(srcCont);
         BtnListener listener = new BtnListener();
         buttonP.add(setupBtn(sourceBtn, sourcePathL, true, listener));
         buttonP.add(setupBtn(targetBtn, targetPathL, true, listener));
         buttonP.add(setupBtn(preProcBtn, null, false, listener));
 
-
-       /* Container targetCont = new Container();
-        targetCont.setLayout(new FlowLayout(FlowLayout.LEFT));
-        targetCont.add(targetBtn);
-        targetCont.add(targetPathL);
-        targetPathL.setColumns(50);
-        targetPathL.setEditable(false);
-        buttonP.add(targetCont);
-
-        Container preprocCont = new Container();
-        preprocCont.setLayout(new FlowLayout(FlowLayout.LEFT));
-        preprocCont.add(preProcBtn);*/
-        //      preprocCont.setSize(new Dimension(100,50));
-        //buttonP.add(preprocCont);
-
-
-
-
-    /*    //setup buttons here
-        sourceBtn.setPreferredSize(new Dimension(10,5));
-
-        //sourceBtn.setActionCommand(sourceBtn.getText());
-
-        buttonP.add(sourceBtn);
-        buttonP.add(sourcePathL);
-        buttonP.add(targetBtn);
-        buttonP.add(targetPathL);
-        buttonP.add(preProcBtn);
-
-        */
         buttonP.setBorder(BorderFactory.createLineBorder(Color.black));
         frame.add(buttonP, BorderLayout.NORTH);
-
         frame.getContentPane().add(blueLabel, BorderLayout.CENTER);
+        renderBtns();
 
         Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();
 
@@ -322,6 +278,14 @@ public class HIDS extends Observable {
         frame.setVisible(true);
     }
 
+
+    private Boolean canPreProcess(){
+        return (source != null && target != null);
+    }
+    private void renderBtns(){
+        preProcBtn.setEnabled(canPreProcess());
+    }
+
     private Container setupBtn(JButton btn, JLabel label, Boolean hasField, BtnListener listener) {
         Container cnt = new Container();
         cnt.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -335,6 +299,8 @@ public class HIDS extends Observable {
         return cnt;
     }
 
+
+
     private class BtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent evt) {
@@ -343,6 +309,7 @@ public class HIDS extends Observable {
             System.out.println("evt src: " + evt.getSource());
             String btnLabel = evt.getActionCommand();
             btnHandler(btnLabel);
+            renderBtns();
         }
 
         private void btnHandler(String btnLabel){
