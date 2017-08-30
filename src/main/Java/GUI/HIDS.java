@@ -17,7 +17,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import scala.Option;
-import scala.xml.Null;
 
 //public class HIDS extends Observable implements Observer {
 public class HIDS extends Observable {
@@ -25,6 +24,7 @@ public class HIDS extends Observable {
     private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private Properties props = null;
     private String[] extensions = new String[0];
+    private String[] delimiters = new String[0];
     private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
     private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
     private DecisionEnginePlugin currentDecisionEngine = null;
@@ -51,7 +51,7 @@ public class HIDS extends Observable {
         return source;
     }
 
-    public void setSource(File source) {
+    private void setSource(File source) {
         this.source = source;
         setChanged();
         notifyObservers("source");
@@ -61,19 +61,41 @@ public class HIDS extends Observable {
         return target;
     }
 
-    public void setTarget(File target) {
+    private void setTarget(File target) {
         this.target = target;
         setChanged();
         notifyObservers("target");
     }
 
+    public String[] getDelimiters() {
+        return delimiters;
+    }
+
+    private void setDelimiters(String[] delimiters) {
+        this.delimiters = delimiters;
+    }
+
+    public String[] getExtensions() {
+        return extensions;
+    }
+
+    private void setExtensions(String[] extensions) {
+        this.extensions = extensions;
+    }
 
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
         hids.loadProperties(configPath);
-        if (!(hids.moduleInit() && hids.extensionsInit())) {
+        if (!(hids.moduleInit() &&
+                hids.extensionsInit() &&
+                hids.delimitersInit())) {
             JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+
+        for(String d : hids.getDelimiters()){
+            System.out.println("delimiter: " + d);
         }
 
 
@@ -106,8 +128,21 @@ public class HIDS extends Observable {
     private boolean extensionsInit() {
         if (props != null) {
             try {
-                extensions = props.getProperty("extensions").trim().split("\\s*,\\s*");
-                return extensions != null && extensions.length > 0;
+                setExtensions(props.getProperty("extensions").trim().split("\\s*,\\s*"));
+                return getExtensions() != null && getExtensions().length > 0;
+            } catch (NullPointerException e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean delimitersInit() {
+        if (props != null) {
+            try {
+                setDelimiters(props.getProperty("delimiters").trim().split("."));
+                return getDelimiters() != null && getDelimiters().length > 0;
             } catch (NullPointerException e){
                 e.printStackTrace();
                 return false;
@@ -245,7 +280,11 @@ public class HIDS extends Observable {
 
 
     private Boolean canPreProcess(){
-        return (getSource() != null && getTarget() != null && currentDataModule != null);
+        return (getSource() != null &&
+                getTarget() != null &&
+                getSource().isDirectory() &&
+                getTarget().isDirectory() &&
+                currentDataModule != null);
     }
     private void renderBtns(){
         preProcBtn.setEnabled(canPreProcess());
@@ -281,7 +320,7 @@ public class HIDS extends Observable {
             String currDir = "...";
             try {
                 if(btnLabel.equals("Source") && (getSource() != null)) { currDir = getSource().getCanonicalPath(); }
-                else if(btnLabel.equals("Target") && (getSource() != null)) {  currDir = getTarget().getCanonicalPath(); }
+                else if(btnLabel.equals("Target") && (getTarget() != null)) {  currDir = getTarget().getCanonicalPath(); }
 
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int returnVal = fc.showOpenDialog(HIDS.this.frame);
@@ -310,7 +349,8 @@ public class HIDS extends Observable {
         }
 
         private void preProcessHandler(){
-            //TODO - PREPROCESS LOGIC HERE!
+            //Map sysCallMap = currentDataModule.preprocess(getSource(), getTarget())
+
         }
     }
 }

@@ -25,7 +25,7 @@ class SMTGUITest extends FunSuite{
   val eventStr2 = "eventStr2"
   val eventStr3 = "eventStr3"
 
-  test("GUI displays"){
+ /* test("GUI displays"){
     val n1 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     n1.learn(condition1, event1)
     val dm = new DataModel
@@ -56,5 +56,5 @@ class SMTGUITest extends FunSuite{
     Thread.sleep(1000000)
 
 
-  }
+  }*/
 }
