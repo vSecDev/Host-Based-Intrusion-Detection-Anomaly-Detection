@@ -4,10 +4,10 @@ import Data.DataProcessor;
 import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
-
 import javafx.util.Pair;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -68,13 +68,6 @@ public class HIDS extends Observable{
         setChanged();
         notifyObservers("target");
     }
-
-
-    /*@Override
-    public void update(Observable o, Object arg) {
-
-    }*/
-
 
 
 
@@ -273,30 +266,36 @@ public class HIDS extends Observable{
 
 
 
-        Container srcCont = new Container();
+
+
+        /*Container srcCont = new Container();
         srcCont.setLayout(new FlowLayout(FlowLayout.LEFT));
-        sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
+        //sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
         srcCont.add(sourceBtn);
         srcCont.add(sourcePathF);
         sourcePathF.setColumns(50);
-        sourcePathF.setEditable(false);
-      //  srcCont.setSize(new Dimension(100,50));
-        buttonP.add(srcCont);
+        sourcePathF.setEditable(false);*/
 
-        Container targetCont = new Container();
+        //buttonP.add(srcCont);
+        BtnListener listener = new BtnListener();
+        buttonP.add(setupBtn(sourceBtn,sourcePathF,true, listener));
+        buttonP.add(setupBtn(targetBtn, targetPathF, true, listener));
+        buttonP.add(setupBtn(preProcBtn, null, false, listener));
+
+
+       /* Container targetCont = new Container();
         targetCont.setLayout(new FlowLayout(FlowLayout.LEFT));
         targetCont.add(targetBtn);
         targetCont.add(targetPathF);
         targetPathF.setColumns(50);
         targetPathF.setEditable(false);
-//        targetCont.setSize(new Dimension(100,50));
         buttonP.add(targetCont);
 
         Container preprocCont = new Container();
         preprocCont.setLayout(new FlowLayout(FlowLayout.LEFT));
-        preprocCont.add(preProcBtn);
+        preprocCont.add(preProcBtn);*/
   //      preprocCont.setSize(new Dimension(100,50));
-        buttonP.add(preprocCont);
+        //buttonP.add(preprocCont);
 
 
 
@@ -333,6 +332,36 @@ public class HIDS extends Observable{
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+    }
+
+    private Container setupBtn(JButton btn, JTextField field, Boolean hasField, BtnListener listener) {
+        Container cnt = new Container();
+        cnt.setLayout(new FlowLayout(FlowLayout.LEFT));
+        cnt.add(btn);
+        btn.addActionListener(listener);
+        if(hasField){
+            cnt.add(field);
+            field.setColumns(50);
+            field.setEditable(false);
+        }
+        return cnt;
+    }
+
+    private class BtnListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            // Need to determine which button fired the event.
+            // the getActionCommand() returns the Button's label
+            String btnLabel = evt.getActionCommand();
+            /*if (btnLabel.equals("Count Up")) {
+
+            } else if (btnLabel.equals("Count Down")) {
+
+            } else {
+
+            }*/
+            System.out.println("btnlablel: " + btnLabel);
+        }
     }
 
 

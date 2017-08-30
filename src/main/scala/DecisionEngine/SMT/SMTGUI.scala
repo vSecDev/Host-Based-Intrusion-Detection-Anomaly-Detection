@@ -53,6 +53,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val learnBtn = new JButton("Learn")
   private final val classifyBtn = new JButton("Classify")
   private final val validateBtn = new JButton("Validate")
+  private final val loadModelBtn = new JButton("Load SMT")
   private final val saveModelBtn = new JButton("Save SMT")
   private final val saveReportBtn = new JButton("Save report")
 
@@ -113,6 +114,7 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(mlParamsP, learnBtn, learnBtn.getText)
     setupButton(mlParamsP, classifyBtn, classifyBtn.getText)
     setupButton(mlParamsP, validateBtn, validateBtn.getText)
+    setupButton(mlParamsP, loadModelBtn, loadModelBtn.getText)
     setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText)
     setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText)
     mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
@@ -176,6 +178,13 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) => plugin.source.isDefined && (plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty)
   }
 
+  private def canLoadModel: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) => if(plugin.source.isDefined){
+      plugin.source.get.isFile && plugin.isTrained
+    }else false
+  }
+
   private def canSaveModel: Boolean = pluginInstance match {
     case None => false
     case Some(plugin) => plugin.target.isDefined && plugin.isTrained
@@ -225,6 +234,7 @@ class SMTGUI extends DecisionEngineGUI {
     learnBtn.setEnabled(canLearn)
     classifyBtn.setEnabled(canClassify)
     validateBtn.setEnabled(canClassify)
+    loadModelBtn.setEnabled(canLoadModel)
     saveModelBtn.setEnabled(canSaveModel)
     //saveReportBtn.setEnabled(canSaveReport)
   }
