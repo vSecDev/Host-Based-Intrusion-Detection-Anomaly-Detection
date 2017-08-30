@@ -53,6 +53,8 @@ class SMTGUI extends DecisionEngineGUI {
   private final val learnBtn = new JButton("Learn")
   private final val classifyBtn = new JButton("Classify")
   private final val validateBtn = new JButton("Validate")
+  private final val saveModelBtn = new JButton("Save SMT")
+  private final val saveReportBtn = new JButton("Save report")
 
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val intCheckBox = new JCheckBox("Integer traces")
@@ -111,6 +113,8 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(mlParamsP, learnBtn, learnBtn.getText)
     setupButton(mlParamsP, classifyBtn, classifyBtn.getText)
     setupButton(mlParamsP, validateBtn, validateBtn.getText)
+    setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText)
+    setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText)
     mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(mlParamsP)
 
@@ -172,6 +176,11 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) => plugin.source.isDefined && (plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty)
   }
 
+  private def canSaveModel: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) => plugin.target.isDefined && plugin.isTrained
+  }
+
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
@@ -216,6 +225,8 @@ class SMTGUI extends DecisionEngineGUI {
     learnBtn.setEnabled(canLearn)
     classifyBtn.setEnabled(canClassify)
     validateBtn.setEnabled(canClassify)
+    saveModelBtn.setEnabled(canSaveModel)
+    //saveReportBtn.setEnabled(canSaveReport)
   }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
