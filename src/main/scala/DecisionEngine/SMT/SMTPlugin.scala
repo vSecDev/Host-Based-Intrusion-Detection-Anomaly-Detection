@@ -53,10 +53,10 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   override def getGUI: Option[DecisionEngineGUI] = Some(gui)
 
 
-  /*override def update(o: Observable, arg: Any): Unit = {
+  override def update(o: Observable, arg: Any): Unit = {
     super.update(o, arg)
-
-  }*/
+    gui.render
+  }
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     if (data.isEmpty) return model

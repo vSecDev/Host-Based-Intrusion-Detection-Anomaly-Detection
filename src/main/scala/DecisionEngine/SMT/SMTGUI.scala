@@ -376,4 +376,6 @@ class SMTGUI extends DecisionEngineGUI {
 
 
   }
+
+  def render = { renderBtns }
 }
