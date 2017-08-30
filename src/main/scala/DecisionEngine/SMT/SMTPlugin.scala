@@ -20,9 +20,6 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
 
   gui.setPluginInstance(this)
 
-
-  override def update(o: Observable, arg: scala.Any): Unit = ???
-
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
       try

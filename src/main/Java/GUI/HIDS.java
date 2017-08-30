@@ -17,8 +17,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class HIDS extends Observable implements Observer {
-
+//public class HIDS extends Observable implements Observer {
+public class HIDS extends Observable{
     private static final String configPath =  new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
     private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
@@ -29,6 +29,8 @@ public class HIDS extends Observable implements Observer {
     private File trgtFile = null;
     private File srcDir = null;
     private File trgtDir = null;
+    private File loadModelFile = null;
+
 
 
     public File getSrcFile() {
@@ -37,6 +39,8 @@ public class HIDS extends Observable implements Observer {
 
     public void setSrcFile(File srcFile) {
         this.srcFile = srcFile;
+        setChanged();
+        notifyObservers("srcFile");
     }
 
     public File getTrgtFile() {
@@ -45,6 +49,8 @@ public class HIDS extends Observable implements Observer {
 
     public void setTrgtFile(File trgtFile) {
         this.trgtFile = trgtFile;
+        setChanged();
+        notifyObservers("trgtFile");
     }
 
     public File getSrcDir() {
@@ -53,6 +59,8 @@ public class HIDS extends Observable implements Observer {
 
     public void setSrcDir(File srcDir) {
         this.srcDir = srcDir;
+        setChanged();
+        notifyObservers("srcDir");
     }
 
     public File getTrgtDir() {
@@ -61,13 +69,26 @@ public class HIDS extends Observable implements Observer {
 
     public void setTrgtDir(File trgtDir) {
         this.trgtDir = trgtDir;
+        setChanged();
+        notifyObservers("trgtDir");
+    }
+
+    public File getLoadModelFile() {
+        return loadModelFile;
+    }
+
+    public void setLoadModelFile(File loadModelFile) {
+        this.loadModelFile = loadModelFile;
+        setChanged();
+        notifyObservers("loadModelFile");
     }
 
 
-    @Override
+
+    /*@Override
     public void update(Observable o, Object arg) {
 
-    }
+    }*/
 
 
 
@@ -93,6 +114,14 @@ public class HIDS extends Observable implements Observer {
 
 
 
+        /*hids.setSrcFile(new File(configPath));
+        hids.setTrgtFile(new File(configPath + "1"));
+        hids.setSrcDir(new File(configPath + "2"));
+        hids.setTrgtDir(new File(configPath + "3"));
+        hids.setLoadModelFile(new File(configPath + "4"));*/
+
+
+
         /*javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 startGUI();
@@ -112,6 +141,11 @@ public class HIDS extends Observable implements Observer {
                 currentDataModule = dataModules.get(0);
                 //TODO SUBSCRIBE ALL DES TO FILE CHANGES HERE
                 //TODO SUBSCRIBE HIDS TO CHANGES IN DES
+                for(DecisionEnginePlugin de : decisionEngines){
+                    System.out.println("adding " + de.getClass().getName() + " as observer");
+                    addObserver(de);
+                }
+
 
                 return true;
             } else {return false;}
@@ -268,6 +302,7 @@ public class HIDS extends Observable implements Observer {
         frame.pack();
         frame.setVisible(true);
     }
+
 
 
 }
