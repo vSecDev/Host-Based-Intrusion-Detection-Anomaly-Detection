@@ -259,7 +259,7 @@ public class HIDS extends Observable{
     private void initGUI() {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1600, 800);
+        frame.setSize(900, 1000);
         frame.setLayout(new BorderLayout(3,3));
 
         JLabel blueLabel = new JLabel();
@@ -278,7 +278,7 @@ public class HIDS extends Observable{
         sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
         srcCont.add(sourceBtn);
         srcCont.add(sourcePathF);
-        sourcePathF.setColumns(30);
+        sourcePathF.setColumns(50);
         sourcePathF.setEditable(false);
       //  srcCont.setSize(new Dimension(100,50));
         buttonP.add(srcCont);
@@ -287,7 +287,7 @@ public class HIDS extends Observable{
         targetCont.setLayout(new FlowLayout(FlowLayout.LEFT));
         targetCont.add(targetBtn);
         targetCont.add(targetPathF);
-        targetPathF.setColumns(30);
+        targetPathF.setColumns(50);
         targetPathF.setEditable(false);
 //        targetCont.setSize(new Dimension(100,50));
         buttonP.add(targetCont);

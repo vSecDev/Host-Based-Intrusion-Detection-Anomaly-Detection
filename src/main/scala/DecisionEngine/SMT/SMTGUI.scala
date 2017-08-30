@@ -113,6 +113,8 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(mlParamsP, validateBtn, validateBtn.getText)
     mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(mlParamsP)
+
+    mainPanel.setBorder(BorderFactory.createLineBorder(Color.black))
   }
 
   private def hasRoot: Boolean = {
