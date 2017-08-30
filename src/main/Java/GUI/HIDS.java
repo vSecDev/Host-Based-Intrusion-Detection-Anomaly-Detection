@@ -70,21 +70,11 @@ public class HIDS extends Observable {
         HIDS hids = new HIDS();
         if (!hids.moduleInit()) {
             //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
-            System.out.println("Initialisation unsuccessful!");
+
+            JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        /*for (DecisionEnginePlugin de : hids.decisionEngines) {
-            System.out.println("de in main: " + de.pluginName());
-        }
-        for(DataProcessor dp : hids.dataModules){
-            System.out.println("dm in main: " + dp.getClass().getName());
-        }
-        System.out.println("current de: " + hids.currentDecisionEngine.getClass().getName());
-        System.out.println("current dm: " + hids.currentDataModule.getClass().getName());
-
-
-        hids.setSource(new File(configPath));
-        hids.setTarget(new File(configPath + "1"));*/
 
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -97,9 +87,6 @@ public class HIDS extends Observable {
     private boolean moduleInit() {
         Properties props = this.loadProperties(configPath);
         if (props != null) {
-            // return(loadModules(this, props) && loadDataModules(this, props));
-            /*return(loadModules(this, props, "dePlugin") &&
-            loadModules(this, props, "dataModule"));*/
             if (loadModules(this, props, "dePlugin") &&
                     loadModules(this, props, "dataModule")) {
                 currentDecisionEngine = decisionEngines.get(0);
@@ -110,8 +97,6 @@ public class HIDS extends Observable {
                     System.out.println("adding " + de.getClass().getName() + " as observer");
                     addObserver(de);
                 }
-
-
                 return true;
             } else {
                 return false;
@@ -189,19 +174,11 @@ public class HIDS extends Observable {
                 }
             }
             return false;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NullPointerException e) {
             e.printStackTrace();
             return false;
         }
+
     }
 
     private Pair<Constructor<?>, Object[]> getMultiParamConst(String deName, String[] params, ClassLoader classLoader) {
