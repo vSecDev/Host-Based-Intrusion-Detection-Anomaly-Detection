@@ -87,16 +87,19 @@ public class HIDS extends Observable {
 
         HIDS hids = new HIDS();
         hids.loadProperties(configPath);
-        if (!(hids.moduleInit() &&
-                hids.extensionsInit() &&
-                hids.delimitersInit())) {
+        if (!(hids.moduleInit() && hids.extensionsInit() && hids.delimitersInit())) {
+            System.out.println("here");
             JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
 
-        for(String d : hids.getDelimiters()){
-            System.out.println("delimiter: " + d);
+        for(String s : hids.getExtensions()){
+            System.out.println("extension: " + s);
         }
+        for(String s : hids.getDelimiters()){
+            System.out.println("delimiter: " + s);
+        }
+
 
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -141,9 +144,10 @@ public class HIDS extends Observable {
     private boolean delimitersInit() {
         if (props != null) {
             try {
-                setDelimiters(props.getProperty("delimiters").trim().split("."));
+                setDelimiters(props.getProperty("delimiters").trim().split("\\+"));
                 return getDelimiters() != null && getDelimiters().length > 0;
             } catch (NullPointerException e){
+                System.out.println("nullpointerexception thrown");
                 e.printStackTrace();
                 return false;
             }
@@ -349,8 +353,7 @@ public class HIDS extends Observable {
         }
 
         private void preProcessHandler(){
-            //Map sysCallMap = currentDataModule.preprocess(getSource(), getTarget())
-
+            currentDataModule.preprocess(getSource(), getTarget(), getDelimiters(), getExtensions()).get();
         }
     }
 }

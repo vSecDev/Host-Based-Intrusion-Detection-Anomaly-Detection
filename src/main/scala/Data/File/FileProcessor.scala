@@ -186,10 +186,7 @@ class FileProcessor extends DataProcessor {
     try {
       val source = scala.io.Source.fromFile(f)
       val lines = try " " + (source.getLines mkString "\n" replaceAll(delimiters.mkString("|"), " ")) finally source.close()
-      println("\nlines: " + lines)
-      println("map before replace: " + map)
       val result = map.foldLeft(lines)((a, b) => a.replaceAllLiterally(" " + b._1, " " + b._2.toString)).trim
-      println("result: " + result)
       result
     } catch {
       case ioe: IOException => throw new DataException("IOException thrown during conversion of source data file.", ioe)
