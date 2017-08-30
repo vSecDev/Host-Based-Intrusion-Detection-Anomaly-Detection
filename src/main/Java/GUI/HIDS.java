@@ -340,46 +340,42 @@ public class HIDS extends Observable {
         public void actionPerformed(ActionEvent evt) {
             // Need to determine which button fired the event.
             // the getActionCommand() returns the Button's label
+            System.out.println("evt src: " + evt.getSource());
             String btnLabel = evt.getActionCommand();
-            if (btnLabel.equals("Source")) {
-                String currSrc = "...";
-                try {
+            btnHandler(btnLabel);
+        }
 
-                    if (source != null) {
-                        currSrc = source.getCanonicalPath();
-                    }
+        private void btnHandler(String btnLabel){
 
-                    fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    int returnVal = fc.showOpenDialog(HIDS.this.frame);
+            String currDir = "...";
+            try {
+                if(btnLabel.equals("Source") && (source != null)) { currDir = getSource().getCanonicalPath(); }
+                else if(btnLabel.equals("Target") && (target != null)) {  currDir = target.getCanonicalPath(); }
 
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        File file = fc.getSelectedFile();
+                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                int returnVal = fc.showOpenDialog(HIDS.this.frame);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    if(btnLabel.equals("Source")){
                         HIDS.this.setSource(file);
                         sourcePathL.setText(file.getCanonicalPath());
-                    } else {
-                        //TODO - DELETE BELOW
-                        System.out.println("source but not Approve Option.");
+                    }else if(btnLabel.equals("Target")){
+                        HIDS.this.setTarget(file);
+                        targetPathL.setText(file.getCanonicalPath());
                     }
-                } catch (IOException e) {
-                    sourcePathL.setText(currSrc);
-                    e.printStackTrace();
+                } else {
+                    //TODO - DELETE BELOW
+                    System.out.println("source but not Approve Option.");
                 }
+            } catch (IOException e) {
+                if(btnLabel.equals("Source")){
+                    sourcePathL.setText(currDir);
+                }else if(btnLabel.equals("Target")){
+                    targetPathL.setText(currDir);
+                }
+                e.printStackTrace();
             }
-
-
-       /* } else if(btnLabel.equals("Count Down"))
-
-        {
-
-        } else
-
-        {
-
-        }*/
-            System.out.println("btnlablel: "+btnLabel);
+        }
     }
-}
-
-
-
 }
