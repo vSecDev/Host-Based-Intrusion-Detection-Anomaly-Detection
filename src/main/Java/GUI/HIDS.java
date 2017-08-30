@@ -20,9 +20,9 @@ import java.util.List;
 import scala.Option;
 
 //public class HIDS extends Observable implements Observer {
-public class HIDS extends Observable{
+public class HIDS extends Observable {
 
-    private static final String configPath =  new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
+    private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
     private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
     private DecisionEnginePlugin currentDecisionEngine = null;
@@ -32,7 +32,7 @@ public class HIDS extends Observable{
     private File source = null;
     private File target = null;
 
-    //Observed by HIDS here
+    //Observed field in DEs
 
 
     //GUI
@@ -40,13 +40,10 @@ public class HIDS extends Observable{
     private final JButton sourceBtn = new JButton("Source");
     private final JButton targetBtn = new JButton("Target");
     private final JButton preProcBtn = new JButton("Pre-process");
-    private final JTextField sourcePathF = new JTextField();
-    private final JTextField targetPathF = new JTextField();
+    private final JLabel sourcePathL = new JLabel();
+    private final JLabel targetPathL = new JLabel();
 
-
-
-    //Observed field in DEs
-   // private
+    private final JFileChooser fc = new JFileChooser();
 
 
     public File getSource() {
@@ -70,11 +67,10 @@ public class HIDS extends Observable{
     }
 
 
-
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
-        if(!hids.moduleInit()){
+        if (!hids.moduleInit()) {
             //TODO - HANDLE HIDS INITIALISATION ERROR HERE + POPUP ERROR MSG + CALL INITIALISE AGAIN
             System.out.println("Initialisation unsuccessful!");
         }
@@ -93,8 +89,6 @@ public class HIDS extends Observable{
         hids.setTarget(new File(configPath + "1"));*/
 
 
-
-
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 hids.initGUI();
@@ -102,27 +96,31 @@ public class HIDS extends Observable{
         });
     }
 
-    private boolean moduleInit(){
+    private boolean moduleInit() {
         Properties props = this.loadProperties(configPath);
         if (props != null) {
-          // return(loadModules(this, props) && loadDataModules(this, props));
+            // return(loadModules(this, props) && loadDataModules(this, props));
             /*return(loadModules(this, props, "dePlugin") &&
             loadModules(this, props, "dataModule"));*/
-            if(loadModules(this, props, "dePlugin") &&
-                    loadModules(this, props, "dataModule")){
+            if (loadModules(this, props, "dePlugin") &&
+                    loadModules(this, props, "dataModule")) {
                 currentDecisionEngine = decisionEngines.get(0);
                 currentDataModule = dataModules.get(0);
                 //TODO SUBSCRIBE ALL DES TO FILE CHANGES HERE
                 //TODO SUBSCRIBE HIDS TO CHANGES IN DES
-                for(DecisionEnginePlugin de : decisionEngines){
+                for (DecisionEnginePlugin de : decisionEngines) {
                     System.out.println("adding " + de.getClass().getName() + " as observer");
                     addObserver(de);
                 }
 
 
                 return true;
-            } else {return false;}
-        }else {return false;}
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     private Properties loadProperties(String path) {
@@ -145,6 +143,7 @@ public class HIDS extends Observable{
         }
         return null;
     }
+
     //TODO - EXCEPTION HANDLING!!!
     private boolean loadModules(HIDS hids, Properties props, String propName) {
 
@@ -156,36 +155,36 @@ public class HIDS extends Observable{
                 if (props.containsKey(de)) {
                     String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
                     if (params.length > 0) {
-                      Pair<Constructor<?>, Object[]> pair = getMultiParamConst(de,params, classLoader);
-                      if(pair == null){
-                          return false;
-                      }
-                        if(propName == "dePlugin") {
+                        Pair<Constructor<?>, Object[]> pair = getMultiParamConst(de, params, classLoader);
+                        if (pair == null) {
+                            return false;
+                        }
+                        if (propName == "dePlugin") {
                             DecisionEnginePlugin plugin = (DecisionEnginePlugin) pair.getKey().newInstance(pair.getValue());
                             hids.decisionEngines.add(plugin);
-                        }else if(propName == "dataModule"){
+                        } else if (propName == "dataModule") {
                             DataProcessor dataProcessor = (DataProcessor) pair.getKey().newInstance(pair.getValue());
                             hids.dataModules.add(dataProcessor);
                         }
                     }
                 } else {
                     Class c = classLoader.loadClass(de);
-                    if(propName == "dePlugin") {
+                    if (propName == "dePlugin") {
                         DecisionEnginePlugin plugin = (DecisionEnginePlugin) c.newInstance();
                         hids.decisionEngines.add(plugin);
-                    }else if(propName == "dataModule"){
-                        DataProcessor dataProcessor = (DataProcessor)c.newInstance();
+                    } else if (propName == "dataModule") {
+                        DataProcessor dataProcessor = (DataProcessor) c.newInstance();
                         hids.dataModules.add(dataProcessor);
                     }
                 }
             }
 
-            if(propName == "dePlugin") {
+            if (propName == "dePlugin") {
                 if (hids.decisionEngines.size() > 0) {
                     //hids.currentDecisionEngine = hids.decisionEngines.get(0);
                     return true;
                 }
-            }else if(propName == "dataModule"){
+            } else if (propName == "dataModule") {
                 if (hids.dataModules.size() > 0) {
                     //hids.currentDataModule = hids.dataModules.get(0);
                     return true;
@@ -207,7 +206,7 @@ public class HIDS extends Observable{
         }
     }
 
-    private Pair<Constructor<?>, Object[]> getMultiParamConst(String deName, String[] params, ClassLoader classLoader){
+    private Pair<Constructor<?>, Object[]> getMultiParamConst(String deName, String[] params, ClassLoader classLoader) {
         try {
             List<Class> classes = new ArrayList<>();
             List<Object> args = new ArrayList<>();
@@ -224,7 +223,7 @@ public class HIDS extends Observable{
             Class<?> c = classLoader.loadClass(deName);
             Constructor<?> ctor = c.getConstructor(classArr);
             return new Pair<>(ctor, objArr);
-        }catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
         } catch (InstantiationException e) {
@@ -240,20 +239,11 @@ public class HIDS extends Observable{
     }
 
 
-
-
-
-
-
-
-
-
-
     private void initGUI() {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 1000);
-        frame.setLayout(new BorderLayout(3,3));
+        frame.setLayout(new BorderLayout(3, 3));
 
         JLabel blueLabel = new JLabel();
         blueLabel.setOpaque(true);
@@ -272,29 +262,29 @@ public class HIDS extends Observable{
         srcCont.setLayout(new FlowLayout(FlowLayout.LEFT));
         //sourceBtn.setMaximumSize(new Dimension(10,sourceBtn.getMinimumSize().height));
         srcCont.add(sourceBtn);
-        srcCont.add(sourcePathF);
-        sourcePathF.setColumns(50);
-        sourcePathF.setEditable(false);*/
+        srcCont.add(sourcePathL);
+        sourcePathL.setColumns(50);
+        sourcePathL.setEditable(false);*/
 
         //buttonP.add(srcCont);
         BtnListener listener = new BtnListener();
-        buttonP.add(setupBtn(sourceBtn,sourcePathF,true, listener));
-        buttonP.add(setupBtn(targetBtn, targetPathF, true, listener));
+        buttonP.add(setupBtn(sourceBtn, sourcePathL, true, listener));
+        buttonP.add(setupBtn(targetBtn, targetPathL, true, listener));
         buttonP.add(setupBtn(preProcBtn, null, false, listener));
 
 
        /* Container targetCont = new Container();
         targetCont.setLayout(new FlowLayout(FlowLayout.LEFT));
         targetCont.add(targetBtn);
-        targetCont.add(targetPathF);
-        targetPathF.setColumns(50);
-        targetPathF.setEditable(false);
+        targetCont.add(targetPathL);
+        targetPathL.setColumns(50);
+        targetPathL.setEditable(false);
         buttonP.add(targetCont);
 
         Container preprocCont = new Container();
         preprocCont.setLayout(new FlowLayout(FlowLayout.LEFT));
         preprocCont.add(preProcBtn);*/
-  //      preprocCont.setSize(new Dimension(100,50));
+        //      preprocCont.setSize(new Dimension(100,50));
         //buttonP.add(preprocCont);
 
 
@@ -306,9 +296,9 @@ public class HIDS extends Observable{
         //sourceBtn.setActionCommand(sourceBtn.getText());
 
         buttonP.add(sourceBtn);
-        buttonP.add(sourcePathF);
+        buttonP.add(sourcePathL);
         buttonP.add(targetBtn);
-        buttonP.add(targetPathF);
+        buttonP.add(targetPathL);
         buttonP.add(preProcBtn);
 
         */
@@ -319,14 +309,12 @@ public class HIDS extends Observable{
 
         Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();
 
-        if(de.nonEmpty()) {
+        if (de.nonEmpty()) {
             frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
         }
 
 
-
         //Set the menu bar and add the label to the content pane.
-
 
 
         //Display the window.
@@ -334,15 +322,15 @@ public class HIDS extends Observable{
         frame.setVisible(true);
     }
 
-    private Container setupBtn(JButton btn, JTextField field, Boolean hasField, BtnListener listener) {
+    private Container setupBtn(JButton btn, JLabel label, Boolean hasField, BtnListener listener) {
         Container cnt = new Container();
         cnt.setLayout(new FlowLayout(FlowLayout.LEFT));
         cnt.add(btn);
         btn.addActionListener(listener);
-        if(hasField){
-            cnt.add(field);
-            field.setColumns(50);
-            field.setEditable(false);
+        if (hasField) {
+            cnt.add(label);
+            label.setText("...");
+            //label.setEditable(false);
         }
         return cnt;
     }
@@ -353,16 +341,44 @@ public class HIDS extends Observable{
             // Need to determine which button fired the event.
             // the getActionCommand() returns the Button's label
             String btnLabel = evt.getActionCommand();
-            /*if (btnLabel.equals("Count Up")) {
+            if (btnLabel.equals("Source")) {
+                String currSrc = "...";
+                try {
 
-            } else if (btnLabel.equals("Count Down")) {
+                    if (source != null) {
+                        currSrc = source.getCanonicalPath();
+                    }
 
-            } else {
+                    fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                    int returnVal = fc.showOpenDialog(HIDS.this.frame);
 
-            }*/
-            System.out.println("btnlablel: " + btnLabel);
-        }
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = fc.getSelectedFile();
+                        HIDS.this.setSource(file);
+                        sourcePathL.setText(file.getCanonicalPath());
+                    } else {
+                        //TODO - DELETE BELOW
+                        System.out.println("source but not Approve Option.");
+                    }
+                } catch (IOException e) {
+                    sourcePathL.setText(currSrc);
+                    e.printStackTrace();
+                }
+            }
+
+
+       /* } else if(btnLabel.equals("Count Down"))
+
+        {
+
+        } else
+
+        {
+
+        }*/
+            System.out.println("btnlablel: "+btnLabel);
     }
+}
 
 
 
