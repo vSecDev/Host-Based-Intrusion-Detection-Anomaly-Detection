@@ -17,11 +17,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import scala.Option;
+import scala.xml.Null;
 
 //public class HIDS extends Observable implements Observer {
 public class HIDS extends Observable {
 
     private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
+    private Properties props = null;
+    private String[] extensions = new String[0];
     private List<DecisionEnginePlugin> decisionEngines = new ArrayList<DecisionEnginePlugin>();
     private List<DataProcessor> dataModules = new ArrayList<DataProcessor>();
     private DecisionEnginePlugin currentDecisionEngine = null;
@@ -68,7 +71,8 @@ public class HIDS extends Observable {
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
-        if (!hids.moduleInit()) {
+        hids.loadProperties(configPath);
+        if (!(hids.moduleInit() && hids.extensionsInit())) {
             JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -81,7 +85,7 @@ public class HIDS extends Observable {
     }
 
     private boolean moduleInit() {
-        Properties props = this.loadProperties(configPath);
+        //Properties props = this.loadProperties(configPath);
         if (props != null) {
             if (loadModules(this, props, "dePlugin") &&
                     loadModules(this, props, "dataModule")) {
@@ -94,21 +98,32 @@ public class HIDS extends Observable {
                     addObserver(de);
                 }
                 return true;
-            } else {
+            }
+        }
+        return false;
+    }
+
+    private boolean extensionsInit() {
+        if (props != null) {
+            try {
+                extensions = props.getProperty("extensions").trim().split("\\s*,\\s*");
+                return extensions != null && extensions.length > 0;
+            } catch (NullPointerException e){
+                e.printStackTrace();
                 return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     private Properties loadProperties(String path) {
-        Properties prop = new Properties();
+        //Properties prop = new Properties();
+        props = new Properties();
         InputStream input = null;
         try {
             input = new FileInputStream(path);
-            prop.load(input);
-            return prop;
+            props.load(input);
+            return props;
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {

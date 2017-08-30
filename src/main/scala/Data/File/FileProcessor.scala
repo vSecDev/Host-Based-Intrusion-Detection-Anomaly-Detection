@@ -44,7 +44,7 @@ class FileProcessor extends DataProcessor {
   }
 
   @throws(classOf[DataException])
-  override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
+  override def preprocess(source: File, target: File, delimiters: Array[String] = Array("\\s"), extensions: Array[String]): Option[mutable.Map[String, Int]] = {
     if(!checkDirs(source, target)) return None
     try {
       clearDir(target)
