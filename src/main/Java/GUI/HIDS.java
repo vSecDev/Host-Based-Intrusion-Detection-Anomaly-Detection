@@ -253,11 +253,15 @@ public class HIDS extends Observable {
         public void actionPerformed(ActionEvent evt) {
             System.out.println("evt src: " + evt.getSource());
             String btnLabel = evt.getActionCommand();
-            btnHandler(btnLabel);
+            if(btnLabel.equals("Pre-process")){
+                preProcessHandler();
+            }else {
+                srcTargetBtnHandler(btnLabel);
+            }
             renderBtns();
         }
 
-        private void btnHandler(String btnLabel){
+        private void srcTargetBtnHandler(String btnLabel){
 
             String currDir = "...";
             try {
@@ -288,6 +292,10 @@ public class HIDS extends Observable {
                 }
                 e.printStackTrace();
             }
+        }
+
+        private void preProcessHandler(){
+            //TODO - PREPROCESS LOGIC HERE!
         }
     }
 }
