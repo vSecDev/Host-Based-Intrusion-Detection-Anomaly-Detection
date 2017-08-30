@@ -3,7 +3,6 @@ package GUI;
 import Data.DataProcessor;
 import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -42,7 +41,6 @@ public class HIDS extends Observable {
     private final JButton preProcBtn = new JButton("Pre-process");
     private final JLabel sourcePathL = new JLabel();
     private final JLabel targetPathL = new JLabel();
-
     private final JFileChooser fc = new JFileChooser();
 
 
@@ -280,7 +278,7 @@ public class HIDS extends Observable {
 
 
     private Boolean canPreProcess(){
-        return (source != null && target != null);
+        return (getSource() != null && getTarget() != null);
     }
     private void renderBtns(){
         preProcBtn.setEnabled(canPreProcess());
@@ -316,8 +314,8 @@ public class HIDS extends Observable {
 
             String currDir = "...";
             try {
-                if(btnLabel.equals("Source") && (source != null)) { currDir = getSource().getCanonicalPath(); }
-                else if(btnLabel.equals("Target") && (target != null)) {  currDir = target.getCanonicalPath(); }
+                if(btnLabel.equals("Source") && (getSource() != null)) { currDir = getSource().getCanonicalPath(); }
+                else if(btnLabel.equals("Target") && (getSource() != null)) {  currDir = getTarget().getCanonicalPath(); }
 
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int returnVal = fc.showOpenDialog(HIDS.this.frame);
