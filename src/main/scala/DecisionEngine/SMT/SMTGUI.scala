@@ -62,6 +62,7 @@ class SMTGUI extends DecisionEngineGUI {
   override def setPluginInstance(plugin: SMTPlugin): Unit = {
     super.setPluginInstance(plugin)
     //TODO - RENDER HERE!
+    renderBtns
   }
 
   override def getGUIComponent: Option[JPanel] = {
@@ -158,47 +159,61 @@ class SMTGUI extends DecisionEngineGUI {
     }else return None
   }
 
-  private def canLearn: Boolean = hasRoot || canCreateRoot
+  private def canLearn: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) =>
+      plugin.source.isDefined && (hasRoot || canCreateRoot)
+  }
 
   private def canClassify: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty
+    case Some(plugin) => plugin.source.isDefined && (plugin.isTrained && thresholdField.getText.nonEmpty && toleranceField.getText.nonEmpty)
   }
 
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
-    learnBtn.setEnabled(canLearn)
+   /* learnBtn.setEnabled(canLearn)
     classifyBtn.setEnabled(canClassify)
-    validateBtn.setEnabled(canClassify)
+    validateBtn.setEnabled(canClassify)*/
     addFieldDocListener(maxDepthField)
     addFieldDocListener(maxPhiField)
     addFieldDocListener(maxSeqCntField)
     addFieldDocListener(smoothingField)
     addFieldDocListener(thresholdField)
     addFieldDocListener(toleranceField)
+    renderBtns
   }
 
   private def addFieldDocListener(field: JFormattedTextField) = {
     field.getDocument.asInstanceOf[PlainDocument].addDocumentListener(new DocumentListener {
       override def insertUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
+      /*  learnBtn.setEnabled(canLearn)
         classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)*/
+        renderBtns
       }
 
       override def changedUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
+      /*  learnBtn.setEnabled(canLearn)
         classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)*/
+        renderBtns
       }
 
       override def removeUpdate(e: DocumentEvent) = {
-        learnBtn.setEnabled(canLearn)
+        /*learnBtn.setEnabled(canLearn)
         classifyBtn.setEnabled(canClassify)
-        validateBtn.setEnabled(canClassify)
+        validateBtn.setEnabled(canClassify)*/
+        renderBtns
       }
     })
+  }
+
+  private def renderBtns = {
+    learnBtn.setEnabled(canLearn)
+    classifyBtn.setEnabled(canClassify)
+    validateBtn.setEnabled(canClassify)
   }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
@@ -309,6 +324,7 @@ class SMTGUI extends DecisionEngineGUI {
           smoothingField.setText(newRoot.smoothing.toString)
           priorField.setText(newRoot.prior.toString)
           paramChanged = false
+          renderBtns
           true
         } else {
           false

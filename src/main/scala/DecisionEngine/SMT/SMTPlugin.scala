@@ -17,7 +17,6 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
 
-
   gui.setPluginInstance(this)
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
@@ -52,6 +51,12 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   } else None
 
   override def getGUI: Option[DecisionEngineGUI] = Some(gui)
+
+
+  /*override def update(o: Observable, arg: Any): Unit = {
+    super.update(o, arg)
+
+  }*/
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     if (data.isEmpty) return model

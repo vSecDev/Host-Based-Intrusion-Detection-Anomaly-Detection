@@ -14,7 +14,7 @@ import scala.collection.immutable.ListMap
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val isWindows = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   var extensions = if (isWindows) Array("GHC") else Array("txt")

@@ -26,68 +26,33 @@ public class HIDS extends Observable{
     private DataProcessor currentDataModule = null;
 
     //Observed by DEs
-    private File srcFile = null;
-    private File trgtFile = null;
-    private File srcDir = null;
-    private File trgtDir = null;
-    private File loadModelFile = null;
+    private File source = null;
+    private File target = null;
+
 
     //Observed field in DEs
-    private
+   // private
 
 
-
-
-    public File getSrcFile() {
-        return srcFile;
+    public File getSource() {
+        return source;
     }
 
-    public void setSrcFile(File srcFile) {
-        this.srcFile = srcFile;
+    public void setSource(File source) {
+        this.source = source;
         setChanged();
-        notifyObservers("srcFile");
+        notifyObservers("source");
     }
 
-    public File getTrgtFile() {
-        return trgtFile;
+    public File getTarget() {
+        return target;
     }
 
-    public void setTrgtFile(File trgtFile) {
-        this.trgtFile = trgtFile;
+    public void setTarget(File target) {
+        this.target = target;
         setChanged();
-        notifyObservers("trgtFile");
+        notifyObservers("target");
     }
-
-    public File getSrcDir() {
-        return srcDir;
-    }
-
-    public void setSrcDir(File srcDir) {
-        this.srcDir = srcDir;
-        setChanged();
-        notifyObservers("srcDir");
-    }
-
-    public File getTrgtDir() {
-        return trgtDir;
-    }
-
-    public void setTrgtDir(File trgtDir) {
-        this.trgtDir = trgtDir;
-        setChanged();
-        notifyObservers("trgtDir");
-    }
-
-    public File getLoadModelFile() {
-        return loadModelFile;
-    }
-
-    public void setLoadModelFile(File loadModelFile) {
-        this.loadModelFile = loadModelFile;
-        setChanged();
-        notifyObservers("loadModelFile");
-    }
-
 
 
     /*@Override
@@ -119,11 +84,9 @@ public class HIDS extends Observable{
 
 
 
-        /*hids.setSrcFile(new File(configPath));
-        hids.setTrgtFile(new File(configPath + "1"));
-        hids.setSrcDir(new File(configPath + "2"));
-        hids.setTrgtDir(new File(configPath + "3"));
-        hids.setLoadModelFile(new File(configPath + "4"));*/
+        hids.setSource(new File(configPath));
+        hids.setTarget(new File(configPath + "1"));
+
 
 
 
