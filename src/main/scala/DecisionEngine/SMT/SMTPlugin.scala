@@ -16,6 +16,7 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   private var root: Option[Node[_, _]] = None
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
+  private var learnFlag: Boolean = false
 
   gui.setPluginInstance(this)
 
@@ -108,7 +109,6 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
       case w: StringDataWrapper => w.retrieve match {
         case None =>
         case Some(d) =>
-
           if (d._2.nonEmpty) {
             if (ints && node.isInstanceOf[Node[Int, Int]]) {
               //process as int trace
@@ -129,6 +129,7 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
     })
     val dm = new DataModel
     dm.store(node)
+    resetLearn
     Some(dm)
   }
 
@@ -217,6 +218,10 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
   def setTolerance(t: Double) = tolerance = Some(t)
 
   def getTolerance: Option[Double] = tolerance
+
+  def setLearn = learnFlag = true
+
+  def resetLearn = learnFlag = false
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 

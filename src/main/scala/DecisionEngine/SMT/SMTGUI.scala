@@ -69,7 +69,7 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   override def getGUIComponent: Option[JPanel] = {
-//    test(mainPanel)
+    //    test(mainPanel)
     Some(mainPanel)
   }
 
@@ -147,16 +147,16 @@ class SMTGUI extends DecisionEngineGUI {
       smoothingField.getText.nonEmpty &&
       priorField.getText.nonEmpty
 
-  private def createPluginRoot: Option[Node[_,_]] = {
-    if(canCreateRoot){
-      if(intCheckBox.isSelected){
+  private def createPluginRoot: Option[Node[_, _]] = {
+    if (canCreateRoot) {
+      if (intCheckBox.isSelected) {
         Some(new Node[Int, Int](
           maxDepthField.getText.toInt,
           maxPhiField.getText.toInt,
           maxSeqCntField.getText.toInt,
           smoothingField.getText.toDouble,
           priorField.getText.toDouble))
-      }else{
+      } else {
         //TODO - EXTEND FOR OTHER NODE TYPES
         Some(new Node[String, String](
           maxDepthField.getText.toInt,
@@ -165,7 +165,7 @@ class SMTGUI extends DecisionEngineGUI {
           smoothingField.getText.toDouble,
           priorField.getText.toDouble))
       }
-    }else return None
+    } else return None
   }
 
   private def canLearn: Boolean = pluginInstance match {
@@ -181,9 +181,9 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canLoadModel: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => if(plugin.source.isDefined){
+    case Some(plugin) => if (plugin.source.isDefined) {
       plugin.source.get.isFile && plugin.isTrained
-    }else false
+    } else false
   }
 
   private def canSaveModel: Boolean = pluginInstance match {
@@ -262,7 +262,7 @@ class SMTGUI extends DecisionEngineGUI {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
-     // println("in insertString")
+      // println("in insertString")
       val doc = fb.getDocument
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
@@ -328,6 +328,7 @@ class SMTGUI extends DecisionEngineGUI {
     pluginInstance match {
       case None => false
       case Some(plugin) => {
+        //TODO - CHECK CONDITION BELOW!
         if (plugin.loadModel(model)) {
           val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
 
@@ -346,9 +347,11 @@ class SMTGUI extends DecisionEngineGUI {
     }
   }
 
-  def render = { renderBtns }
+  def render = {
+    renderBtns
+  }
 
-  private class SMTBtnListener extends ActionListener{
+  private class SMTBtnListener extends ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       val btnLabel = e.getActionCommand
       println("SMT GUI button pressed: " + btnLabel)
@@ -357,5 +360,46 @@ class SMTGUI extends DecisionEngineGUI {
       }
 
     }
+
+    private def learnHandler = {
+      //check again in case conditions changed
+      if (canLearn) {
+        println("learnHandler. canlearn true")
+        if (hasRoot) {
+          println("learnHandler: SMTPlugin has root.")
+          if (paramChanged) {
+            println("learnHandler: params have changed. confirm overwrite")
+
+
+          } else {
+            println("learnHandler: params have not changed. setting learnFlag in plugin")
+            pluginInstance.get.setLearn
+          }
+        } else {
+          println("learnHandler: SMTPlugin -> no root set. creating new root")
+          //no root set - learn btn active so SMT params must have been set manually
+          createPluginRoot match {
+            case None => showError("An error occurred during SMT root initialisation!", "Error")
+            case Some(node) =>
+              println("created new root. setting new root for plugin")
+              val dm = new DataModel
+              dm.store(node)
+              if (setPluginRoot(dm)) {
+                println("new root set. setting learnflag.")
+                pluginInstance.get.setLearn
+              } else {
+                showError("An error occurred during SMT root initialisation!", "Error")
+              }
+          }
+        }
+      } else {
+        showError("An error occurred. Cannot train SMT!", "Error")
+      }
+    }
+
+    def showError(txt: String, title: String) = {
+      JOptionPane.showMessageDialog(new JPanel, txt, title, JOptionPane.ERROR_MESSAGE)
+    }
   }
+
 }
