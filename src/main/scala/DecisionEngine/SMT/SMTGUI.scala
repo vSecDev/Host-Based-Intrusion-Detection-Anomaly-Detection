@@ -1,6 +1,6 @@
 package DecisionEngine.SMT
 
-import java.awt.event.{ItemEvent, ItemListener}
+import java.awt.event.{ActionEvent, ActionListener, ItemEvent, ItemListener}
 import java.awt.{Toolkit, _}
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JFormattedTextField, _}
@@ -111,12 +111,13 @@ class SMTGUI extends DecisionEngineGUI {
 
     //ML buttons
     val mlParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    setupButton(mlParamsP, learnBtn, learnBtn.getText)
-    setupButton(mlParamsP, classifyBtn, classifyBtn.getText)
-    setupButton(mlParamsP, validateBtn, validateBtn.getText)
-    setupButton(mlParamsP, loadModelBtn, loadModelBtn.getText)
-    setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText)
-    setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText)
+    val listener = new SMTBtnListener;
+    setupButton(mlParamsP, learnBtn, learnBtn.getText, listener)
+    setupButton(mlParamsP, classifyBtn, classifyBtn.getText, listener)
+    setupButton(mlParamsP, validateBtn, validateBtn.getText, listener)
+    setupButton(mlParamsP, loadModelBtn, loadModelBtn.getText, listener)
+    setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText, listener)
+    setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText, listener)
     mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
     mainPanel.add(mlParamsP)
 
@@ -190,7 +191,7 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) => plugin.target.isDefined && plugin.isTrained
   }
 
-  private def setupButton(panel: JPanel, btn: JButton, btnTxt: String) = {
+  private def setupButton(panel: JPanel, btn: JButton, btnTxt: String, listener: ActionListener) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
     addFieldDocListener(maxDepthField)
@@ -199,6 +200,7 @@ class SMTGUI extends DecisionEngineGUI {
     addFieldDocListener(smoothingField)
     addFieldDocListener(thresholdField)
     addFieldDocListener(toleranceField)
+    btn.addActionListener(listener)
     renderBtns
   }
 
@@ -345,4 +347,15 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   def render = { renderBtns }
+
+  private class SMTBtnListener extends ActionListener{
+    override def actionPerformed(e: ActionEvent): Unit = {
+      val btnLabel = e.getActionCommand
+      println("SMT GUI button pressed: " + btnLabel)
+      btnLabel match {
+        case "Learn" => println("learn button pressed!")
+      }
+
+    }
+  }
 }
