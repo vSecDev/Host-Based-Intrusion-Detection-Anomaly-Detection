@@ -5,6 +5,7 @@ import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.*;
 import javafx.util.Pair;
 import javax.swing.*;
@@ -94,10 +95,10 @@ public class HIDS extends Observable {
 
 
         for(String s : hids.getExtensions()){
-            System.out.println("extension: " + s);
+            System.out.println("extension:{" + s + "}");
         }
         for(String s : hids.getDelimiters()){
-            System.out.println("delimiter: " + s);
+            System.out.println("delimiter:{" + s + "}");
         }
 
 
@@ -144,7 +145,10 @@ public class HIDS extends Observable {
     private boolean delimitersInit() {
         if (props != null) {
             try {
-                setDelimiters(props.getProperty("delimiters").trim().split("\\+"));
+                List<String> delimiters = new ArrayList<String>(Arrays.asList(props.getProperty("delimiters").trim().split("\\s*-\\s*")));
+                delimiters.add(" ");
+                String[] list2 = new String[delimiters.size()];
+                setDelimiters(delimiters.toArray(list2));
                 return getDelimiters() != null && getDelimiters().length > 0;
             } catch (NullPointerException e){
                 System.out.println("nullpointerexception thrown");
@@ -309,7 +313,6 @@ public class HIDS extends Observable {
     private class BtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent evt) {
-            System.out.println("evt src: " + evt.getSource());
             String btnLabel = evt.getActionCommand();
             if(btnLabel.equals("Pre-process")){
                 preProcessHandler();
