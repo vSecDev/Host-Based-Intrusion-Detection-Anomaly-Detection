@@ -1,6 +1,8 @@
 package GUI;
 
+import Data.DataModel;
 import Data.DataProcessor;
+import Data.DataWrapper;
 import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 import java.awt.event.ActionEvent;
@@ -17,10 +19,13 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+
+import scala.None$;
 import scala.Option;
+import scala.collection.immutable.Vector;
 
 //public class HIDS extends Observable implements Observer {
-public class HIDS extends Observable {
+public class HIDS extends Observable implements Observer {
 
     private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private Properties props = null;
@@ -36,7 +41,6 @@ public class HIDS extends Observable {
     private File target = null;
 
     //Observed field in DEs
-
 
     //GUI
     private final JFrame frame = new JFrame("HIDS");
@@ -90,7 +94,8 @@ public class HIDS extends Observable {
         hids.loadProperties(configPath);
         if (!(hids.moduleInit() && hids.extensionsInit() && hids.delimitersInit())) {
             System.out.println("here");
-            JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
+            hids.showError("An error occurred during initialisation!", "Error");
+            //JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
 
@@ -286,7 +291,6 @@ public class HIDS extends Observable {
         frame.setVisible(true);
     }
 
-
     private Boolean canPreProcess(){
         return (getSource() != null &&
                 getTarget() != null &&
@@ -294,6 +298,7 @@ public class HIDS extends Observable {
                 getTarget().isDirectory() &&
                 currentDataModule != null);
     }
+
     private void renderBtns(){
         preProcBtn.setEnabled(canPreProcess());
     }
@@ -308,6 +313,61 @@ public class HIDS extends Observable {
             label.setText("...");
         }
         return cnt;
+    }
+
+    private void showError(String txt, String title) {
+        JOptionPane.showMessageDialog(new JPanel(), txt, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (arg.toString().equals("learn")) {
+            if (currentDataModule == null ||
+                    source == null ||
+                    extensions.length == 0 ||
+                    delimiters.length == 0) {
+                showError("An error occurred during learn request processing", "Error");
+            }else{
+                if(source.isDirectory()){
+                   Option<Vector<DataWrapper>> input = currentDataModule.getAllData(source, extensions);
+                   if(input.isEmpty()){
+                       showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
+                   }else{
+                       Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
+                       scala.Option<DataModel> none = scala.Option.apply(null);
+                       Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
+                       if(trainedModel.isEmpty()){
+                           System.out.println("empty model returned after learning");
+                       }else{
+                           System.out.println("Trained model: " + trainedModel.get().toString());
+                           System.out.println("--- add code to save returned model!");
+                       }
+                   }
+                } else {
+                    //source is a file
+
+                    Option<DataWrapper> in = currentDataModule.getData(source, extensions);
+                    if(in.isEmpty()){
+                        showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
+                    }else{
+                        Vector<DataWrapper> input = new Vector<DataWrapper>(0,0,0);
+                        input.appendBack(in.get());
+                        Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
+                        scala.Option<DataModel> none = scala.Option.apply(null);
+                        Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
+                        if(trainedModel.isEmpty()){
+                            System.out.println("empty model returned after learning");
+                        }else{
+                            System.out.println("Trained model: " + trainedModel.get().toString());
+                            System.out.println("--- add code to save returned model!");
+                        }
+                    }
+
+
+
+                }
+            }
+        }
     }
 
     private class BtnListener implements ActionListener {

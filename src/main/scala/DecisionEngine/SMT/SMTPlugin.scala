@@ -5,20 +5,31 @@ import java.util.Observable
 
 import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
 import DecisionEngine.{DecisionEngineConfig, DecisionEngineGUI, DecisionEnginePlugin, DecisionEngineReport}
+import GUI.HIDS
 
 /**
   * Created by apinter on 08/08/2017.
   */
 //TODO REFACTOR TO AVOID REPETITION OF CODE!
-class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
+class SMTPlugin(gui: SMTGUI, hids: HIDS) extends Observable with DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
+  private var currHIDS: Option[HIDS] = None
   private var root: Option[Node[_, _]] = None
+  private var isIntRoot: Boolean = false
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
   private var learnFlag: Boolean = false
 
+
   gui.setPluginInstance(this)
+  registerHIDS(hids)
+
+  override def registerHIDS(hids: HIDS): Boolean = {
+    currHIDS = Some(hids)
+
+    true
+  }
 
   override def configure(config: DecisionEngineConfig): Boolean = config match {
     case c: SMTConfig =>
@@ -26,12 +37,12 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
         c.getSettings match {
           case None => false
           case Some(s) => if (s.isIntTrace) {
-            setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
+            setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = true)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
             true
           } else {
-            setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior))
+            setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = false)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
             false
@@ -110,7 +121,7 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
-            if (ints && node.isInstanceOf[Node[Int, Int]]) {
+            if (ints && isIntRoot) {
               //process as int trace
               for (t <- getIntInput(node.maxDepth, d._2)) {
                 node.asInstanceOf[Node[Int, Int]].learn(t._1, t._2)
@@ -141,7 +152,7 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
-            if (ints && node.isInstanceOf[Node[Int, Int]]) {
+            if (ints && isIntRoot) {
               //process as int trace
               var quotients: Vector[Double] = Vector()
               for (t <- getIntInput(node.maxDepth, d._2)) {
@@ -209,7 +220,10 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
     input
   }
 
-  private def setRoot(node: Node[_, _]) = root = Some(node)
+  private def setRoot(node: Node[_, _], isInt: Boolean) = {
+    root = Some(node)
+    isIntRoot = isInt
+  }
 
   def setThreshold(t: Double) = threshold = Some(t)
 
@@ -219,16 +233,19 @@ class SMTPlugin(gui: SMTGUI) extends DecisionEnginePlugin {
 
   def getTolerance: Option[Double] = tolerance
 
-  def setLearn = learnFlag = true
+  def setLearnFlag: Unit = {
+    learnFlag = true
+    notifyObservers("learn")
+  }
 
   def resetLearn = learnFlag = false
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
-  def loadModel(model: DataModel): Boolean = model.retrieve match {
+  def loadModel(model: DataModel, isInt: Boolean): Boolean = model.retrieve match {
     case None => false
     case Some(mod) => mod match {
-      case m: Node[_, _] => setRoot(m); true
+      case m: Node[_, _] => setRoot(m, isInt); true
       case _ => false
     }
   }

@@ -24,6 +24,7 @@ trait DecisionEnginePlugin extends Observer{
    }
   }
 
+  def registerHIDS(hids: HIDS): Boolean
   def configure(config: DecisionEngineConfig): Boolean
   def getConfiguration: Option[DecisionEngineConfig]
   def getGUI: Option[DecisionEngineGUI]

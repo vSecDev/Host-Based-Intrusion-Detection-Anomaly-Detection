@@ -5,7 +5,7 @@ import java.awt.{Toolkit, _}
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JFormattedTextField, _}
 import javax.swing.text._
-
+import javax.swing.JOptionPane
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
 
@@ -329,7 +329,7 @@ class SMTGUI extends DecisionEngineGUI {
       case None => false
       case Some(plugin) => {
         //TODO - CHECK CONDITION BELOW!
-        if (plugin.loadModel(model)) {
+        if (plugin.loadModel(model, isSetToInt)) {
           val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
 
           maxDepthField.setText(newRoot.maxDepth.toString)
@@ -351,6 +351,8 @@ class SMTGUI extends DecisionEngineGUI {
     renderBtns
   }
 
+  override def isSetToInt = intCheckBox.isSelected
+
   private class SMTBtnListener extends ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       val btnLabel = e.getActionCommand
@@ -371,9 +373,29 @@ class SMTGUI extends DecisionEngineGUI {
             println("learnHandler: params have changed. confirm overwrite")
 
 
+            val response = JOptionPane.showConfirmDialog(null, "SMT root is already set with different parameters. Would you like to overwrite it?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+            if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
+            else if (response == JOptionPane.YES_OPTION) {System.out.println("Yes button clicked")
+              createPluginRoot match {
+                case None => showError("An error occurred during SMT root initialisation!", "Error")
+                case Some(node) =>
+                  println("created new root. setting new root for plugin")
+                  val dm = new DataModel
+                  dm.store(node)
+                  if (setPluginRoot(dm)) {
+                    println("new root set. setting learnflag.")
+                    pluginInstance.get.setLearnFlag
+                  } else {
+                    showError("An error occurred during SMT root initialisation!", "Error")
+                  }
+              }
+            }
+            else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
+
+
           } else {
             println("learnHandler: params have not changed. setting learnFlag in plugin")
-            pluginInstance.get.setLearn
+            pluginInstance.get.setLearnFlag
           }
         } else {
           println("learnHandler: SMTPlugin -> no root set. creating new root")
@@ -386,7 +408,7 @@ class SMTGUI extends DecisionEngineGUI {
               dm.store(node)
               if (setPluginRoot(dm)) {
                 println("new root set. setting learnflag.")
-                pluginInstance.get.setLearn
+                pluginInstance.get.setLearnFlag
               } else {
                 showError("An error occurred during SMT root initialisation!", "Error")
               }
