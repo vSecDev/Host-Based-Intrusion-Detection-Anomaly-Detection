@@ -121,6 +121,7 @@ public class HIDS extends Observable implements Observer {
             if (loadModules(this, props, "dePlugin") &&
                     loadModules(this, props, "dataModule")) {
                 currentDecisionEngine = decisionEngines.get(0);
+                currentDecisionEngine.registerHIDS(this);
                 currentDataModule = dataModules.get(0);
                 //TODO SUBSCRIBE ALL DES TO FILE CHANGES HERE
                 //TODO SUBSCRIBE HIDS TO CHANGES IN DES
@@ -321,6 +322,7 @@ public class HIDS extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+        System.out.println("nodified. arg: " + arg);
         if (arg.toString().equals("learn")) {
             if (currentDataModule == null ||
                     source == null ||
@@ -339,7 +341,7 @@ public class HIDS extends Observable implements Observer {
                        if(trainedModel.isEmpty()){
                            System.out.println("empty model returned after learning");
                        }else{
-                           System.out.println("Trained model: " + trainedModel.get().toString());
+                           System.out.println("Trained model: " + (trainedModel.get()).toString());
                            System.out.println("--- add code to save returned model!");
                        }
                    }

@@ -358,7 +358,7 @@ class SMTGUI extends DecisionEngineGUI {
       val btnLabel = e.getActionCommand
       println("SMT GUI button pressed: " + btnLabel)
       btnLabel match {
-        case "Learn" => println("learn button pressed!")
+        case "Learn" => learnHandler
       }
 
     }

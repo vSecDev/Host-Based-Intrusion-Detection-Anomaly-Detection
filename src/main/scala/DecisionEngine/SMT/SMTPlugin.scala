@@ -11,7 +11,7 @@ import GUI.HIDS
   * Created by apinter on 08/08/2017.
   */
 //TODO REFACTOR TO AVOID REPETITION OF CODE!
-class SMTPlugin(gui: SMTGUI, hids: HIDS) extends Observable with DecisionEnginePlugin {
+class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
   private var currHIDS: Option[HIDS] = None
@@ -23,11 +23,11 @@ class SMTPlugin(gui: SMTGUI, hids: HIDS) extends Observable with DecisionEngineP
 
 
   gui.setPluginInstance(this)
-  registerHIDS(hids)
+  //registerHIDS(hids)
 
   override def registerHIDS(hids: HIDS): Boolean = {
     currHIDS = Some(hids)
-
+    addObserver(currHIDS.get)
     true
   }
 
@@ -235,6 +235,7 @@ class SMTPlugin(gui: SMTGUI, hids: HIDS) extends Observable with DecisionEngineP
 
   def setLearnFlag: Unit = {
     learnFlag = true
+    setChanged
     notifyObservers("learn")
   }
 

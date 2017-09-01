@@ -66,7 +66,7 @@ class SMTPluginTest extends  FunSuite {
     assert(config.asInstanceOf[SMTConfig].getSettings.get.prior == prior)
     assert(config.asInstanceOf[SMTConfig].getSettings.get.isIntTrace == ints)
 
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     plugin.configure(config)
 
     val returnedModel = plugin.getModel
@@ -83,7 +83,7 @@ class SMTPluginTest extends  FunSuite {
   }
   test("SMTPlugin - configure returns false if no settings are provided"){
     val emptyConfig = new SMTConfig
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     assert(!plugin.configure(emptyConfig))
   }
   test("SMTPlugin - learn returns trained model - root loaded") {
@@ -100,7 +100,7 @@ class SMTPluginTest extends  FunSuite {
     model.store(n1)
     assert(model.retrieve.get.isInstanceOf[Node[Int, Int]])
 
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     assert(plugin.loadModel(model, true))
     val returnedModel1 = plugin.getModel.get.retrieve.get
     assert(returnedModel1.isInstanceOf[Node[Int, Int]])
@@ -200,7 +200,7 @@ class SMTPluginTest extends  FunSuite {
     model.store(n1)
     assert(model.retrieve.get.isInstanceOf[Node[String, String]])
 
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     assert(plugin.loadModel(model, true))
     val returnedModel1 = plugin.getModel.get.retrieve.get
     assert(returnedModel1.isInstanceOf[Node[String, String]])
@@ -300,7 +300,7 @@ class SMTPluginTest extends  FunSuite {
 
     val model = new DataModel
     model.store(n1)
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     assert(plugin.loadModel(model, true))
     val rootM = plugin.getModel.get.retrieve.get
     assert(rootM.isInstanceOf[Node[Int, Int]])
@@ -342,7 +342,7 @@ class SMTPluginTest extends  FunSuite {
     assert(root2.getChildren(0)(0).asInstanceOf[SequenceList[Int, Int]].getSequence(condition1).get.getWeight == 2.0 / 3)
   }
   test("SMTPlugin - learn returns None if no model is set as root or passed as param") {
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     assert(plugin.getModel().isEmpty)
     val dw = new StringDataWrapper
     dw.store("filename", "1 2 3 666")
@@ -360,7 +360,7 @@ class SMTPluginTest extends  FunSuite {
 
     val model = new DataModel
     model.store(n1)
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val emptyWrapper = new StringDataWrapper
     val returnedModel = plugin.learn(Vector(emptyWrapper), Some(model), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
@@ -384,7 +384,7 @@ class SMTPluginTest extends  FunSuite {
     dm.store(n1)
     val wrapper = new StringDataWrapper
     wrapper.store("filename", "")
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     r1 = returnedModel.predict(condition1, event1)
@@ -407,7 +407,7 @@ class SMTPluginTest extends  FunSuite {
     dm.store(n1)
     val wrapper = new StringDataWrapper
     wrapper.store("filename", "1 2 3 nonNumeric")
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     r1 = returnedModel.predict(condition1, event1)
@@ -431,7 +431,7 @@ class SMTPluginTest extends  FunSuite {
     wrapper.store("filename", "1 2 3 nonNumeric")
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename2", "1 2 3 777")
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val returnedModel = plugin.learn(Vector(wrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
@@ -460,7 +460,7 @@ class SMTPluginTest extends  FunSuite {
     shortWrapper.store("filename", "1")
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename", "1 2 3 777")
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
@@ -489,7 +489,7 @@ class SMTPluginTest extends  FunSuite {
     shortWrapper.store("filename", "shortStr")
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename", "one two three eventStr2")
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints2).get.retrieve.get.asInstanceOf[Node[String, String]]
     val retNode = returnedModel.asInstanceOf[Node[String, String]]
     val r5 = retNode.predict(strCondition1, eventStr1)
@@ -504,7 +504,7 @@ class SMTPluginTest extends  FunSuite {
     val settings = new SMTSettings(maxDepth, maxPhi, maxSeqCount, smoothing, prior, ints, 1.0, 0.0)
     val config = new SMTConfig
     config.storeSettings(settings)
-    val plugin = new SMTPlugin(new SMTGUI, new HIDS)
+    val plugin = new SMTPlugin(new SMTGUI)
     plugin.configure(config)
 
     assert(plugin.getModel.get.retrieve.get.asInstanceOf[Node[Int, Int]].getChildren.size == 0)
