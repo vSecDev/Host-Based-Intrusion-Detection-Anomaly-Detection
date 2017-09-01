@@ -121,6 +121,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
+            //if (ints && isIntRoot) {
             if (ints && isIntRoot) {
               //process as int trace
               for (t <- getIntInput(node.maxDepth, d._2)) {
@@ -141,6 +142,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     val dm = new DataModel
     dm.store(node)
     resetLearn
+    println("learnFlag after learnHelper is done :" + learnFlag)
     Some(dm)
   }
 
@@ -224,6 +226,12 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     root = Some(node)
     isIntRoot = isInt
   }
+
+  //TODO - SETINTROOT WILL BE DELETED OR MADE PRIVATE => TEST FROM UI
+  def setIntRoot(int: Boolean): Unit ={
+    isIntRoot = int
+  }
+
 
   def setThreshold(t: Double) = threshold = Some(t)
 

@@ -408,6 +408,7 @@ class SMTPluginTest extends  FunSuite {
     val wrapper = new StringDataWrapper
     wrapper.store("filename", "1 2 3 nonNumeric")
     val plugin = new SMTPlugin(new SMTGUI)
+    plugin.setIntRoot(true)
     val returnedModel = plugin.learn(Vector(wrapper), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     r1 = returnedModel.predict(condition1, event1)
@@ -432,6 +433,7 @@ class SMTPluginTest extends  FunSuite {
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename2", "1 2 3 777")
     val plugin = new SMTPlugin(new SMTGUI)
+    plugin.setIntRoot(true)
     val returnedModel = plugin.learn(Vector(wrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
@@ -461,6 +463,8 @@ class SMTPluginTest extends  FunSuite {
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename", "1 2 3 777")
     val plugin = new SMTPlugin(new SMTGUI)
+    //TODO - SETINTROOT WILL BE DELETED OR MADE PRIVATE => TEST FROM UI
+    plugin.setIntRoot(true)
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints).get.retrieve.get.asInstanceOf[Node[Int, Int]]
 
     val retNode = returnedModel.asInstanceOf[Node[Int, Int]]
@@ -490,6 +494,8 @@ class SMTPluginTest extends  FunSuite {
     val wrapper2 = new StringDataWrapper
     wrapper2.store("filename", "one two three eventStr2")
     val plugin = new SMTPlugin(new SMTGUI)
+    //TODO - SETINTROOT WILL BE DELETED OR MADE PRIVATE => TEST FROM UI
+    plugin.setIntRoot(ints2)
     val returnedModel = plugin.learn(Vector(shortWrapper, wrapper2), Some(dm), ints2).get.retrieve.get.asInstanceOf[Node[String, String]]
     val retNode = returnedModel.asInstanceOf[Node[String, String]]
     val r5 = retNode.predict(strCondition1, eventStr1)
