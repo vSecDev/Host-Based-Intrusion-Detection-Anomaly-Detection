@@ -133,7 +133,7 @@ class SMTGUI extends DecisionEngineGUI {
 
     //Output panel
     outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS))
-    mainPanel.add(Box.createVerticalStrut(5))
+  //  mainPanel.add(Box.createVerticalStrut(5))
     outputTxtA.setEditable(false)
     val sp = new JScrollPane(outputTxtA)
     sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
@@ -143,6 +143,7 @@ class SMTGUI extends DecisionEngineGUI {
 
     //Add panels to mainPanel
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS))
+
     mainPanel.add(inputPanel)
     mainPanel.add(Box.createVerticalStrut(10))
     mainPanel.add(outputPanel)
