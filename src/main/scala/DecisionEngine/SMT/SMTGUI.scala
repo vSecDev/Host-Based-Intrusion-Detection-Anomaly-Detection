@@ -8,10 +8,15 @@ import javax.swing.text._
 import javax.swing.JOptionPane
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
+import javax.swing.Box
+import java.awt.Dimension
+import javax.swing.JScrollPane
 
 class SMTGUI extends DecisionEngineGUI {
 
-  private val mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+  private val mainPanel = new JPanel()
+  private val outputPanel = new JPanel()
+  private val inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = None
   private var paramChanged = false
@@ -32,6 +37,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val toleranceToolTipStr = "If the percentage of subsequences in the analysed system call trace exceed the tolerance, the whole trace is classified as anomalous. Must be a decimal between 0-100!"
   private final val isIntStr = "Integer traces"
   private final val isIntToolTipStr = "Integer traces: check if the analysed system call traces have been pre-processed using \"system call-to-integer\" mapping."
+  //private final var outputLabelStr = "Report"
 
   private final val maxDepthLabel = new JLabel(maxDepthStr)
   private final val maxPhiLabel = new JLabel(maxPhiStr)
@@ -41,6 +47,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val thresholdLabel = new JLabel(thresholdStr)
   private final val toleranceLabel = new JLabel(toleranceStr)
   private final val isIntLabel = new JLabel(isIntStr)
+  //private final val outputLabel = new JLabel(outputLabelStr)
 
   private final val maxDepthField = new JFormattedTextField
   private final val maxPhiField = new JFormattedTextField
@@ -56,6 +63,8 @@ class SMTGUI extends DecisionEngineGUI {
   private final val loadModelBtn = new JButton("Load SMT")
   private final val saveModelBtn = new JButton("Save SMT")
   private final val saveReportBtn = new JButton("Save report")
+
+  private final val outputTxtA = new JTextArea(20,134)
 
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val intCheckBox = new JCheckBox("Integer traces")
@@ -98,7 +107,7 @@ class SMTGUI extends DecisionEngineGUI {
       }
     })
     smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
-    mainPanel.add(smtPanel)
+    inputPanel.add(smtPanel)
 
     //Classification params
     val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
@@ -107,7 +116,7 @@ class SMTGUI extends DecisionEngineGUI {
     classifyParamsP.add(toleranceLabel)
     addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 2, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
     classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
-    mainPanel.add(classifyParamsP)
+    inputPanel.add(classifyParamsP)
 
     //ML buttons
     val mlParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
@@ -119,9 +128,27 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText, listener)
     setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText, listener)
     mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
-    mainPanel.add(mlParamsP)
+    inputPanel.add(mlParamsP)
+  //  inputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
 
-    mainPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    //Output panel
+    outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS))
+    mainPanel.add(Box.createVerticalStrut(5))
+    outputTxtA.setEditable(false)
+    val sp = new JScrollPane(outputTxtA)
+    sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
+    sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+    outputPanel.add(sp)
+  //  outputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+
+    //Add panels to mainPanel
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS))
+    mainPanel.add(inputPanel)
+    mainPanel.add(Box.createVerticalStrut(10))
+    mainPanel.add(outputPanel)
+    mainPanel.setBorder(BorderFactory.createBevelBorder(50))
+
+
   }
 
   private def hasRoot: Boolean = {

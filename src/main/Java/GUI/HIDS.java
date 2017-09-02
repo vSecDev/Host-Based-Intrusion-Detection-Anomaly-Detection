@@ -263,10 +263,10 @@ public class HIDS extends Observable implements Observer {
         frame.setSize(900, 1000);
         frame.setLayout(new BorderLayout(3, 3));
 
-        JLabel blueLabel = new JLabel();
+        /*JLabel blueLabel = new JLabel();
         blueLabel.setOpaque(true);
         blueLabel.setBackground(new Color(70, 130, 180));
-        blueLabel.setPreferredSize(new Dimension(800, 500));
+        blueLabel.setPreferredSize(new Dimension(800, 500));*/
 
         JPanel buttonP = new JPanel();
         buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
@@ -277,8 +277,10 @@ public class HIDS extends Observable implements Observer {
         buttonP.add(setupBtn(preProcBtn, null, false, listener));
 
         buttonP.setBorder(BorderFactory.createLineBorder(Color.black));
-        frame.add(buttonP, BorderLayout.NORTH);
-        frame.getContentPane().add(blueLabel, BorderLayout.CENTER);
+        frame.getContentPane().add(buttonP, BorderLayout.NORTH);
+      //  frame.getContentPane().add(blueLabel, BorderLayout.CENTER);
+        frame.getContentPane().add(Box.createVerticalStrut(25));
+
         renderBtns();
 
         Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();

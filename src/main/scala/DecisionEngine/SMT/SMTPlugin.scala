@@ -141,6 +141,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     })
     val dm = new DataModel
     dm.store(node)
+    println("trained node: " + node)
     resetLearn
     println("learnFlag after learnHelper is done :" + learnFlag)
     Some(dm)
