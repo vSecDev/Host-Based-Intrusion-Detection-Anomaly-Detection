@@ -8,6 +8,7 @@ import DecisionEngine.DecisionEnginePlugin;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.util.*;
 import javafx.util.Pair;
 import javax.swing.*;
@@ -99,13 +100,12 @@ public class HIDS extends Observable implements Observer {
         }
 
 
-        for(String s : hids.getExtensions()){
+        for (String s : hids.getExtensions()) {
             System.out.println("extension:{" + s + "}");
         }
-        for(String s : hids.getDelimiters()){
+        for (String s : hids.getDelimiters()) {
             System.out.println("delimiter:{" + s + "}");
         }
-
 
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -140,7 +140,7 @@ public class HIDS extends Observable implements Observer {
             try {
                 setExtensions(props.getProperty("extensions").trim().split("\\s*,\\s*"));
                 return getExtensions() != null && getExtensions().length > 0;
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 e.printStackTrace();
                 return false;
             }
@@ -156,7 +156,7 @@ public class HIDS extends Observable implements Observer {
                 String[] list2 = new String[delimiters.size()];
                 setDelimiters(delimiters.toArray(list2));
                 return getDelimiters() != null && getDelimiters().length > 0;
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 System.out.println("nullpointerexception thrown");
                 e.printStackTrace();
                 return false;
@@ -292,7 +292,7 @@ public class HIDS extends Observable implements Observer {
         frame.setVisible(true);
     }
 
-    private Boolean canPreProcess(){
+    private Boolean canPreProcess() {
         return (getSource() != null &&
                 getTarget() != null &&
                 getSource().isDirectory() &&
@@ -300,7 +300,7 @@ public class HIDS extends Observable implements Observer {
                 currentDataModule != null);
     }
 
-    private void renderBtns(){
+    private void renderBtns() {
         preProcBtn.setEnabled(canPreProcess());
     }
 
@@ -329,42 +329,41 @@ public class HIDS extends Observable implements Observer {
                     extensions.length == 0 ||
                     delimiters.length == 0) {
                 showError("An error occurred during learn request processing", "Error");
-            }else{
-                if(source.isDirectory()){
-                   Option<Vector<DataWrapper>> input = currentDataModule.getAllData(source, extensions);
-                   if(input.isEmpty()){
-                       showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
-                   }else{
-                       Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
-                       scala.Option<DataModel> none = scala.Option.apply(null);
-                       Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
-                       if(trainedModel.isEmpty()){
-                           System.out.println("empty model returned after learning");
-                       }else{
-                           System.out.println("Trained model: " + (trainedModel.get()).toString());
-                           System.out.println("--- add code to save returned model!");
-                       }
-                   }
+            } else {
+                if (source.isDirectory()) {
+                    Option<Vector<DataWrapper>> input = currentDataModule.getAllData(source, extensions);
+                    if (input.isEmpty()) {
+                        showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
+                    } else {
+                        Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
+                        scala.Option<DataModel> none = scala.Option.apply(null);
+                        Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
+                        if (trainedModel.isEmpty()) {
+                            System.out.println("empty model returned after learning");
+                        } else {
+                            System.out.println("Trained model: " + (trainedModel.get()).toString());
+                            System.out.println("--- add code to save returned model!");
+                        }
+                    }
                 } else {
                     //source is a file
 
                     Option<DataWrapper> in = currentDataModule.getData(source, extensions);
-                    if(in.isEmpty()){
+                    if (in.isEmpty()) {
                         showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
-                    }else{
-                        Vector<DataWrapper> input = new Vector<DataWrapper>(0,0,0);
+                    } else {
+                        Vector<DataWrapper> input = new Vector<DataWrapper>(0, 0, 0);
                         input.appendBack(in.get());
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
                         Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
-                        if(trainedModel.isEmpty()){
+                        if (trainedModel.isEmpty()) {
                             System.out.println("empty model returned after learning");
-                        }else{
+                        } else {
                             System.out.println("Trained model: " + trainedModel.get().toString());
                             System.out.println("--- add code to save returned model!");
                         }
                     }
-
 
 
                 }
@@ -376,48 +375,60 @@ public class HIDS extends Observable implements Observer {
         @Override
         public void actionPerformed(ActionEvent evt) {
             String btnLabel = evt.getActionCommand();
-            if(btnLabel.equals("Pre-process")){
+            if (btnLabel.equals("Pre-process")) {
                 preProcessHandler();
-            }else {
+            } else {
                 srcTargetBtnHandler(btnLabel);
             }
             renderBtns();
         }
 
-        private void srcTargetBtnHandler(String btnLabel){
+        private void srcTargetBtnHandler(String btnLabel) {
 
             String currDir = "...";
             try {
-                if(btnLabel.equals("Source") && (getSource() != null)) { currDir = getSource().getCanonicalPath(); }
-                else if(btnLabel.equals("Target") && (getTarget() != null)) {  currDir = getTarget().getCanonicalPath(); }
+                if (btnLabel.equals("Source") && (getSource() != null)) {
+                    currDir = getSource().getCanonicalPath();
+                } else if (btnLabel.equals("Target") && (getTarget() != null)) {
+                    currDir = getTarget().getCanonicalPath();
+                }
 
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int returnVal = fc.showOpenDialog(HIDS.this.frame);
 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    if(btnLabel.equals("Source")){
-                        HIDS.this.setSource(file);
-                        sourcePathL.setText(file.getCanonicalPath());
-                    }else if(btnLabel.equals("Target")){
-                        HIDS.this.setTarget(file);
-                        targetPathL.setText(file.getCanonicalPath());
+                    if (btnLabel.equals("Source")) {
+                        if (getTarget() != null && Files.isSameFile(file.toPath(), getTarget().toPath())) {
+                            showError("Source file or directory must be different from Target!", "Warning");
+                        } else {
+                            HIDS.this.setSource(file);
+                            sourcePathL.setText(file.getCanonicalPath());
+                        }
+                    } else if (btnLabel.equals("Target")) {
+                        if (getSource() != null && Files.isSameFile(file.toPath(), getSource().toPath())) {
+                            showError("Target file or directory must be different from Source!", "Warning");
+                        } else {
+                            HIDS.this.setTarget(file);
+                            targetPathL.setText(file.getCanonicalPath());
+                        }
+
+                    }} else {
+                        //TODO - DELETE BELOW
+                        System.out.println("source but not Approve Option.");
                     }
-                } else {
-                    //TODO - DELETE BELOW
-                    System.out.println("source but not Approve Option.");
+                } catch(IOException e){
+                    if (btnLabel.equals("Source")) {
+                        sourcePathL.setText(currDir);
+                    } else if (btnLabel.equals("Target")) {
+                        targetPathL.setText(currDir);
+                    }
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                if(btnLabel.equals("Source")){
-                    sourcePathL.setText(currDir);
-                }else if(btnLabel.equals("Target")){
-                    targetPathL.setText(currDir);
-                }
-                e.printStackTrace();
-            }
+
         }
 
-        private void preProcessHandler(){
+        private void preProcessHandler() {
             currentDataModule.preprocess(getSource(), getTarget(), getDelimiters(), getExtensions()).get();
         }
     }
