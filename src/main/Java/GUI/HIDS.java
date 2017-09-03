@@ -263,6 +263,11 @@ public class HIDS extends Observable implements Observer {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 1000);
         frame.setLayout(new BorderLayout(3, 20));
+        ((JComponent)frame.getContentPane()).setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        frame.getContentPane().setBackground(new Color(240,248,255));
+
+
+
 
         JPanel buttonP = new JPanel();
         buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
@@ -288,8 +293,8 @@ public class HIDS extends Observable implements Observer {
             frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
         }
 
-        //Display the window.
-        ((JComponent)frame.getContentPane()).setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
+
 
         frame.pack();
         frame.setVisible(true);

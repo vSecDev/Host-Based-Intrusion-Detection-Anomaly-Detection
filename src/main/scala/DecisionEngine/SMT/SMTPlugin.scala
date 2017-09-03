@@ -71,19 +71,32 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   }
 
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
-    if (data.isEmpty) return model
+    gui.appendText("Training SMT...")
+
+    if (data.isEmpty) {
+      gui.appendText("No data to process...")
+      return model
+    }
 
     model match {
       case None =>
         root match {
           case None => None //No model/SMT to train
-          case Some(node) => learnHelper(data, node, ints)
+          case Some(node) =>
+            val result = learnHelper(data, node, ints)
+            gui.appendText("Training completed.")
+            gui.appendText("Trained Sparse Markov Tree model:\n" + root.get)
+            result
         }
       case Some(w) =>
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_, _] => learnHelper(data, node, ints)
+            case node: Node[_, _] =>
+              val result = learnHelper(data, node, ints)
+              gui.appendText("Training completed.")
+              gui.appendText("Trained Sparse Markov Tree model:\n" + root.get)
+              result
             case _ => None
           }
         }
@@ -121,6 +134,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
+            gui.appendText("Processing " + d._1)
             //if (ints && isIntRoot) {
             if (ints && isIntRoot) {
               //process as int trace

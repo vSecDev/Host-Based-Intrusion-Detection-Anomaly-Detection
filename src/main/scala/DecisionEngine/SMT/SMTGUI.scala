@@ -158,7 +158,8 @@ class SMTGUI extends DecisionEngineGUI {
 
     outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.PAGE_AXIS))
     outputTxtA.setEditable(false)
-
+    outputTxtA.setBackground(new Color(173,216,230))
+    outputTxtA.setFont(outputTxtA.getFont().deriveFont(12f))
     val sp = new JScrollPane(outputTxtA)
     sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
     sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
@@ -424,6 +425,15 @@ class SMTGUI extends DecisionEngineGUI {
     renderBtns
   }
 
+  def clearText = {
+    outputTxtA.setText("")
+  }
+
+  def appendText(str: String) = {
+
+    outputTxtA.append("\n" + str)
+  }
+
   override def isSetToInt = intCheckBox.isSelected
 
   private class SMTBtnListener extends ActionListener {
@@ -481,7 +491,17 @@ class SMTGUI extends DecisionEngineGUI {
               dm.store(node)
               if (setPluginRoot(dm)) {
                 println("new root set. setting learnflag.")
-                pluginInstance.get.setLearnFlag
+
+                val thread = new Thread(new Runnable() {
+                  override def run(): Unit = {
+                    pluginInstance.get.setLearnFlag
+                  }
+                })
+
+                thread.start
+
+
+                //pluginInstance.get.setLearnFlag
               } else {
                 showError("An error occurred during SMT root initialisation!", "Error")
               }
