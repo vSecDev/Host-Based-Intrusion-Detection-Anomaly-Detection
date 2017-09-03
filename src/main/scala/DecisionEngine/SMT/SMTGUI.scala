@@ -88,24 +88,36 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def initialise(): Unit = {
     inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT))
-
+    inputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+      BorderFactory.createEmptyBorder(10, 10, 10, 10)))
 
     //SMT param components
-    val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    smtPanel.add(maxDepthLabel)
-    addTxtField(smtPanel, maxDepthField, maxDepthStr, maxDepthToolTipStr, 2, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
-    smtPanel.add(maxPhiLabel)
-    addTxtField(smtPanel, maxPhiField, maxPhiStr, maxPhiToolTipStr, 2, isPositive = false, isDouble = false, isPercent = false, registerChange = true)
-    smtPanel.add(maxSeqCntLabel)
-    addTxtField(smtPanel, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3, isPositive = true, isDouble = false, isPercent = false, registerChange = true)
-    smtPanel.add(smoothingLabel)
-    addTxtField(smtPanel, smoothingField, smoothingStr, smoothingToolTipStr, 3, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
-    smtPanel.add(priorLabel)
-    //TODO - CHECK FOR 0.0 PRIOR BEFORE CLASSIFICATION
-    addTxtField(smtPanel, priorField, priorStr, priorToolTipStr, 2, isPositive = false, isDouble = true, isPercent = false, registerChange = true)
+    val p1 = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    p1.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
+
+    p1.add(maxDepthLabel)
+    addTxtField(p1, maxDepthField, maxDepthStr, maxDepthToolTipStr, 2,
+      isPositive = true, isDouble = false, isPercent = false, registerChange = true)
+
+    p1.add(maxPhiLabel)
+    addTxtField(p1, maxPhiField, maxPhiStr, maxPhiToolTipStr, 2,
+      isPositive = false, isDouble = false, isPercent = false, registerChange = true)
+
+    p1.add(maxSeqCntLabel)
+    addTxtField(p1, maxSeqCntField, maxSeqCntStr, maxSeqCntToolTipStr, 3,
+      isPositive = true, isDouble = false, isPercent = false, registerChange = true)
+
+    p1.add(smoothingLabel)
+    addTxtField(p1, smoothingField, smoothingStr, smoothingToolTipStr, 3,
+      isPositive = false, isDouble = true, isPercent = false, registerChange = true)
+
+    p1.add(priorLabel)
+    addTxtField(p1, priorField, priorStr, priorToolTipStr, 2,
+      isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     priorField.setText("1.0")
     priorField.setEditable(false)
-    smtPanel.add(intCheckBox)
+
+    p1.add(intCheckBox)
     intCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
         println("checkbox. paramsChanged before: " + paramChanged)
@@ -113,74 +125,57 @@ class SMTGUI extends DecisionEngineGUI {
         println("checkbox. paramsChanged after: " + paramChanged)
       }
     })
-
-    //smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
-    smtPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
-    inputPanel.add(smtPanel)
+    inputPanel.add(p1)
     inputPanel.add(Box.createRigidArea(new Dimension(0, 5)))
 
     //Classification params
-    val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    classifyParamsP.add(thresholdLabel)
-    addTxtField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false, registerChange = false)
-    classifyParamsP.add(toleranceLabel)
-    addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 2, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
-    //classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
-    classifyParamsP.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
-    inputPanel.add(classifyParamsP)
+    val p2 = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    p2.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
+
+    p2.add(thresholdLabel)
+    addTxtField(p2, thresholdField, thresholdStr, thresholdToolTipStr, 5,
+      isPositive = false, isDouble = true, isPercent = false, registerChange = false)
+    p2.add(toleranceLabel)
+    addTxtField(p2, toleranceField, toleranceStr, toleranceToolTipStr, 2,
+      isPositive = false, isDouble = true, isPercent = true, registerChange = false)
+
+    inputPanel.add(p2)
     inputPanel.add(Box.createRigidArea(new Dimension(0, 5)))
 
     //ML buttons
-    val mlParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    val p3 = new JPanel(new FlowLayout(FlowLayout.LEFT))
+    p3.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
     val listener = new SMTBtnListener
-    setupButton(mlParamsP, learnBtn, learnBtn.getText, listener)
-    setupButton(mlParamsP, classifyBtn, classifyBtn.getText, listener)
-    setupButton(mlParamsP, validateBtn, validateBtn.getText, listener)
-    setupButton(mlParamsP, loadModelBtn, loadModelBtn.getText, listener)
-    setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText, listener)
-    setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText, listener)
-    //mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
-    mlParamsP.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
-    inputPanel.add(mlParamsP)
-    //inputPanel.add(Box.createRigidArea(new Dimension(5, 0)))
-
-
-    //inputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
-
-
-    inputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-      BorderFactory.createEmptyBorder(10, 10, 10, 10)))
-
-
+    setupButton(p3, learnBtn, learnBtn.getText, listener)
+    setupButton(p3, classifyBtn, classifyBtn.getText, listener)
+    setupButton(p3, validateBtn, validateBtn.getText, listener)
+    setupButton(p3, loadModelBtn, loadModelBtn.getText, listener)
+    setupButton(p3, saveModelBtn, saveModelBtn.getText, listener)
+    setupButton(p3, saveReportBtn, saveReportBtn.getText, listener)
+    inputPanel.add(p3)
 
     //Output panel
-    //outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS))
-    outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.PAGE_AXIS))
 
+    outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.PAGE_AXIS))
     outputTxtA.setEditable(false)
+
     val sp = new JScrollPane(outputTxtA)
     sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
     sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
     sp.setAlignmentX(Component.LEFT_ALIGNMENT)
 
-
-
-    //outputPanel.add(Box.createRigidArea(new Dimension(0, 10)))
     outputPanel.add(outputLabel)
     outputLabel.setLabelFor(sp)
-
     outputPanel.add(Box.createRigidArea(new Dimension(0, 10)))
     outputPanel.add(sp)
     outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
       BorderFactory.createEmptyBorder(10, 10, 10, 10)))
 
-
-
     //Add panels to mainPanel
-    //mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS))
-
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS))
-
+    mainPanel.add(new JLabel("SPARSE MARKOV TREE"))
+    mainPanel.setBackground(new Color(176,196,222))
+    mainPanel.add(Box.createVerticalStrut(10))
     mainPanel.add(inputPanel)
     inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT)
     //mainPanel.add(Box.createHorizontalGlue())
