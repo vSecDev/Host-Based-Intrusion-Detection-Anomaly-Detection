@@ -6,6 +6,9 @@ import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JFormattedTextField, _}
 import javax.swing.text._
 import javax.swing.JOptionPane
+import javax.swing.BorderFactory
+import javax.swing.border.{Border, EmptyBorder, EtchedBorder}
+
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
 import javax.swing.Box
@@ -16,7 +19,8 @@ class SMTGUI extends DecisionEngineGUI {
 
   private val mainPanel = new JPanel()
   private val outputPanel = new JPanel()
-  private val inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+  //private val inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
+  private val inputPanel = new JPanel()
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = None
   private var paramChanged = false
@@ -37,7 +41,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val toleranceToolTipStr = "If the percentage of subsequences in the analysed system call trace exceed the tolerance, the whole trace is classified as anomalous. Must be a decimal between 0-100!"
   private final val isIntStr = "Integer traces"
   private final val isIntToolTipStr = "Integer traces: check if the analysed system call traces have been pre-processed using \"system call-to-integer\" mapping."
-  //private final var outputLabelStr = "Report"
+  private final var outputLabelStr = "Report"
 
   private final val maxDepthLabel = new JLabel(maxDepthStr)
   private final val maxPhiLabel = new JLabel(maxPhiStr)
@@ -47,7 +51,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val thresholdLabel = new JLabel(thresholdStr)
   private final val toleranceLabel = new JLabel(toleranceStr)
   private final val isIntLabel = new JLabel(isIntStr)
-  //private final val outputLabel = new JLabel(outputLabelStr)
+  private final val outputLabel = new JLabel(outputLabelStr)
 
   private final val maxDepthField = new JFormattedTextField
   private final val maxPhiField = new JFormattedTextField
@@ -64,7 +68,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val saveModelBtn = new JButton("Save SMT")
   private final val saveReportBtn = new JButton("Save report")
 
-  private final val outputTxtA = new JTextArea(20,134)
+  private final val outputTxtA = new JTextArea(30,134)
 
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val intCheckBox = new JCheckBox("Integer traces")
@@ -83,6 +87,9 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   private def initialise(): Unit = {
+    inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT))
+
+
     //SMT param components
     val smtPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
     smtPanel.add(maxDepthLabel)
@@ -106,8 +113,11 @@ class SMTGUI extends DecisionEngineGUI {
         println("checkbox. paramsChanged after: " + paramChanged)
       }
     })
-    smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+
+    //smtPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    smtPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
     inputPanel.add(smtPanel)
+    inputPanel.add(Box.createRigidArea(new Dimension(0, 5)))
 
     //Classification params
     val classifyParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
@@ -115,40 +125,80 @@ class SMTGUI extends DecisionEngineGUI {
     addTxtField(classifyParamsP, thresholdField, thresholdStr, thresholdToolTipStr, 5, isPositive = false, isDouble = true, isPercent = false, registerChange = false)
     classifyParamsP.add(toleranceLabel)
     addTxtField(classifyParamsP, toleranceField, toleranceStr, toleranceToolTipStr, 2, isPositive = false, isDouble = true, isPercent = true, registerChange = false)
-    classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    //classifyParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    classifyParamsP.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
     inputPanel.add(classifyParamsP)
+    inputPanel.add(Box.createRigidArea(new Dimension(0, 5)))
 
     //ML buttons
     val mlParamsP = new JPanel(new FlowLayout(FlowLayout.LEFT))
-    val listener = new SMTBtnListener;
+    val listener = new SMTBtnListener
     setupButton(mlParamsP, learnBtn, learnBtn.getText, listener)
     setupButton(mlParamsP, classifyBtn, classifyBtn.getText, listener)
     setupButton(mlParamsP, validateBtn, validateBtn.getText, listener)
     setupButton(mlParamsP, loadModelBtn, loadModelBtn.getText, listener)
     setupButton(mlParamsP, saveModelBtn, saveModelBtn.getText, listener)
     setupButton(mlParamsP, saveReportBtn, saveReportBtn.getText, listener)
-    mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    //mlParamsP.setBorder(BorderFactory.createLineBorder(Color.black))
+    mlParamsP.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED))
     inputPanel.add(mlParamsP)
-  //  inputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    //inputPanel.add(Box.createRigidArea(new Dimension(5, 0)))
+
+
+    //inputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+
+
+    inputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+      BorderFactory.createEmptyBorder(10, 10, 10, 10)))
+
+
 
     //Output panel
-    outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS))
-  //  mainPanel.add(Box.createVerticalStrut(5))
+    //outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.Y_AXIS))
+    outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.PAGE_AXIS))
+
     outputTxtA.setEditable(false)
     val sp = new JScrollPane(outputTxtA)
     sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
     sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+    sp.setAlignmentX(Component.LEFT_ALIGNMENT)
+
+
+
+    //outputPanel.add(Box.createRigidArea(new Dimension(0, 10)))
+    outputPanel.add(outputLabel)
+    outputLabel.setLabelFor(sp)
+
+    outputPanel.add(Box.createRigidArea(new Dimension(0, 10)))
     outputPanel.add(sp)
-  //  outputPanel.setBorder(BorderFactory.createLineBorder(Color.black))
+    outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+      BorderFactory.createEmptyBorder(10, 10, 10, 10)))
+
+
 
     //Add panels to mainPanel
+    //mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS))
+
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS))
 
     mainPanel.add(inputPanel)
+    inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT)
+    //mainPanel.add(Box.createHorizontalGlue())
     mainPanel.add(Box.createVerticalStrut(10))
+    outputPanel.setAlignmentX(Component.LEFT_ALIGNMENT)
     mainPanel.add(outputPanel)
-    mainPanel.setBorder(BorderFactory.createBevelBorder(50))
+    mainPanel.add(Box.createVerticalStrut(10))
+    mainPanel.add(Box.createVerticalGlue())
+    //mainPanel.setBorder(BorderFactory.createBevelBorder(50))
+   // mainPanel.setBorder(new EmptyBorder(10,10,10,10))
+   //val border2 = BorderFactory.createLineBorder(Color.black, 2)
+   //val border2 = BorderFactory.createRaisedBevelBorder()
+   val border2 = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)
+    mainPanel.setBorder(BorderFactory.createCompoundBorder(border2,
+      BorderFactory.createEmptyBorder(10, 10, 10, 10)))
 
+    println("inputPanel: " + inputPanel.getLayout)
+    println("outputPanel: " + outputPanel.getLayout)
 
   }
 

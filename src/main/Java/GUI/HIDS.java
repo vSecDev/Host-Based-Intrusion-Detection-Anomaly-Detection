@@ -5,25 +5,26 @@ import Data.DataProcessor;
 import Data.DataWrapper;
 import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
+import javafx.util.Pair;
+import scala.Option;
+import scala.collection.immutable.Vector;
+
+import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.util.*;
-import javafx.util.Pair;
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.List;
-
-import scala.None$;
-import scala.Option;
-import scala.collection.immutable.Vector;
 
 //public class HIDS extends Observable implements Observer {
 public class HIDS extends Observable implements Observer {
@@ -261,12 +262,7 @@ public class HIDS extends Observable implements Observer {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 1000);
-        frame.setLayout(new BorderLayout(3, 3));
-
-        /*JLabel blueLabel = new JLabel();
-        blueLabel.setOpaque(true);
-        blueLabel.setBackground(new Color(70, 130, 180));
-        blueLabel.setPreferredSize(new Dimension(800, 500));*/
+        frame.setLayout(new BorderLayout(3, 20));
 
         JPanel buttonP = new JPanel();
         buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
@@ -275,21 +271,26 @@ public class HIDS extends Observable implements Observer {
         buttonP.add(setupBtn(sourceBtn, sourcePathL, true, listener));
         buttonP.add(setupBtn(targetBtn, targetPathL, true, listener));
         buttonP.add(setupBtn(preProcBtn, null, false, listener));
-
         buttonP.setBorder(BorderFactory.createLineBorder(Color.black));
+
+
+        buttonP.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
         frame.getContentPane().add(buttonP, BorderLayout.NORTH);
-      //  frame.getContentPane().add(blueLabel, BorderLayout.CENTER);
-        frame.getContentPane().add(Box.createVerticalStrut(25));
 
         renderBtns();
 
         Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();
+
 
         if (de.nonEmpty()) {
             frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
         }
 
         //Display the window.
+        ((JComponent)frame.getContentPane()).setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
         frame.pack();
         frame.setVisible(true);
     }
