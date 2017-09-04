@@ -20,6 +20,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
   private var learnFlag: Boolean = false
+  private var classifyFlag: Boolean = false
 
 
   gui.setPluginInstance(this)
@@ -107,19 +108,30 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   }
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
-    if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) return None
+    gui.appendText("Classifying input...")
+    println("is data empty: " + data.isEmpty)
+    if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty){
+      gui.appendText("No data to process or threshold or tolerance not set...")
+      return None
+    }
 
     model match {
       case None =>
         root match {
           case None => None //No model/SMT to classify with
-          case Some(node) => classifyHelper(data, node, ints)
+          case Some(node) =>
+            val report = classifyHelper(data, node, ints)
+            gui.appendText("Classification completed!")
+            report
         }
       case Some(w) =>
         w.retrieve match {
           case None => None
           case Some(m) => m match {
-            case node: Node[_, _] => classifyHelper(data, node, ints)
+            case node: Node[_, _] =>
+              val report = classifyHelper(data, node, ints)
+              gui.appendText("Classification completed!")
+              report
             case _ => None
           }
         }
@@ -165,6 +177,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
+            gui.appendText("Classifying " + d._1)
             if (ints && isIntRoot) {
               //process as int trace
               var quotients: Vector[Double] = Vector()
@@ -181,7 +194,9 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                 val anomalyCount = quotients.count(_ < threshold.get)
                 val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
                 val isAnomaly = anomalyPercentage > tolerance.get
-                report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get))
+                val traceReport = new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get)
+                report.addTraceReport(traceReport)
+                gui.appendText(traceReport.toString)
               }
             } else node match {
               case n: Node[String, String] =>
@@ -199,7 +214,9 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                   val anomalyCount = quotients.count(_ < threshold.get)
                   val anomalyPercentage = (anomalyCount / quotients.size.toDouble) * 100.00
                   var isAnomaly = anomalyPercentage > tolerance.get
-                  report.addTraceReport(new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get))
+                  val traceReport = new SMTTraceReport(d._1, quotients.size, anomalyCount, isAnomaly, quotients, threshold.get, tolerance.get)
+                  report.addTraceReport(traceReport)
+                  gui.appendText(traceReport.toString)
                 }
               case _ => //TODO - ADD LOGIC FOR OTHER TYPES
             }
@@ -207,6 +224,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
+    resetClassify
     if (report.getTraceReports.isEmpty) None else Some(report)
   }
 
@@ -233,6 +251,10 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     input
   }
 
+  private def resetLearn = learnFlag = false
+
+  private def resetClassify = classifyFlag = false
+
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
     isIntRoot = isInt
@@ -258,7 +280,11 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("learn")
   }
 
-  def resetLearn = learnFlag = false
+  def setClassifyFlag: Unit = {
+    classifyFlag = true
+    setChanged
+    notifyObservers("classify")
+  }
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 

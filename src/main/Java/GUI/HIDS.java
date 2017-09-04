@@ -5,6 +5,7 @@ import Data.DataProcessor;
 import Data.DataWrapper;
 import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
+import DecisionEngine.DecisionEngineReport;
 import javafx.util.Pair;
 import scala.Option;
 import scala.collection.immutable.Vector;
@@ -326,7 +327,8 @@ public class HIDS extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (arg.toString().equals("learn")) {
+        String action = arg.toString();
+        if (action.equals("learn") || action.equals("classify")) {
             if (currentDataModule == null ||
                     source == null ||
                     extensions.length == 0 ||
@@ -338,14 +340,24 @@ public class HIDS extends Observable implements Observer {
                     if (input.isEmpty()) {
                         showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
                     } else {
+                        System.out.println("input size: " + input.get().size());
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
-                        Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
+
+                        if(action.equals("learn")){
+                            handleLearn(input.get(), none, isInt);
+                        }else if(action.equals("classify")){
+                            handleClassify(input.get(), none, isInt);
+                        }
+
+                       /* Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
                         if (trainedModel.isEmpty()) {
                             System.out.println("empty model returned after learning");
                         } else {
                             System.out.println("--- add code to save returned model!");
-                        }
+                        }*/
+
+
                     }
                 } else {
                     Option<DataWrapper> in = currentDataModule.getData(source, extensions);
@@ -354,20 +366,52 @@ public class HIDS extends Observable implements Observer {
                     } else {
                         Vector<DataWrapper> input = new Vector<DataWrapper>(0, 0, 0);
                         input = input.appendBack(in.get());
+                        System.out.println("input size: " + input.size());
+
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
-                        Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
+
+                        if(action.equals("learn")){
+                            handleLearn(input, none, isInt);
+                        }else if(action.equals("classify")){
+                            handleClassify(input, none, isInt);
+                        }
+
+
+                        /*Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
                         if (trainedModel.isEmpty()) {
                             System.out.println("empty model returned after learning");
                         } else {
                             System.out.println("--- add code to save returned model!");
-                        }
+                        }*/
                     }
 
 
                 }
             }
         }
+    }
+
+    private Option<DataModel> handleLearn(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt) {
+        Option<DataModel> trainedModel = currentDecisionEngine.learn(input, model, isInt);
+        if (trainedModel.isEmpty()) {
+            System.out.println("empty model returned after learning");
+        } else {
+            System.out.println("--- add code to save returned model!");
+
+        }
+        return trainedModel;
+    }
+
+    private Option<DecisionEngineReport> handleClassify(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt){
+        System.out.println("handleClassify. is input empty: " + input.isEmpty());
+        Option<DecisionEngineReport> report = currentDecisionEngine.classify(input, model, isInt);
+        if(report.isEmpty()){
+            System.out.println("no DE report is returned!");
+        }else{
+            System.out.println("--- add code to save returned report!");
+        }
+        return report;
     }
 
     private class BtnListener implements ActionListener {

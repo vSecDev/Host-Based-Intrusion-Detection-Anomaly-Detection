@@ -114,7 +114,7 @@ class SMTGUI extends DecisionEngineGUI {
     p1.add(priorLabel)
     addTxtField(p1, priorField, priorStr, priorToolTipStr, 2,
       isPositive = false, isDouble = true, isPercent = false, registerChange = true)
-    priorField.setText("1.0")
+    priorField.setText("0.1")
     priorField.setEditable(false)
 
     p1.add(intCheckBox)
@@ -457,7 +457,7 @@ class SMTGUI extends DecisionEngineGUI {
             if (response == JOptionPane.YES_OPTION) {
               if(addNewRoot){
                 appendText("New SMT root set: " + pluginInstance.get.getModel().get.retrieve().get.asInstanceOf[Node[_,_]])
-                setLearnFlag
+                setFlag("learn")
               }else{
                 showError("An error occurred during SMT root initialisation!", "Error")
               }
@@ -465,7 +465,7 @@ class SMTGUI extends DecisionEngineGUI {
 
           } else {
             println("learnHandler: params have not changed. setting learnFlag in plugin")
-           setLearnFlag
+           setFlag("learn")
           }
         } else {
           println("learnHandler: SMTPlugin -> no root set. creating new root")
@@ -473,7 +473,7 @@ class SMTGUI extends DecisionEngineGUI {
           if(addNewRoot){
             println("new root set. setting learnflag.")
             appendText("New SMT root set: " + pluginInstance.get.getModel().get.retrieve().get.asInstanceOf[Node[_,_]])
-            setLearnFlag
+            setFlag("learn")
           }else{
             showError("An error occurred during SMT root initialisation!", "Error")
           }
@@ -483,15 +483,32 @@ class SMTGUI extends DecisionEngineGUI {
       }
     }
 
-    private def setLearnFlag = {
-      val thread = new Thread(() => {
-        pluginInstance.get.setLearnFlag
-      })
-      thread.start
+    private def classifyHandler = {
+      if(canClassify){
+        if(paramChanged){
+          val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+
+          if (response == JOptionPane.YES_OPTION) {
+            if(addNewRoot){
+              appendText("New SMT root set: " + pluginInstance.get.getModel().get.retrieve().get + "\nNew root must be trained before classification!")
+            }else{
+              showError("An error occurred during SMT root initialisation!", "Error")
+            }
+          }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
+          else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
+        }else{
+          println("classifyHandler: params have not changed. setting classifyFlag in plugin")
+          pluginInstance.get.setThreshold(thresholdField.getText().toDouble)
+          pluginInstance.get.setTolerance(toleranceField.getText().toDouble)
+          setFlag("classify")
+        }
+      }else{
+        showError("An error occurred. Cannot classify with current SMT!", "Error")
+      }
     }
 
     private def addNewRoot: Boolean = {
-println("in addnewRoot")
+      println("in addnewRoot")
       createPluginRoot match {
         case None => showError("An error occurred during SMT root initialisation!", "Error"); false
         case Some(node) =>
@@ -502,35 +519,14 @@ println("in addnewRoot")
       }
     }
 
-
-    private def classifyHandler = {
-      if(canClassify){
-        if(paramChanged){
-          println("classifyHandler: params have changed. confirm overwrite --> if yes, new root will have to be trained")
-          val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-          if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
-          else if (response == JOptionPane.YES_OPTION) {System.out.println("Yes button clicked")
-            if(addNewRoot){
-              println("new root set. setting learnflag.")
-              JOptionPane.showMessageDialog(null, "New root set!")
-             render
-            }else{
-              showError("An error occurred during SMT root initialisation!", "Error")
-            }
-
-          }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
-
-        }else{
-          //parameters have not changed can set classify flag
-        }
-      }else{
-        showError("An error occurred. Cannot classify with current SMT!", "Error")
-
-      }
-
+    private def setFlag(flag: String) = {
+      val thread = new Thread(() => flag match {
+        case "learn" => pluginInstance.get.setLearnFlag
+        case "classify" => pluginInstance.get.setClassifyFlag
+        case _ =>
+      })
+      thread.start
     }
-
-
 
 
 
