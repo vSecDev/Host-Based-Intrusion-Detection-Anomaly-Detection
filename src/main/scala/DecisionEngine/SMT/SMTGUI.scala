@@ -115,6 +115,7 @@ class SMTGUI extends DecisionEngineGUI {
     addTxtField(p1, priorField, priorStr, priorToolTipStr, 2,
       isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     priorField.setText("0.1")
+
     priorField.setEditable(false)
 
     p1.add(intCheckBox)

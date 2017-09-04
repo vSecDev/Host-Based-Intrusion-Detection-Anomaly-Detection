@@ -27,5 +27,7 @@ class SMTValidationReport(report: SMTReport) extends DecisionEngineReport{
     case Some(x) => df.format(x)
   }
 
-  override def toString: String = report.toString + "\nClassification error: " + classErrorStr
+  private def sensitivityStr = df.format(sensitivity.toDouble)
+
+  override def toString: String = report.toString + "\nClassification error: " + classErrorStr + " = Sensitivity: " + sensitivityStr
 }
