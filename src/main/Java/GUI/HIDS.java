@@ -349,26 +349,26 @@ public class HIDS extends Observable implements Observer {
                         if (trainedModel.isEmpty()) {
                             System.out.println("empty model returned after learning");
                         } else {
-                            System.out.println("Trained model: " + (trainedModel.get()).toString());
                             System.out.println("--- add code to save returned model!");
                         }
                     }
                 } else {
                     //source is a file
 
+                    System.out.println("Source is a file");
                     Option<DataWrapper> in = currentDataModule.getData(source, extensions);
                     if (in.isEmpty()) {
                         showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
                     } else {
+                        System.out.println("getData returned a non-empty option.");
                         Vector<DataWrapper> input = new Vector<DataWrapper>(0, 0, 0);
-                        input.appendBack(in.get());
+                        input = input.appendBack(in.get());
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
                         Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
                         if (trainedModel.isEmpty()) {
                             System.out.println("empty model returned after learning");
                         } else {
-                            System.out.println("Trained model: " + trainedModel.get().toString());
                             System.out.println("--- add code to save returned model!");
                         }
                     }

@@ -85,7 +85,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
           case Some(node) =>
             val result = learnHelper(data, node, ints)
             gui.appendText("Training completed.")
-            gui.appendText("Trained Sparse Markov Tree model:\n" + root.get)
             result
         }
       case Some(w) =>
@@ -95,7 +94,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
             case node: Node[_, _] =>
               val result = learnHelper(data, node, ints)
               gui.appendText("Training completed.")
-              gui.appendText("Trained Sparse Markov Tree model:\n" + root.get)
               result
             case _ => None
           }
@@ -155,9 +153,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     })
     val dm = new DataModel
     dm.store(node)
-    println("trained node: " + node)
     resetLearn
-    println("learnFlag after learnHelper is done :" + learnFlag)
     Some(dm)
   }
 

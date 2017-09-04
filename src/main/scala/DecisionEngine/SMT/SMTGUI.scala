@@ -467,7 +467,8 @@ class SMTGUI extends DecisionEngineGUI {
                   dm.store(node)
                   if (setPluginRoot(dm)) {
                     println("new root set. setting learnflag.")
-                    pluginInstance.get.setLearnFlag
+
+                    setLearnFlag
                   } else {
                     showError("An error occurred during SMT root initialisation!", "Error")
                   }
@@ -478,7 +479,8 @@ class SMTGUI extends DecisionEngineGUI {
 
           } else {
             println("learnHandler: params have not changed. setting learnFlag in plugin")
-            pluginInstance.get.setLearnFlag
+            //pluginInstance.get.setLearnFlag
+           setLearnFlag
           }
         } else {
           println("learnHandler: SMTPlugin -> no root set. creating new root")
@@ -492,13 +494,7 @@ class SMTGUI extends DecisionEngineGUI {
               if (setPluginRoot(dm)) {
                 println("new root set. setting learnflag.")
 
-                val thread = new Thread(new Runnable() {
-                  override def run(): Unit = {
-                    pluginInstance.get.setLearnFlag
-                  }
-                })
-
-                thread.start
+                setLearnFlag
 
 
                 //pluginInstance.get.setLearnFlag
@@ -511,6 +507,14 @@ class SMTGUI extends DecisionEngineGUI {
         showError("An error occurred. Cannot train SMT!", "Error")
       }
     }
+
+    private def setLearnFlag = {
+      val thread = new Thread(() => {
+        pluginInstance.get.setLearnFlag
+      })
+      thread.start
+    }
+
 
     def showError(txt: String, title: String) = {
       JOptionPane.showMessageDialog(new JPanel, txt, title, JOptionPane.ERROR_MESSAGE)
