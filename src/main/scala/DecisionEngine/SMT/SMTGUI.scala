@@ -443,7 +443,8 @@ class SMTGUI extends DecisionEngineGUI {
       println("SMT GUI button pressed: " + btnLabel)
       btnLabel match {
         case "Learn" => learnHandler
-        case "Classify" => classifyHandler
+        case "Classify" => classifyValidateHandler(isClassify = true)
+        case "Validate" => classifyValidateHandler(isClassify = false)
       }
 
     }
@@ -484,7 +485,7 @@ class SMTGUI extends DecisionEngineGUI {
       }
     }
 
-    private def classifyHandler = {
+    private def classifyValidateHandler(isClassify: Boolean) = {
       if(canClassify){
         if(paramChanged){
           val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
@@ -501,7 +502,10 @@ class SMTGUI extends DecisionEngineGUI {
           println("classifyHandler: params have not changed. setting classifyFlag in plugin")
           pluginInstance.get.setThreshold(thresholdField.getText().toDouble)
           pluginInstance.get.setTolerance(toleranceField.getText().toDouble)
-          setFlag("classify")
+          if(isClassify)
+            setFlag("classify")
+          else
+            setFlag("validate")
         }
       }else{
         showError("An error occurred. Cannot classify with current SMT!", "Error")
@@ -524,6 +528,7 @@ class SMTGUI extends DecisionEngineGUI {
       val thread = new Thread(() => flag match {
         case "learn" => pluginInstance.get.setLearnFlag
         case "classify" => pluginInstance.get.setClassifyFlag
+        case "validate" => pluginInstance.get.setValidateFlag
         case _ =>
       })
       thread.start

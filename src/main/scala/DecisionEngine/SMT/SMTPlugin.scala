@@ -21,6 +21,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   private var tolerance: Option[Double] = None
   private var learnFlag: Boolean = false
   private var classifyFlag: Boolean = false
+  private var validateFlag: Boolean = false
 
 
   gui.setPluginInstance(this)
@@ -76,63 +77,95 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
     if (data.isEmpty) {
       gui.appendText("No data to process...")
+      resetLearn
       return model
     }
 
     model match {
       case None =>
         root match {
-          case None => None //No model/SMT to train
+          case None =>
+            resetLearn
+            None //No model/SMT to train
           case Some(node) =>
             val result = learnHelper(data, node, ints)
             gui.appendText("Training completed.")
+            resetLearn
             result
         }
       case Some(w) =>
         w.retrieve match {
-          case None => None
+          case None =>
+            resetLearn
+            None
           case Some(m) => m match {
             case node: Node[_, _] =>
               val result = learnHelper(data, node, ints)
               gui.appendText("Training completed.")
+              resetLearn
               result
-            case _ => None
+            case _ =>
+              resetLearn
+              None
           }
         }
     }
   }
 
-  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = classify(data, model, ints) match {
-    case None => None
-    case Some(report: SMTReport) => Some(new SMTValidationReport(report))
-  }
+  override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
 
+    gui.appendText("Validating input...")
+    classify(data, model, ints) match {
+      case None =>
+        resetValidate
+        None
+      case Some(report: SMTReport) =>
+        gui.appendText("Validation completed!")
+        val vReport = new SMTValidationReport(report)
+        gui.appendText(vReport.toString)
+        resetValidate
+        Some(vReport)
+    }
+}
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
-    gui.appendText("Classifying input...")
-    println("is data empty: " + data.isEmpty)
+
+    if(!validateFlag)
+      gui.appendText("Classifying input...")
+
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty){
       gui.appendText("No data to process or threshold or tolerance not set...")
+      resetClassify
       return None
     }
 
     model match {
       case None =>
         root match {
-          case None => None //No model/SMT to classify with
+          case None =>
+            resetClassify
+            None //No model/SMT to classify with
           case Some(node) =>
             val report = classifyHelper(data, node, ints)
-            gui.appendText("Classification completed!")
+            if(!validateFlag)
+              gui.appendText("Classification completed!\n" + report.toString)
+            resetClassify
             report
         }
       case Some(w) =>
         w.retrieve match {
-          case None => None
+          case None =>
+            resetClassify
+            None
           case Some(m) => m match {
             case node: Node[_, _] =>
               val report = classifyHelper(data, node, ints)
-              gui.appendText("Classification completed!")
+              if(!validateFlag)
+                gui.appendText("Classification completed!\n" + report.toString)
+              resetClassify
               report
-            case _ => None
+            case _ =>
+              resetClassify
+              None
           }
         }
     }
@@ -165,7 +198,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     })
     val dm = new DataModel
     dm.store(node)
-    resetLearn
+  //  resetLearn
     Some(dm)
   }
 
@@ -177,7 +210,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         case None =>
         case Some(d) =>
           if (d._2.nonEmpty) {
-            gui.appendText("Classifying " + d._1)
             if (ints && isIntRoot) {
               //process as int trace
               var quotients: Vector[Double] = Vector()
@@ -224,7 +256,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
-    resetClassify
+   // resetClassify
     if (report.getTraceReports.isEmpty) None else Some(report)
   }
 
@@ -255,6 +287,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   private def resetClassify = classifyFlag = false
 
+  private def resetValidate = validateFlag = false
+
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
     isIntRoot = isInt
@@ -284,6 +318,12 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     classifyFlag = true
     setChanged
     notifyObservers("classify")
+  }
+
+  def setValidateFlag: Unit = {
+    validateFlag = true
+    setChanged
+    notifyObservers("validate")
   }
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined

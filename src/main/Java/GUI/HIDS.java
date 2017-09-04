@@ -328,7 +328,7 @@ public class HIDS extends Observable implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         String action = arg.toString();
-        if (action.equals("learn") || action.equals("classify")) {
+        if (action.equals("learn") || action.equals("classify") || action.equals("validate")) {
             if (currentDataModule == null ||
                     source == null ||
                     extensions.length == 0 ||
@@ -348,6 +348,8 @@ public class HIDS extends Observable implements Observer {
                             handleLearn(input.get(), none, isInt);
                         }else if(action.equals("classify")){
                             handleClassify(input.get(), none, isInt);
+                        }else if(action.equals("validate")){
+                            handleValidate(input.get(), none, isInt);
                         }
 
                        /* Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
@@ -375,6 +377,8 @@ public class HIDS extends Observable implements Observer {
                             handleLearn(input, none, isInt);
                         }else if(action.equals("classify")){
                             handleClassify(input, none, isInt);
+                        }else if(action.equals("validate")){
+                            handleValidate(input, none, isInt);
                         }
 
 
@@ -409,7 +413,18 @@ public class HIDS extends Observable implements Observer {
         if(report.isEmpty()){
             System.out.println("no DE report is returned!");
         }else{
-            System.out.println("--- add code to save returned report!");
+            System.out.println("--- add code to save returned classify report!");
+        }
+        return report;
+    }
+
+    private Option<DecisionEngineReport> handleValidate(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt){
+        System.out.println("handleValidate. is input empty: " + input.isEmpty());
+        Option<DecisionEngineReport> report = currentDecisionEngine.validate(input, model, isInt);
+        if(report.isEmpty()){
+            System.out.println("no DE report is returned!");
+        }else{
+            System.out.println("--- add code to save returned validate report!");
         }
         return report;
     }

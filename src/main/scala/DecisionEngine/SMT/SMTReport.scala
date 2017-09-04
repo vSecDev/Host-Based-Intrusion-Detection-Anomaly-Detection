@@ -94,7 +94,7 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
     case Some(x) => df.format(x)
   }
 
-  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
+  override def toString: String = "ID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
 
   case class Distribution(nBins: Int, data: List[Double]) {
     require(data.length > nBins)
