@@ -124,10 +124,7 @@ public class HIDS extends Observable implements Observer {
                 currentDecisionEngine = decisionEngines.get(0);
                 currentDecisionEngine.registerHIDS(this);
                 currentDataModule = dataModules.get(0);
-                //TODO SUBSCRIBE ALL DES TO FILE CHANGES HERE
-                //TODO SUBSCRIBE HIDS TO CHANGES IN DES
                 for (DecisionEnginePlugin de : decisionEngines) {
-                    System.out.println("adding " + de.getClass().getName() + " as observer");
                     addObserver(de);
                 }
                 return true;
@@ -158,7 +155,6 @@ public class HIDS extends Observable implements Observer {
                 setDelimiters(delimiters.toArray(list2));
                 return getDelimiters() != null && getDelimiters().length > 0;
             } catch (NullPointerException e) {
-                System.out.println("nullpointerexception thrown");
                 e.printStackTrace();
                 return false;
             }
@@ -330,7 +326,6 @@ public class HIDS extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("nodified. arg: " + arg);
         if (arg.toString().equals("learn")) {
             if (currentDataModule == null ||
                     source == null ||
@@ -353,14 +348,10 @@ public class HIDS extends Observable implements Observer {
                         }
                     }
                 } else {
-                    //source is a file
-
-                    System.out.println("Source is a file");
                     Option<DataWrapper> in = currentDataModule.getData(source, extensions);
                     if (in.isEmpty()) {
                         showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
                     } else {
-                        System.out.println("getData returned a non-empty option.");
                         Vector<DataWrapper> input = new Vector<DataWrapper>(0, 0, 0);
                         input = input.appendBack(in.get());
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
