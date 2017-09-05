@@ -487,7 +487,7 @@ class SMTGUI extends DecisionEngineGUI {
 
     private def classifyValidateHandler(isClassify: Boolean) = {
       if(canClassify){
-        if(paramChanged){
+        if(paramChanged && !compareParams){
           val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 
           if (response == JOptionPane.YES_OPTION) {
@@ -534,6 +534,15 @@ class SMTGUI extends DecisionEngineGUI {
       thread.start
     }
 
+    private def compareParams(): Boolean = {
+      val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
+
+      maxDepthField.getText.toInt.equals(root.maxDepth) &&
+      maxPhiField.getText.toInt.equals(root.maxPhi) &&
+      maxSeqCntField.getText.toInt.equals(root.maxSeqCount) &&
+      smoothingField.getText.toDouble.equals(root.smoothing) &&
+      priorField.getText.toDouble.equals(root.prior)
+    }
 
 
     def showError(txt: String, title: String) = {
