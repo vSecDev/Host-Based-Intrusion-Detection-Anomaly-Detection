@@ -432,7 +432,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   def appendText(str: String) = {
 
-    outputTxtA.append("\n" + str)
+    outputTxtA.append("\n " + str)
   }
 
   override def isSetToInt = intCheckBox.isSelected
