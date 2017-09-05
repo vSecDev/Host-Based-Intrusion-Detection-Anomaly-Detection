@@ -15,4 +15,5 @@ trait DataProcessor {
   def saveModel(model: DataModel, target: File): Boolean
 
   def loadModel(model: DataModel, source: File): Option[DataModel]
+
 }

@@ -256,9 +256,8 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canLoadModel: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => if (plugin.source.isDefined) {
-      plugin.source.get.isFile && plugin.isTrained
-    } else false
+    case Some(plugin) =>
+      plugin.source.isDefined && plugin.source.get.isFile
   }
 
   private def canSaveModel: Boolean = pluginInstance match {
@@ -445,6 +444,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "Learn" => learnHandler
         case "Classify" => classifyValidateHandler(isClassify = true)
         case "Validate" => classifyValidateHandler(isClassify = false)
+        case "Load SMT" => loadSMTHandler
       }
 
     }
@@ -483,6 +483,7 @@ class SMTGUI extends DecisionEngineGUI {
       } else {
         showError("An error occurred. Cannot train SMT!", "Error")
       }
+      render
     }
 
     private def classifyValidateHandler(isClassify: Boolean) = {
@@ -510,6 +511,7 @@ class SMTGUI extends DecisionEngineGUI {
       }else{
         showError("An error occurred. Cannot classify with current SMT!", "Error")
       }
+      render
     }
 
     private def addNewRoot: Boolean = {
@@ -529,6 +531,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "learn" => pluginInstance.get.setLearnFlag
         case "classify" => pluginInstance.get.setClassifyFlag
         case "validate" => pluginInstance.get.setValidateFlag
+        case "loadSMT" => pluginInstance.get.setLoadSMTFlag
         case _ =>
       })
       thread.start
@@ -544,6 +547,30 @@ class SMTGUI extends DecisionEngineGUI {
       priorField.getText.toDouble.equals(root.prior)
     }
 
+    private def loadSMTHandler() = {
+     if(canLoadModel){
+       pluginInstance.get.getModel match {
+         case None => setFlag("loadSMT") //No root set => can load new
+         case Some(model) => model.retrieve match {
+           case None => setFlag("loadSMT") //No root set => can load new
+           case Some(root) =>
+             //root is set, confirm overwrite!
+             val response = JOptionPane.showConfirmDialog(null, "SMT root is already set. Would you like to overwrite the current root?",
+               "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+
+             if (response == JOptionPane.YES_OPTION) {
+               //load new model here!
+               setFlag("loadSMT")
+             }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
+             else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
+         }
+       }
+
+     } else{
+       showError("An error occurred. Cannot load SMT model!", "Error")
+     }
+      render
+    }
 
     def showError(txt: String, title: String) = {
       JOptionPane.showMessageDialog(new JPanel, txt, title, JOptionPane.ERROR_MESSAGE)
