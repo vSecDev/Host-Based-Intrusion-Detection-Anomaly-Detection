@@ -453,7 +453,7 @@ class SMTGUI extends DecisionEngineGUI {
       //check again in case conditions changed
       if (canLearn) {
         if (hasRoot) {
-          if (paramChanged) {
+          if (paramChanged && !compareParams) {
             val response = JOptionPane.showConfirmDialog(null, "SMT root is already set with different parameters. Would you like to overwrite it?",
               "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
             if (response == JOptionPane.YES_OPTION) {
