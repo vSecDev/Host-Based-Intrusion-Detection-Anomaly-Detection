@@ -1,19 +1,14 @@
 package DecisionEngine.SMT
 
 import java.awt.event.{ActionEvent, ActionListener, ItemEvent, ItemListener}
-import java.awt.{Toolkit, _}
+import java.awt.{Dimension, Toolkit, _}
+import javax.swing.border.EtchedBorder
 import javax.swing.event.{DocumentEvent, DocumentListener}
-import javax.swing.{JFormattedTextField, _}
-import javax.swing.text._
-import javax.swing.JOptionPane
-import javax.swing.BorderFactory
-import javax.swing.border.{Border, EmptyBorder, EtchedBorder}
+import javax.swing.text.{DefaultCaret, _}
+import javax.swing.{BorderFactory, Box, JFormattedTextField, JOptionPane, JScrollPane, _}
 
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
-import javax.swing.Box
-import java.awt.Dimension
-import javax.swing.JScrollPane
 
 class SMTGUI extends DecisionEngineGUI {
 
@@ -69,6 +64,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val saveReportBtn = new JButton("Save report")
 
   private final val outputTxtA = new JTextArea(30,134)
+  private val outputScrollP = new JScrollPane(outputTxtA)
 
   //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
   private final val intCheckBox = new JCheckBox("Integer traces")
@@ -160,15 +156,15 @@ class SMTGUI extends DecisionEngineGUI {
     outputTxtA.setEditable(false)
     outputTxtA.setBackground(new Color(173,216,230))
     outputTxtA.setFont(outputTxtA.getFont().deriveFont(12f))
-    val sp = new JScrollPane(outputTxtA)
-    sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
-    sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
-    sp.setAlignmentX(Component.LEFT_ALIGNMENT)
+    //val outputScrollP = new JScrollPane(outputTxtA)
+    outputScrollP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
+    outputScrollP.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+    outputScrollP.setAlignmentX(Component.LEFT_ALIGNMENT)
 
     outputPanel.add(outputLabel)
-    outputLabel.setLabelFor(sp)
+    outputLabel.setLabelFor(outputScrollP)
     outputPanel.add(Box.createRigidArea(new Dimension(0, 10)))
-    outputPanel.add(sp)
+    outputPanel.add(outputScrollP)
     outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
       BorderFactory.createEmptyBorder(10, 10, 10, 10)))
 
@@ -442,6 +438,16 @@ class SMTGUI extends DecisionEngineGUI {
   def appendText(str: String) = {
 
     outputTxtA.append("\n " + str)
+
+    val caret = outputTxtA.getCaret.asInstanceOf[DefaultCaret]
+    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE)
+
+
+   // outputScrollP.getVerticalScrollBar.setValue(outputScrollP.getVerticalScrollBar.getMaximum)
+/*
+    output = scrollPane.getVerticalScrollBar();
+    vertical.setValue( vertical.getMaximum() );*/
+
   }
 
   override def isSetToInt = intCheckBox.isSelected

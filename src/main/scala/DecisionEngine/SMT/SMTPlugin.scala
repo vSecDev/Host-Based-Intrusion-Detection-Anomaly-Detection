@@ -150,8 +150,13 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
             None //No model/SMT to classify with
           case Some(node) =>
             val report = classifyHelper(data, node, ints)
-            if(!validateFlag)
-              gui.appendText("Classification completed!\n" + report.toString)
+            if(!validateFlag){
+              if(report.isEmpty){
+                gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
+              }else {
+                gui.appendText("Classification completed!\n" + report.get.toString)
+              }
+            }
             resetClassify
             report
         }
@@ -163,8 +168,13 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
           case Some(m) => m match {
             case node: Node[_, _] =>
               val report = classifyHelper(data, node, ints)
-              if(!validateFlag)
-                gui.appendText("Classification completed!\n" + report.toString)
+              if(!validateFlag){
+                if(report.isEmpty){
+                  gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
+                }else {
+                  gui.appendText("Classification completed!\n" + report.get.toString)
+                }
+              }
               resetClassify
               report
             case _ =>
