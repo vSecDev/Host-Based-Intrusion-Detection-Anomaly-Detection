@@ -398,21 +398,7 @@ public class HIDS extends Observable implements Observer {
             if (currentDataModule == null || source == null || source.isDirectory()){
                 showError("An error occurred during 'Load Model' request processing.\nCheck if source is set and is a file!", "Error");
             }else{
-                //load model here
-                DataModel dm = new DataModel();
-                try {
-                   Option<DataModel> dmo = currentDataModule.loadModel(dm, source);
-                   if(dmo.isEmpty()){
-                       showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
-                   }else{
-                       dm = dmo.get();
-                       if(!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())){
-                           showError("The Decision Engine could not load the module!", "Error");
-                       }
-                   }
-                }catch(DataException de){
-                    showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
-                }
+              handleLoadModel();
             }
         }
     }
@@ -448,6 +434,23 @@ public class HIDS extends Observable implements Observer {
             System.out.println("--- add code to save returned validate report!");
         }
         return report;
+    }
+
+    private void handleLoadModel(){
+        DataModel dm = new DataModel();
+        try {
+            Option<DataModel> dmo = currentDataModule.loadModel(dm, source);
+            if(dmo.isEmpty()){
+                showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
+            }else{
+                dm = dmo.get();
+                if(!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())){
+                    showError("The Decision Engine could not load the module!", "Error");
+                }
+            }
+        }catch(DataException de){
+            showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
+        }
     }
 
     private class BtnListener implements ActionListener {

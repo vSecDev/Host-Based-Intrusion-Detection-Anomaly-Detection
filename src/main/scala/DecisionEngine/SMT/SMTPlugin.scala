@@ -42,11 +42,13 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
             setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = true)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
+            gui.render
             true
           } else {
             setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = false)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
+            gui.render
             false
           }
         }
