@@ -120,6 +120,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     gui.appendText("Validating input...")
     classify(data, model, ints) match {
       case None =>
+        gui.appendText("Validation completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
         resetValidate
         None
       case Some(report: SMTReport) =>
