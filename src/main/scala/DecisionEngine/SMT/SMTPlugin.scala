@@ -23,6 +23,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   private var classifyFlag: Boolean = false
   private var validateFlag: Boolean = false
   private var loadModelFlag: Boolean = false
+  private var saveModelFlag: Boolean = false
 
   gui.setPluginInstance(this)
   //registerHIDS(hids)
@@ -92,8 +93,9 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
             None //No model/SMT to train
           case Some(node) =>
             val result = learnHelper(data, node, ints)
-            gui.appendText("Training completed.")
             resetLearn
+            gui.appendText("Training completed.")
+            gui.render
             result
         }
       case Some(w) =>
@@ -104,8 +106,9 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
           case Some(m) => m match {
             case node: Node[_, _] =>
               val result = learnHelper(data, node, ints)
-              gui.appendText("Training completed.")
               resetLearn
+              gui.appendText("Training completed.")
+              gui.render
               result
             case _ =>
               resetLearn
@@ -200,6 +203,25 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         resetLoadModel
         false
     }
+  }
+
+  override def getModel(): Option[DataModel] = root match {
+    case None => None
+    case Some(m) =>
+      val dm = new DataModel
+      dm.store(m)
+      Some(dm)
+  }
+
+  override def getModelName: Option[String] = root match {
+    case None => None
+    case Some(node) =>
+      Some(
+        node.maxDepth.toString + "_" +
+          node.maxPhi.toString + "_" +
+          node.maxSeqCount.toString + "_" +
+          node.smoothing.toString + "_" +
+          node.prior.toString)
   }
 
   private def learnHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DataModel] = {
@@ -322,6 +344,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   private def resetLoadModel = loadModelFlag =  false
 
+  private def resetSaveModel = saveModelFlag =  false
+
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
     isIntRoot = isInt
@@ -365,19 +389,16 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("loadModel")
   }
 
-  def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
-
-  def getModel(): Option[DataModel] = root match {
-    case None => None
-    case Some(m) =>
-      val dm = new DataModel
-      dm.store(m)
-      Some(dm)
+  def setSaveModelFlag: Unit = {
+    saveModelFlag = true
+    setChanged
+    notifyObservers("saveModel")
   }
+
+  def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def isTrained: Boolean = root match {
     case None => false
-    //TODO - CHECK CONDITION!
     case Some(x: Node[_, _]) => x.getChildren.nonEmpty
   }
 }

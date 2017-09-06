@@ -110,7 +110,7 @@ class FileProcessor extends DataProcessor {
     try {
       dm.serialise(target)
     } catch {
-      case de: DataException => throw de
+      case de: DataException => throw new DataException("DataException thrown during saving the model!", de)
     }
   }
 

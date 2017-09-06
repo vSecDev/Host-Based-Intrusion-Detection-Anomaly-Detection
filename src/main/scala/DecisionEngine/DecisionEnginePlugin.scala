@@ -31,5 +31,6 @@ trait DecisionEnginePlugin extends Observer{
   def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
   def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
   def loadModel(model: DataModel, isInt: Boolean): Boolean
-
+  def getModel: Option[DataModel]
+  def getModelName: Option[String]
 }

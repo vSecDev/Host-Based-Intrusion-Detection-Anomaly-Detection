@@ -8,6 +8,7 @@ import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 import DecisionEngine.DecisionEngineReport;
 import javafx.util.Pair;
+import org.apache.commons.io.FilenameUtils;
 import scala.Option;
 import scala.collection.immutable.Vector;
 
@@ -18,10 +19,7 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -400,6 +398,12 @@ public class HIDS extends Observable implements Observer {
             }else{
               handleLoadModel();
             }
+        }else if(action.equals("saveModel")){
+            if (currentDecisionEngine == null || currentDataModule == null || target == null || target.isFile()){
+                showError("An error occurred during 'Save Model' request processing.\nCheck if target is set and is a folder!", "Error");
+            }else{
+                handleSaveModel();
+            }
         }
     }
 
@@ -445,11 +449,35 @@ public class HIDS extends Observable implements Observer {
             }else{
                 dm = dmo.get();
                 if(!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())){
-                    showError("The Decision Engine could not load the module!", "Error");
+                    showError("The Decision Engine could not load the model!", "Error");
                 }
             }
         }catch(DataException de){
             showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
+        }
+    }
+
+    private void handleSaveModel() {
+        Option<DataModel> dm = currentDecisionEngine.getModel();
+        if (!dm.isEmpty()) {
+            try {
+                Option<String> fileName = currentDecisionEngine.getModelName();
+                if (fileName.nonEmpty()) {
+                    File targetFile = new File(target.getCanonicalPath() + "\\" + fileName.get() + ".IDM");
+                    if (currentDataModule.saveModel(dm.get(), targetFile)) {
+                        JOptionPane.showMessageDialog(new JPanel(), "The model has been saved to disk!",
+                                "Information", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        showError("The Data Processor module could not save the model!", "Error");
+                    }
+                } else {
+                    showError("An error occurred during 'Save Model' request processing.", "Error");
+                }
+            } catch (DataException | IOException e) {
+                showError("The Data Processor module could not save the model!", "Error");
+            }
+        } else {
+            showError("An error occurred during 'Save Model' request processing.\nNo model was returned by the Decision Engine.", "Error");
         }
     }
 

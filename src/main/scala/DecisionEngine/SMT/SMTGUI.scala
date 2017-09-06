@@ -436,18 +436,8 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   def appendText(str: String) = {
-
     outputTxtA.append("\n " + str)
-
-    val caret = outputTxtA.getCaret.asInstanceOf[DefaultCaret]
-    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE)
-
-
-   // outputScrollP.getVerticalScrollBar.setValue(outputScrollP.getVerticalScrollBar.getMaximum)
-/*
-    output = scrollPane.getVerticalScrollBar();
-    vertical.setValue( vertical.getMaximum() );*/
-
+    outputTxtA.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE)
   }
 
   override def isSetToInt = intCheckBox.isSelected
@@ -461,8 +451,8 @@ class SMTGUI extends DecisionEngineGUI {
         case "Classify" => classifyValidateHandler(isClassify = true)
         case "Validate" => classifyValidateHandler(isClassify = false)
         case "Load SMT" => loadSMTHandler
+        case "Save SMT" => saveSMTHandler
       }
-
     }
 
     private def learnHandler = {
@@ -548,6 +538,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "classify" => pluginInstance.get.setClassifyFlag
         case "validate" => pluginInstance.get.setValidateFlag
         case "loadModel" => pluginInstance.get.setLoadModelFlag
+        case "saveModel" => pluginInstance.get.setSaveModelFlag
         case _ =>
       })
       thread.start
@@ -588,7 +579,15 @@ class SMTGUI extends DecisionEngineGUI {
       render
     }
 
-    def showError(txt: String, title: String) = {
+    private def saveSMTHandler() = {
+      if(canSaveModel){
+        setFlag("saveModel")
+      }else{
+        showError("An error occurred. Cannot save SMT model!", "Error")
+      }
+    }
+
+    private def showError(txt: String, title: String) = {
       JOptionPane.showMessageDialog(new JPanel, txt, title, JOptionPane.ERROR_MESSAGE)
     }
   }
