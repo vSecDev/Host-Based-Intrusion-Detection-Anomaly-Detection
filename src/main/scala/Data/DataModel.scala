@@ -47,7 +47,7 @@ class DataModel {
       case ioe: IOException => throw new DataException("IOException thrown during model deserialisation.", ioe)
       case se: SecurityException => throw new DataException("SecurityException thrown during model deserialisation", se)
       case npe: NullPointerException => throw new DataException("NullPointerException thrown during model deserialisation", npe)
-    } 
+    }
     try {
       val newModel = ois.readObject.asInstanceOf[Serializable]
       ois.close

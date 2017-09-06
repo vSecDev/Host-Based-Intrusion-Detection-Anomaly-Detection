@@ -261,7 +261,8 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canSaveModel: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => plugin.target.isDefined && plugin.isTrained
+      //TODO CHECK ISDIRECTORY CONDITION BELOW
+    case Some(plugin) => plugin.target.isDefined && plugin.target.get.isDirectory && plugin.isTrained
   }
 
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String, listener: ActionListener) = {
