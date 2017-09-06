@@ -12,8 +12,10 @@ trait DataProcessor {
 
   def getAllData(source: File, extensions: Array[String]): Option[Vector[DataWrapper]]
 
+  @throws(classOf[DataException])
   def saveModel(model: DataModel, target: File): Boolean
 
+  @throws(classOf[DataException])
   def loadModel(model: DataModel, source: File): Option[DataModel]
 
 }

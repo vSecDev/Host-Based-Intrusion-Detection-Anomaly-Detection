@@ -77,8 +77,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   override def setPluginInstance(plugin: SMTPlugin): Unit = {
     super.setPluginInstance(plugin)
-    //TODO - RENDER HERE!
-    renderBtns
+    render
   }
 
   override def getGUIComponent: Option[JPanel] = {
@@ -302,6 +301,16 @@ class SMTGUI extends DecisionEngineGUI {
     saveModelBtn.setEnabled(canSaveModel)
     //saveReportBtn.setEnabled(canSaveReport)
   }
+  private def renderRoot = {
+    if(hasRoot){
+      val root = pluginInstance.get.getModel().get.retrieve().get.asInstanceOf[Node[_,_]]
+      maxDepthField.setText(root.maxDepth.toString)
+      maxPhiField.setText(root.maxPhi.toString)
+      maxSeqCntField.setText(root.maxSeqCount.toString)
+      smoothingField.setText(root.smoothing.toString)
+      priorField.setText(root.prior.toString)
+    }
+  }
 
   private def addTxtField(panel: JPanel, field: JFormattedTextField, fieldName: String, tooltipStr: String, col: Int, isPositive: Boolean, isDouble: Boolean, isPercent: Boolean, registerChange: Boolean) = {
     field.setColumns(col)
@@ -314,7 +323,7 @@ class SMTGUI extends DecisionEngineGUI {
       doc.addDocumentListener(new DocumentListener {
         override def removeUpdate(e: DocumentEvent): Unit = {
           println("in documentlistener removeUpdate. paramschanged before: " + paramChanged);
-          paramChanged = hasRoot;
+          paramChanged = hasRoot
           println("paramschanged after: " + paramChanged)
         }
 
@@ -404,15 +413,14 @@ class SMTGUI extends DecisionEngineGUI {
       case Some(plugin) => {
         //TODO - CHECK CONDITION BELOW!
         if (plugin.loadModel(model, isSetToInt)) {
-          val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
-
-          maxDepthField.setText(newRoot.maxDepth.toString)
+          //  val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
+        /*  maxDepthField.setText(newRoot.maxDepth.toString)
           maxPhiField.setText(newRoot.maxPhi.toString)
           maxSeqCntField.setText(newRoot.maxSeqCount.toString)
           smoothingField.setText(newRoot.smoothing.toString)
-          priorField.setText(newRoot.prior.toString)
+          priorField.setText(newRoot.prior.toString)*/
           paramChanged = false
-          renderBtns
+          render
           true
         } else {
           false
@@ -423,6 +431,7 @@ class SMTGUI extends DecisionEngineGUI {
 
   def render = {
     renderBtns
+    renderRoot
   }
 
   def clearText = {
@@ -531,7 +540,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "learn" => pluginInstance.get.setLearnFlag
         case "classify" => pluginInstance.get.setClassifyFlag
         case "validate" => pluginInstance.get.setValidateFlag
-        case "loadSMT" => pluginInstance.get.setLoadSMTFlag
+        case "loadModel" => pluginInstance.get.setLoadModelFlag
         case _ =>
       })
       thread.start
@@ -550,9 +559,9 @@ class SMTGUI extends DecisionEngineGUI {
     private def loadSMTHandler() = {
      if(canLoadModel){
        pluginInstance.get.getModel match {
-         case None => setFlag("loadSMT") //No root set => can load new
+         case None => setFlag("loadModel") //No root set => can load new
          case Some(model) => model.retrieve match {
-           case None => setFlag("loadSMT") //No root set => can load new
+           case None => setFlag("loadModel") //No root set => can load new
            case Some(root) =>
              //root is set, confirm overwrite!
              val response = JOptionPane.showConfirmDialog(null, "SMT root is already set. Would you like to overwrite the current root?",
@@ -560,7 +569,7 @@ class SMTGUI extends DecisionEngineGUI {
 
              if (response == JOptionPane.YES_OPTION) {
                //load new model here!
-               setFlag("loadSMT")
+               setFlag("loadModel")
              }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
              else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
          }

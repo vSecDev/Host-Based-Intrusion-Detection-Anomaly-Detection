@@ -22,7 +22,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   private var learnFlag: Boolean = false
   private var classifyFlag: Boolean = false
   private var validateFlag: Boolean = false
-
+  private var loadModelFlag: Boolean = false
 
   gui.setPluginInstance(this)
   //registerHIDS(hids)
@@ -66,6 +66,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   override def getGUI: Option[DecisionEngineGUI] = Some(gui)
 
+  override def isIntModel: Boolean = isIntRoot
 
   override def update(o: Observable, arg: Any): Unit = {
     super.update(o, arg)
@@ -127,6 +128,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         Some(vReport)
     }
 }
+
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
 
     if(!validateFlag)
@@ -168,6 +170,22 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
               None
           }
         }
+    }
+  }
+
+  override def loadModel(model: DataModel, isInt: Boolean): Boolean = model.retrieve match {
+    case None =>
+      resetLoadModel
+      false
+    case Some(mod) => mod match {
+      case m: Node[_, _] =>
+        setRoot(m, isInt)
+        gui.appendText("New root loaded:\n" + root.get.toString)
+        resetLoadModel
+        true
+      case _ =>
+        resetLoadModel
+        false
     }
   }
 
@@ -289,16 +307,18 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   private def resetValidate = validateFlag = false
 
+  private def resetLoadModel = loadModelFlag =  false
+
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
     isIntRoot = isInt
+    gui.render
   }
 
   //TODO - SETINTROOT WILL BE DELETED OR MADE PRIVATE => TEST FROM UI
   def setIntRoot(int: Boolean): Unit ={
     isIntRoot = int
   }
-
 
   def setThreshold(t: Double) = threshold = Some(t)
 
@@ -326,15 +346,13 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("validate")
   }
 
-  def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
-
-  def loadModel(model: DataModel, isInt: Boolean): Boolean = model.retrieve match {
-    case None => false
-    case Some(mod) => mod match {
-      case m: Node[_, _] => setRoot(m, isInt); true
-      case _ => false
-    }
+  def setLoadModelFlag: Unit = {
+    loadModelFlag = true
+    setChanged
+    notifyObservers("loadModel")
   }
+
+  def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def getModel(): Option[DataModel] = root match {
     case None => None

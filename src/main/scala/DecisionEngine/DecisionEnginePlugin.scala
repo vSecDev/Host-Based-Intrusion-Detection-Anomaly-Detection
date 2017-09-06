@@ -14,8 +14,6 @@ trait DecisionEnginePlugin extends Observer{
   var source: Option[File] = None
   var target: Option[File] = None
 
-
-
   override def update(o: Observable, arg: scala.Any): Unit = {
    arg match {
      case "source" => source = Some(o.asInstanceOf[HIDS].getSource)
@@ -28,8 +26,10 @@ trait DecisionEnginePlugin extends Observer{
   def configure(config: DecisionEngineConfig): Boolean
   def getConfiguration: Option[DecisionEngineConfig]
   def getGUI: Option[DecisionEngineGUI]
+  def isIntModel: Boolean
   def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] //model is optional (if passed, the model is further trained with additional training examples
   def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
   def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
+  def loadModel(model: DataModel, isInt: Boolean): Boolean
 
 }

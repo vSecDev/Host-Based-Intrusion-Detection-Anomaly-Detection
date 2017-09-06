@@ -1,5 +1,6 @@
 package GUI;
 
+import Data.DataException;
 import Data.DataModel;
 import Data.DataProcessor;
 import Data.DataWrapper;
@@ -333,7 +334,7 @@ public class HIDS extends Observable implements Observer {
                     source == null ||
                     extensions.length == 0 ||
                     delimiters.length == 0) {
-                showError("An error occurred during learn request processing", "Error");
+                showError("An error occurred during "+ action + " request processing", "Error");
             } else {
                 if (source.isDirectory()) {
                     Option<Vector<DataWrapper>> input = currentDataModule.getAllData(source, extensions);
@@ -391,6 +392,26 @@ public class HIDS extends Observable implements Observer {
                     }
 
 
+                }
+            }
+        }else if(action.equals("loadModel")){
+            if (currentDataModule == null || source == null || source.isDirectory()){
+                showError("An error occurred during 'Load Model' request processing.\nCheck if source is set and is a file!", "Error");
+            }else{
+                //load model here
+                DataModel dm = new DataModel();
+                try {
+                   Option<DataModel> dmo = currentDataModule.loadModel(dm, source);
+                   if(dmo.isEmpty()){
+                       showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
+                   }else{
+                       dm = dmo.get();
+                       if(!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())){
+                           showError("The Decision Engine could not load the module!", "Error");
+                       }
+                   }
+                }catch(DataException de){
+                    showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
                 }
             }
         }
