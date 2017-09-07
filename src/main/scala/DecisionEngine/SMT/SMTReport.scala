@@ -53,7 +53,7 @@ class SMTReport(threshold: Double, tolerance: Double) extends DecisionEngineRepo
     sb.append("SMT Report ID: " + id + " - Trace Count: " + traceCount + " - Anomalous traces: " + anomalyCount + " - Normal traces: " + normalCount + " - Anomaly percentage: " + aPercentStr + " - Normal percentage: " + nPercentStr + " - Threshold: " + threshold + " - Tolerance: " + tolerance + "\nClassified traces: ")
 
     for(tr <- traceReports){
-      sb.append(tr.toString)
+      sb.append("\n" + tr.toString)
     }
     sb.toString
   }
@@ -97,7 +97,7 @@ class SMTTraceReport(val name: String, val subtraceCnt: Int, val anomalyCnt: Int
     case Some(x) => df.format(x)
   }
 
-  override def toString: String = "\nID: "+ id + " - Trace: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
+  override def toString: String = "Trace ID: "+ id + " - File: " + name + " - Subtrace count: " + subtraceCnt + " - Anomalous subtraces: " + anomalyCnt + " - Normal subtraces: " + normalCount + " = Anomaly percentage: " + aPercentStr + " - Classification: " + getClassification
 
   case class Distribution(nBins: Int, data: List[Double]) {
     require(data.length > nBins)

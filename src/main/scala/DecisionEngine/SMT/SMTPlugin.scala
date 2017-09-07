@@ -130,6 +130,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       case Some(report: SMTReport) =>
         gui.appendText("Validation completed!")
         val vReport = new SMTValidationReport(report)
+        println("in validate. vReport class: " + vReport.getClass.getName)
         resetValidate
         lastReport = Some(vReport)
         gui.appendText(vReport.toString)

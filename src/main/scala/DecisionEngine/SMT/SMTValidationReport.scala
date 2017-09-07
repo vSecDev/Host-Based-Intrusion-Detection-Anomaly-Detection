@@ -36,7 +36,7 @@ class SMTValidationReport(report: SMTReport) extends DecisionEngineReport{
 
   private def sensitivityStr = df.format(sensitivity.toDouble)
 
-  override def toString: String = report.toString + "\nClassification error: " + classErrorStr + " = Sensitivity: " + sensitivityStr
+  override def toString: String = "VALIDATION REPORT:\n" + report.toString + "\nClassification error: " + classErrorStr + " = Sensitivity: " + sensitivityStr
 }
 
 object SMTValidationReport{

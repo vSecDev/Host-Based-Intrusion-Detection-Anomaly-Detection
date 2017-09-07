@@ -128,9 +128,11 @@ class FileProcessor extends DataProcessor {
 
   @throws(classOf[DataException])
   override def saveReport(report: DecisionEngineReport, target: File): Boolean = {
+    println("report class: " + report.getReport().get.getClass.getName)
     val bw = new BufferedWriter(new FileWriter(target))
     try{
-      bw.write(report.getReport().get.toString())
+      //bw.write(report.getReport().get.toString())
+      bw.write(report.toString())
       bw.close()
       true
     }catch{
