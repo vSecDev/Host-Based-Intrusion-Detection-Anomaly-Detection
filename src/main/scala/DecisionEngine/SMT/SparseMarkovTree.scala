@@ -1,7 +1,6 @@
 package DecisionEngine.SMT
 
 import java.io._
-import java.lang.reflect.ParameterizedType
 import scala.annotation.tailrec
 import scala.collection.mutable.Map
 
@@ -59,7 +58,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   def getEventCount: Int = eventCount
 
-  //TODO MAKE THIS PRIVATE OR CONTROL ACCESS
   def getEvents: Map[B, Int] = events
 
   def getPredictions: Map[B, Double] = {
@@ -98,10 +96,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     }
   }
 
-  //TODO REVISE THIS - MIGHT NOT HAVE TO MULTIPLY THE RESULT BY THE CURRENT PRIOR!!!
   private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
 
-  //TODO - CHECK IF  WEIGHT PRIORS ARE CORRECT!
   def learn(condition: Vector[A], event: B): Unit = {
 
     if (maxDepth > 0) for {
@@ -115,7 +111,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
           sl.updateSequences((newCondition, event)) match {
             case Some(x) =>
               children = children.updated(i, x)
-              //TODO - DELETE CALL TO GC IF NECESSARY
               System.gc()
             case None =>
           }
@@ -126,14 +121,14 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
             case Some(x: Node[A, B]) =>
               newCondition.tail match {
                 case y +: ys => x.learn(y +: ys, event)
-                case _ => println("should not ever get here with static window size"); updateEvents(event)
+                case _ => updateEvents(event) //should not ever get here with static window size")
               }
             case None =>
               val newNode: Node[A, B] = Node(maxDepth - i - 1, maxPhi, maxSeqCount, _smoothing, getNewPrior)
               newNode.setKey(newCondition.head)
               newCondition.tail match {
                 case y +: ys => newNode.learn(y +: ys, event)
-                case _ => println("should not ever get here with static window size"); updateEvents(event)
+                case _ => updateEvents(event) //should not ever get here with static window size")
               }
               children = children.updated(i, children(i) :+ newNode)
           }
@@ -198,7 +193,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   override def toString: String = {
     val buf = new StringBuilder
-    buf ++= "\n\n-------------------------------\nNode\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+    buf ++= "Node\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
       if (children.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + children(i).size
