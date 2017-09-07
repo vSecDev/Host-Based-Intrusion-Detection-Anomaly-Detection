@@ -6,18 +6,17 @@ import javax.swing.border.EtchedBorder
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.{DefaultCaret, _}
 import javax.swing.{BorderFactory, Box, JFormattedTextField, JOptionPane, JScrollPane, _}
-
 import Data.DataModel
 import DecisionEngine.DecisionEngineGUI
 
 class SMTGUI extends DecisionEngineGUI {
 
-  private val mainPanel = new JPanel()
-  private val outputPanel = new JPanel()
-  //private val inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT))
-  private val inputPanel = new JPanel()
   override type T = SMTPlugin
   override var pluginInstance: Option[SMTPlugin] = None
+
+  private val mainPanel = new JPanel()
+  private val outputPanel = new JPanel()
+  private val inputPanel = new JPanel()
   private var paramChanged = false
 
   private final val maxDepthStr = "Max Depth:"
@@ -64,9 +63,7 @@ class SMTGUI extends DecisionEngineGUI {
   private final val saveReportBtn = new JButton("Save report")
 
   private final val outputTxtA = new JTextArea(30,134)
-  private val outputScrollP = new JScrollPane(outputTxtA)
-
-  //TODO - HOW TO CHECK IF CURRENT ROOT IS NODE[INT, INT]??
+  private final val outputScrollP = new JScrollPane(outputTxtA)
   private final val intCheckBox = new JCheckBox("Integer traces")
 
   initialise
@@ -77,7 +74,6 @@ class SMTGUI extends DecisionEngineGUI {
   }
 
   override def getGUIComponent: Option[JPanel] = {
-    //    test(mainPanel)
     Some(mainPanel)
   }
 
@@ -110,15 +106,12 @@ class SMTGUI extends DecisionEngineGUI {
     addTxtField(p1, priorField, priorStr, priorToolTipStr, 2,
       isPositive = false, isDouble = true, isPercent = false, registerChange = true)
     priorField.setText("0.1")
-
     priorField.setEditable(false)
 
     p1.add(intCheckBox)
     intCheckBox.addItemListener(new ItemListener {
       override def itemStateChanged(e: ItemEvent): Unit = {
-        println("checkbox. paramsChanged before: " + paramChanged)
         paramChanged = hasRoot //If root is already set, manual change of SMT parameters is registered!
-        println("checkbox. paramsChanged after: " + paramChanged)
       }
     })
     inputPanel.add(p1)
@@ -151,12 +144,10 @@ class SMTGUI extends DecisionEngineGUI {
     inputPanel.add(p3)
 
     //Output panel
-
     outputPanel.setLayout(new BoxLayout(outputPanel, BoxLayout.PAGE_AXIS))
     outputTxtA.setEditable(false)
-    outputTxtA.setBackground(new Color(173,216,230))
+    outputTxtA.setBackground(new Color(173, 216, 230))
     outputTxtA.setFont(outputTxtA.getFont().deriveFont(12f))
-    //val outputScrollP = new JScrollPane(outputTxtA)
     outputScrollP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
     outputScrollP.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
     outputScrollP.setAlignmentX(Component.LEFT_ALIGNMENT)
@@ -171,43 +162,33 @@ class SMTGUI extends DecisionEngineGUI {
     //Add panels to mainPanel
     mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS))
     mainPanel.add(new JLabel("SPARSE MARKOV TREE"))
-    mainPanel.setBackground(new Color(176,196,222))
+    mainPanel.setBackground(new Color(176, 196, 222))
     mainPanel.add(Box.createVerticalStrut(10))
     mainPanel.add(inputPanel)
     inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT)
-    //mainPanel.add(Box.createHorizontalGlue())
+
     mainPanel.add(Box.createVerticalStrut(10))
     outputPanel.setAlignmentX(Component.LEFT_ALIGNMENT)
     mainPanel.add(outputPanel)
     mainPanel.add(Box.createVerticalStrut(10))
     mainPanel.add(Box.createVerticalGlue())
-    //mainPanel.setBorder(BorderFactory.createBevelBorder(50))
-   // mainPanel.setBorder(new EmptyBorder(10,10,10,10))
-   //val border2 = BorderFactory.createLineBorder(Color.black, 2)
-   //val border2 = BorderFactory.createRaisedBevelBorder()
-   val border2 = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)
+
+    val border2 = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)
     mainPanel.setBorder(BorderFactory.createCompoundBorder(border2,
       BorderFactory.createEmptyBorder(10, 10, 10, 10)))
-
-    println("inputPanel: " + inputPanel.getLayout)
-    println("outputPanel: " + outputPanel.getLayout)
-
   }
 
-  private def hasRoot: Boolean = {
-    pluginInstance match {
-      case None => false
-      case Some(plugin) => {
-        plugin.getModel match {
+  private def hasRoot: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) =>
+      plugin.getModel match {
+        case None => false
+        case Some(dataModel) => dataModel.retrieve match {
           case None => false
-          case Some(dataModel) => dataModel.retrieve match {
-            case None => false
-            case Some(n: Node[_, _]) => true
-            case _ => false
-          }
+          case Some(n: Node[_, _]) => true
+          case _ => false
         }
       }
-    }
   }
 
   private def canCreateRoot: Boolean =
@@ -257,7 +238,6 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canSaveModel: Boolean = pluginInstance match {
     case None => false
-      //TODO CHECK ISDIRECTORY CONDITION BELOW
     case Some(plugin) => plugin.target.isDefined && plugin.target.get.isDirectory && plugin.isTrained
   }
 
@@ -303,6 +283,7 @@ class SMTGUI extends DecisionEngineGUI {
     saveModelBtn.setEnabled(canSaveModel)
     saveReportBtn.setEnabled(canSaveReport)
   }
+
   private def renderRoot = {
     if(hasRoot){
       val root = pluginInstance.get.getModel().get.retrieve().get.asInstanceOf[Node[_,_]]
@@ -323,21 +304,11 @@ class SMTGUI extends DecisionEngineGUI {
     doc.setDocumentFilter(new NonNegNumFilter(isPositive, isDouble, isPercent))
     if (registerChange) {
       doc.addDocumentListener(new DocumentListener {
-        override def removeUpdate(e: DocumentEvent): Unit = {
-          println("in documentlistener removeUpdate. paramschanged before: " + paramChanged);
-          paramChanged = hasRoot
-          println("paramschanged after: " + paramChanged)
-        }
+        override def removeUpdate(e: DocumentEvent): Unit = { paramChanged = hasRoot }
 
-        override def changedUpdate(e: DocumentEvent): Unit = {
-          println("in documentlistener changedUpdate");
-          paramChanged = hasRoot
-        }
+        override def changedUpdate(e: DocumentEvent): Unit = { paramChanged = hasRoot }
 
-        override def insertUpdate(e: DocumentEvent): Unit = {
-          println("in documentlistener insertUpdate. paramschanged before: " + paramChanged);
-          paramChanged = hasRoot
-        }
+        override def insertUpdate(e: DocumentEvent): Unit = { paramChanged = hasRoot }
       })
     }
     panel.add(field)
@@ -347,22 +318,15 @@ class SMTGUI extends DecisionEngineGUI {
 
     @throws[BadLocationException]
     override def insertString(fb: DocumentFilter.FilterBypass, offset: Int, string: String, attr: AttributeSet): Unit = {
-      // println("in insertString")
       val doc = fb.getDocument
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.insert(offset, string)
       if (test(sb.toString, isDouble, isPercent)) super.insertString(fb, offset, string, attr)
-      else {
-        // warn the user and don't allow the insert
-        println("insertString test failed. removing new char")
-        Toolkit.getDefaultToolkit.beep
-      }
+      else { Toolkit.getDefaultToolkit.beep }
     }
 
     private def test(text: String, isDouble: Boolean, isPercent: Boolean) = try {
-      println("in test")
-
       if (isDouble) {
         val input = text.toDouble
         if (isPercent) {
@@ -376,59 +340,40 @@ class SMTGUI extends DecisionEngineGUI {
       }
     } catch {
       case e: Throwable =>
-        println("EXCEPTION: " + e.getMessage)
         false
     }
 
     @throws[BadLocationException]
     override def replace(fb: DocumentFilter.FilterBypass, offset: Int, length: Int, text: String, attrs: AttributeSet): Unit = {
-      println("in replace")
       val doc = fb.getDocument
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.replace(offset, offset + length, text)
       if (test(sb.toString, isDouble, isPercent)) super.replace(fb, offset, length, text, attrs)
-      else {
-        Toolkit.getDefaultToolkit.beep
-      }
+      else { Toolkit.getDefaultToolkit.beep }
     }
 
     @throws[BadLocationException]
     override def remove(fb: DocumentFilter.FilterBypass, offset: Int, length: Int): Unit = {
-      println("in remove")
       val doc = fb.getDocument
       val sb = new StringBuilder
       sb.append(doc.getText(0, doc.getLength))
       sb.delete(offset, offset + length)
       if (sb.toString().length() == 0) super.replace(fb, offset, length, "", null)
       else if (test(sb.toString, isDouble, isPercent)) super.remove(fb, offset, length)
-      else {
-        Toolkit.getDefaultToolkit.beep
-      }
+      else { Toolkit.getDefaultToolkit.beep }
     }
   }
 
   //TODO - MAKE SETPLUGINROOT PRIVATE
-  def setPluginRoot(model: DataModel): Boolean = {
-    pluginInstance match {
-      case None => false
-      case Some(plugin) => {
-        //TODO - CHECK CONDITION BELOW!
-        if (plugin.loadModel(model, isSetToInt)) {
-          //  val newRoot = model.retrieve.get.asInstanceOf[Node[_, _]]
-        /*  maxDepthField.setText(newRoot.maxDepth.toString)
-          maxPhiField.setText(newRoot.maxPhi.toString)
-          maxSeqCntField.setText(newRoot.maxSeqCount.toString)
-          smoothingField.setText(newRoot.smoothing.toString)
-          priorField.setText(newRoot.prior.toString)*/
-          paramChanged = false
-          render
-          true
-        } else {
-          false
-        }
-      }
-    }
+  def setPluginRoot(model: DataModel): Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) =>
+      if (plugin.loadModel(model, isSetToInt)) {
+        paramChanged = false
+        render
+        true
+      } else { false }
   }
 
   def render = {
@@ -436,9 +381,7 @@ class SMTGUI extends DecisionEngineGUI {
     renderRoot
   }
 
-  def clearText = {
-    outputTxtA.setText("")
-  }
+  def clearText = { outputTxtA.setText("") }
 
   def appendText(str: String) = {
     outputTxtA.append("\n " + str)
@@ -450,7 +393,6 @@ class SMTGUI extends DecisionEngineGUI {
   private class SMTBtnListener extends ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       val btnLabel = e.getActionCommand
-      println("SMT GUI button pressed: " + btnLabel)
       btnLabel match {
         case "Learn" => learnHandler
         case "Classify" => classifyValidateHandler(isClassify = true)
@@ -462,7 +404,7 @@ class SMTGUI extends DecisionEngineGUI {
     }
 
     private def learnHandler = {
-      //check again in case conditions changed
+      //double-check in case conditions changed
       if (canLearn) {
         if (hasRoot) {
           if (paramChanged && !compareParams) {
@@ -476,32 +418,25 @@ class SMTGUI extends DecisionEngineGUI {
                 showError("An error occurred during SMT root initialisation!", "Error")
               }
             }
-
           } else {
-            println("learnHandler: params have not changed. setting learnFlag in plugin")
            setFlag("learn")
           }
         } else {
-          println("learnHandler: SMTPlugin -> no root set. creating new root")
           //no root set - learn btn active so SMT params must have been set manually
           if(addNewRoot){
-            println("new root set. setting learnflag.")
             appendText("New SMT root set: " + pluginInstance.get.getModel().get.retrieve().get.asInstanceOf[Node[_,_]])
             setFlag("learn")
-          }else{
-            showError("An error occurred during SMT root initialisation!", "Error")
-          }
+          }else{ showError("An error occurred during SMT root initialisation!", "Error") }
         }
-      } else {
-        showError("An error occurred. Cannot train SMT!", "Error")
-      }
+      } else { showError("An error occurred. Cannot train SMT!", "Error") }
       render
     }
 
     private def classifyValidateHandler(isClassify: Boolean) = {
       if(canClassify){
         if(paramChanged && !compareParams){
-          val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+          val response = JOptionPane.showConfirmDialog(null, "A trained SMT root is already set with different parameters. If you overwrite it, the new root will need to be trained before used for classification! Would you like to overwrite the current root?",
+            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 
           if (response == JOptionPane.YES_OPTION) {
             if(addNewRoot){
@@ -512,7 +447,6 @@ class SMTGUI extends DecisionEngineGUI {
           }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
           else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
         }else{
-          println("classifyHandler: params have not changed. setting classifyFlag in plugin")
           pluginInstance.get.setThreshold(thresholdField.getText().toDouble)
           pluginInstance.get.setTolerance(toleranceField.getText().toDouble)
           if(isClassify)
@@ -526,16 +460,12 @@ class SMTGUI extends DecisionEngineGUI {
       render
     }
 
-    private def addNewRoot: Boolean = {
-      println("in addnewRoot")
-      createPluginRoot match {
-        case None => showError("An error occurred during SMT root initialisation!", "Error"); false
-        case Some(node) =>
-          println("created new root. setting new root for plugin")
-          val dm = new DataModel
-          dm.store(node)
-          setPluginRoot(dm)
-      }
+    private def addNewRoot: Boolean = createPluginRoot match {
+      case None => showError("An error occurred during SMT root initialisation!", "Error"); false
+      case Some(node) =>
+        val dm = new DataModel
+        dm.store(node)
+        setPluginRoot(dm)
     }
 
     private def setFlag(flag: String) = {
@@ -553,7 +483,6 @@ class SMTGUI extends DecisionEngineGUI {
 
     private def compareParams(): Boolean = {
       val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
-
       maxDepthField.getText.toInt.equals(root.maxDepth) &&
       maxPhiField.getText.toInt.equals(root.maxPhi) &&
       maxSeqCntField.getText.toInt.equals(root.maxSeqCount) &&
@@ -573,38 +502,25 @@ class SMTGUI extends DecisionEngineGUI {
                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
 
              if (response == JOptionPane.YES_OPTION) {
-               //load new model here!
                setFlag("loadModel")
              }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
              else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
          }
        }
-
-     } else{
-       showError("An error occurred. Cannot load SMT model!", "Error")
-     }
+     } else{ showError("An error occurred. Cannot load SMT model!", "Error") }
       render
     }
 
     private def saveSMTHandler() = {
-      if(canSaveModel){
-        setFlag("saveModel")
-      }else{
-        showError("An error occurred. Cannot save SMT model!", "Error")
-      }
+      if(canSaveModel) setFlag("saveModel") else showError("An error occurred. Cannot save SMT model!", "Error")
     }
 
     private def saveReportHandler() = {
-      if(canSaveReport){
-        setFlag("saveReport")
-      }else {
-        showError("An error occurred. Cannot save last report!", "Error")
-      }
+      if(canSaveReport) setFlag("saveReport") else showError("An error occurred. Cannot save last report!", "Error")
     }
 
     private def showError(txt: String, title: String) = {
       JOptionPane.showMessageDialog(new JPanel, txt, title, JOptionPane.ERROR_MESSAGE)
     }
   }
-
 }
