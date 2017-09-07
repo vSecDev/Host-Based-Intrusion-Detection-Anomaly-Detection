@@ -2,11 +2,9 @@ package DecisionEngine
 
 import java.io.File
 import java.util.{Observable, Observer}
-
 import Data.{DataModel, DataWrapper}
 import GUI.HIDS
 
-//trait DecisionEnginePlugin extends Observable with Observer {
 trait DecisionEnginePlugin extends Observer{
 
   val pluginName: String

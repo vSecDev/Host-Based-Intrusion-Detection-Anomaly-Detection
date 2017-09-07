@@ -8,7 +8,8 @@ trait DecisionEngineGUI {
   var pluginInstance: Option[T]
 
   def isSetToInt: Boolean
-  def getGUIComponent: Option[JPanel]
-  def setPluginInstance(plugin: T): Unit = this.pluginInstance = Some(plugin)
 
+  def getGUIComponent: Option[JPanel]
+
+  def setPluginInstance(plugin: T): Unit = this.pluginInstance = Some(plugin)
 }
