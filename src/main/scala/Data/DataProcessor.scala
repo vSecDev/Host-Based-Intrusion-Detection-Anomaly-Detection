@@ -1,9 +1,7 @@
 package Data
 
 import java.io.File
-
 import DecisionEngine.DecisionEngineReport
-
 import scala.collection.mutable
 
 trait DataProcessor {

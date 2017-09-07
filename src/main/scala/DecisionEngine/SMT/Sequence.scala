@@ -1,15 +1,13 @@
 package DecisionEngine.SMT
 
-import sun.nio.cs.ext.DoubleByteEncoder
-
-import scala.collection.mutable.Map
 import java.io._
+import scala.collection.mutable.Map
 
 @SerialVersionUID(666L)
 class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior: Double) extends Serializable {
 
   var smoothing: Double = -1.0
-  var prior = -1.0
+  var prior: Double = -1.0
   var weight: Double = 1.0
   private var condition: Vector[A] = Vector[A]()
   private var eventCount: Int = 0
@@ -46,7 +44,6 @@ class Sequence[A,B](_condition: Vector[A], _event: B, _smoothing: Double, _prior
 
   def getEventCount: Int = eventCount
 
-  //TODO MAKE THIS PRIVATE OR CONTROL ACCESS
   def getEvents: Map[B, Int] = events
 
   def getPredictions: Map[B, Double] = {
