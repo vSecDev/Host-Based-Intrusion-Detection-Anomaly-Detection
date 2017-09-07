@@ -2,22 +2,20 @@ package Data.File
 
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
-
 import Data._
 import DecisionEngine.DecisionEngineReport
 import org.apache.commons.io.{FileUtils, FilenameUtils}
-
 import scala.collection.mutable
 
 class FileProcessor extends DataProcessor {
 
   override def configure(): Unit = {}
 
-  //TODO - FIX EXCEPTION HANDLING - Lock resources!
-
   @throws(classOf[DataException])
   def processNew(f: File, target: File, map: mutable.Map[String, Int], delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
-    if (!checkFiles(f) || !checkDirs(target)) { return None }
+    if (!checkFiles(f) || !checkDirs(target)) {
+      return None
+    }
     val data = getData(f, extensions)
     try {
       data match {
@@ -48,14 +46,12 @@ class FileProcessor extends DataProcessor {
 
   @throws(classOf[DataException])
   override def preprocess(source: File, target: File, delimiters: Array[String], extensions: Array[String]): Option[mutable.Map[String, Int]] = {
-    if(!checkDirs(source, target)) return None
+    if (!checkDirs(source, target)) return None
     try {
       clearDir(target)
-
       var sysCallSet = mutable.Set[String]()
       var sysCallMap = mutable.Map[String, Int]()
       fileStreamNoDirs(source, extensions).foreach(f => sysCallSet = fileToSet(f, sysCallSet, delimiters))
-      //sysCallMap = sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }.toMap
       sysCallMap ++= sysCallSet.zipWithIndex.map { case (v, i) => (v, i + 1) }
 
       fileStream(source).foreach(f => {
@@ -105,7 +101,9 @@ class FileProcessor extends DataProcessor {
         ws = ws :+ wrapper
       })
       Some(ws)
-    } else { None }
+    } else {
+      None
+    }
   }
 
   @throws(classOf[DataException])
@@ -128,28 +126,26 @@ class FileProcessor extends DataProcessor {
 
   @throws(classOf[DataException])
   override def saveReport(report: DecisionEngineReport, target: File): Boolean = {
-    println("report class: " + report.getReport().get.getClass.getName)
     val bw = new BufferedWriter(new FileWriter(target))
-    try{
-      //bw.write(report.getReport().get.toString())
+    try {
       bw.write(report.toString())
       bw.close()
       true
-    }catch{
+    } catch {
       case t: Throwable => throw new DataException("DataException thrown during saving the report!", t)
-    }finally{
+    } finally {
       bw.close()
       false
     }
   }
 
-  private def checkDirs(dirs: File*): Boolean ={
-    dirs.foreach(f => if(!f.exists || !f.isDirectory) return false)
+  private def checkDirs(dirs: File*): Boolean = {
+    dirs.foreach(f => if (!f.exists || !f.isDirectory) return false)
     true
   }
 
   private def checkFiles(files: File*): Boolean = {
-    files.foreach(f => if(!f.exists || !f.isFile) return false)
+    files.foreach(f => if (!f.exists || !f.isFile) return false)
     true
   }
 
@@ -172,7 +168,6 @@ class FileProcessor extends DataProcessor {
       Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream).map {
         files => files.append(files.filter(_.isDirectory).flatMap(fileStream))
       } getOrElse {
-        //println("exception: dir cannot be listed: " + dir.getPath)
         Stream.empty
       }
     } catch {
@@ -183,7 +178,7 @@ class FileProcessor extends DataProcessor {
     try {
       Option(dir.listFiles).map(_.toList.sortBy(_.getName).toStream.partition(_.isDirectory))
         .map { case (dirs, files) =>
-          files.filter(f => checkExtension(f,extensions)).append(dirs.flatMap(fileStreamNoDirs(_,extensions)))
+          files.filter(f => checkExtension(f, extensions)).append(dirs.flatMap(fileStreamNoDirs(_, extensions)))
         } getOrElse {
         Stream.empty
       }
@@ -191,6 +186,7 @@ class FileProcessor extends DataProcessor {
       case se: SecurityException => throw new DataException("SecurityException thrown during processing source files.", se)
     }
 
+  @throws(classOf[DataException])
   private def fileToSet(f: File, set: mutable.Set[String], delimiters: Array[String] = Array("\\s")): mutable.Set[String] = {
     try {
       val source = scala.io.Source.fromFile(f)
