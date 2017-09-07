@@ -1,16 +1,13 @@
 package DecisionEngine.SMT
 
-import java.io.File
 import java.util.Observable
-
-import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
+import Data.{DataModel, DataWrapper, StringDataWrapper}
 import DecisionEngine.{DecisionEngineConfig, DecisionEngineGUI, DecisionEnginePlugin, DecisionEngineReport}
 import GUI.HIDS
 
 /**
   * Created by apinter on 08/08/2017.
   */
-//TODO REFACTOR TO AVOID REPETITION OF CODE!
 class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   override val pluginName: String = "Sparse Markov Tree"
@@ -130,21 +127,20 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       case Some(report: SMTReport) =>
         gui.appendText("Validation completed!")
         val vReport = new SMTValidationReport(report)
-        println("in validate. vReport class: " + vReport.getClass.getName)
         resetValidate
         lastReport = Some(vReport)
         gui.appendText(vReport.toString)
         gui.render
         Some(vReport)
     }
-}
+  }
 
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
 
-    if(!validateFlag)
+    if (!validateFlag)
       gui.appendText("Classifying input...")
 
-    if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty){
+    if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) {
       gui.appendText("No data to process or threshold or tolerance not set...")
       resetClassify
       return None
@@ -158,10 +154,10 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
             None //No model/SMT to classify with
           case Some(node) =>
             val report = classifyHelper(data, node, ints)
-            if(!validateFlag){
-              if(report.isEmpty){
+            if (!validateFlag) {
+              if (report.isEmpty) {
                 gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
-              }else {
+              } else {
                 gui.appendText("Classification completed!\n" + report.get.toString)
                 lastReport = report
                 gui.render
@@ -178,10 +174,10 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
           case Some(m) => m match {
             case node: Node[_, _] =>
               val report = classifyHelper(data, node, ints)
-              if(!validateFlag){
-                if(report.isEmpty){
+              if (!validateFlag) {
+                if (report.isEmpty) {
                   gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
-                }else {
+                } else {
                   gui.appendText("Classification completed!\n" + report.get.toString)
                   lastReport = report
                   gui.render
@@ -223,13 +219,11 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   override def saveModel: Option[DataModel] = {
     resetSaveModel
-    println("in savemodel. after reset: " + saveModelFlag)
     getModel
   }
 
   override def saveReport: Option[DecisionEngineReport] = {
     resetSaveReport
-    println("in savereport. after reset: " + saveReportFlag)
     lastReport
   }
 
@@ -267,7 +261,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         case Some(d) =>
           if (d._2.nonEmpty) {
             gui.appendText("Processing " + d._1)
-            //if (ints && isIntRoot) {
             if (ints && isIntRoot) {
               //process as int trace
               for (t <- getIntInput(node.maxDepth, d._2)) {
@@ -287,7 +280,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     })
     val dm = new DataModel
     dm.store(node)
-  //  resetLearn
     Some(dm)
   }
 
@@ -345,7 +337,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       }
       case _ => //Handle other types of wrappers in future extensions here!
     })
-   // resetClassify
     if (report.getTraceReports.isEmpty) None else Some(report)
   }
 
@@ -378,11 +369,11 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   private def resetValidate = validateFlag = false
 
-  private def resetLoadModel = loadModelFlag =  false
+  private def resetLoadModel = loadModelFlag = false
 
-  private def resetSaveModel = saveModelFlag =  false
+  private def resetSaveModel = saveModelFlag = false
 
-  private def resetSaveReport = saveReportFlag =  false
+  private def resetSaveReport = saveReportFlag = false
 
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
@@ -391,7 +382,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   }
 
   //TODO - SETINTROOT WILL BE DELETED OR MADE PRIVATE => TEST FROM UI
-  def setIntRoot(int: Boolean): Unit ={
+  def setIntRoot(int: Boolean): Unit = {
     isIntRoot = int
   }
 
