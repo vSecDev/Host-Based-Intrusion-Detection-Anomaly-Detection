@@ -21,5 +21,6 @@ trait DataProcessor {
   @throws(classOf[DataException])
   def loadModel(model: DataModel, source: File): Option[DataModel]
 
+  @throws(classOf[DataException])
   def saveReport(report: DecisionEngineReport, target: File): Boolean
 }
