@@ -8,25 +8,23 @@ import DecisionEngine.DecisionEngineGUI;
 import DecisionEngine.DecisionEnginePlugin;
 import DecisionEngine.DecisionEngineReport;
 import javafx.util.Pair;
-import org.apache.commons.io.FilenameUtils;
 import scala.Option;
 import scala.collection.immutable.Vector;
-
 import javax.swing.*;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
 
-//public class HIDS extends Observable implements Observer {
 public class HIDS extends Observable implements Observer {
 
     private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
@@ -42,8 +40,6 @@ public class HIDS extends Observable implements Observer {
     private File source = null;
     private File target = null;
 
-    //Observed field in DEs
-
     //GUI
     private final JFrame frame = new JFrame("HIDS");
     private final JButton sourceBtn = new JButton("Source");
@@ -52,7 +48,6 @@ public class HIDS extends Observable implements Observer {
     private final JLabel sourcePathL = new JLabel();
     private final JLabel targetPathL = new JLabel();
     private final JFileChooser fc = new JFileChooser();
-
 
     public File getSource() {
         return source;
@@ -95,19 +90,8 @@ public class HIDS extends Observable implements Observer {
         HIDS hids = new HIDS();
         hids.loadProperties(configPath);
         if (!(hids.moduleInit() && hids.extensionsInit() && hids.delimitersInit())) {
-            System.out.println("here");
             hids.showError("An error occurred during initialisation!", "Error");
-            //JOptionPane.showMessageDialog(new JPanel(), "An error occurred during initialisation!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-
-        for (String s : hids.getExtensions()) {
-            System.out.println("extension:{" + s + "}");
-        }
-        for (String s : hids.getDelimiters()) {
-            System.out.println("delimiter:{" + s + "}");
-        }
-
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -117,7 +101,6 @@ public class HIDS extends Observable implements Observer {
     }
 
     private boolean moduleInit() {
-        //Properties props = this.loadProperties(configPath);
         if (props != null) {
             if (loadModules(this, props, "dePlugin") &&
                     loadModules(this, props, "dataModule")) {
@@ -139,7 +122,6 @@ public class HIDS extends Observable implements Observer {
                 setExtensions(props.getProperty("extensions").trim().split("\\s*,\\s*"));
                 return getExtensions() != null && getExtensions().length > 0;
             } catch (NullPointerException e) {
-                e.printStackTrace();
                 return false;
             }
         }
@@ -155,7 +137,6 @@ public class HIDS extends Observable implements Observer {
                 setDelimiters(delimiters.toArray(list2));
                 return getDelimiters() != null && getDelimiters().length > 0;
             } catch (NullPointerException e) {
-                e.printStackTrace();
                 return false;
             }
         }
@@ -163,7 +144,6 @@ public class HIDS extends Observable implements Observer {
     }
 
     private Properties loadProperties(String path) {
-        //Properties prop = new Properties();
         props = new Properties();
         InputStream input = null;
         try {
@@ -171,20 +151,19 @@ public class HIDS extends Observable implements Observer {
             props.load(input);
             return props;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            showError("An error occurred during initialisation!", "Error");
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    showError("An error occurred during initialisation!", "Error");
                 }
             }
         }
         return null;
     }
 
-    //TODO - EXCEPTION HANDLING!!!
     private boolean loadModules(HIDS hids, Properties props, String propName) {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
@@ -226,7 +205,6 @@ public class HIDS extends Observable implements Observer {
             }
             return false;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -249,7 +227,6 @@ public class HIDS extends Observable implements Observer {
             Constructor<?> ctor = c.getConstructor(classArr);
             return new Pair<>(ctor, objArr);
         } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -262,36 +239,22 @@ public class HIDS extends Observable implements Observer {
         ((JComponent)frame.getContentPane()).setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         frame.getContentPane().setBackground(new Color(240,248,255));
 
-
-
-
         JPanel buttonP = new JPanel();
         buttonP.setLayout(new BoxLayout(buttonP, BoxLayout.Y_AXIS));
-
         BtnListener listener = new BtnListener();
         buttonP.add(setupBtn(sourceBtn, sourcePathL, true, listener));
         buttonP.add(setupBtn(targetBtn, targetPathL, true, listener));
         buttonP.add(setupBtn(preProcBtn, null, false, listener));
-        buttonP.setBorder(BorderFactory.createLineBorder(Color.black));
-
-
         buttonP.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
         frame.getContentPane().add(buttonP, BorderLayout.NORTH);
-
         renderBtns();
 
         Option<DecisionEngineGUI> de = currentDecisionEngine.getGUI();
-
-
         if (de.nonEmpty()) {
             frame.getContentPane().add(de.get().getGUIComponent().get(), BorderLayout.CENTER);
         }
-
-
-
-
         frame.pack();
         frame.setVisible(true);
     }
@@ -304,9 +267,7 @@ public class HIDS extends Observable implements Observer {
                 currentDataModule != null);
     }
 
-    private void renderBtns() {
-        preProcBtn.setEnabled(canPreProcess());
-    }
+    private void renderBtns() { preProcBtn.setEnabled(canPreProcess()); }
 
     private Container setupBtn(JButton btn, JLabel label, Boolean hasField, BtnListener listener) {
         Container cnt = new Container();
@@ -320,9 +281,7 @@ public class HIDS extends Observable implements Observer {
         return cnt;
     }
 
-    private void showError(String txt, String title) {
-        JOptionPane.showMessageDialog(new JPanel(), txt, title, JOptionPane.ERROR_MESSAGE);
-    }
+    private void showError(String txt, String title) { JOptionPane.showMessageDialog(new JPanel(), txt, title, JOptionPane.ERROR_MESSAGE); }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -350,15 +309,6 @@ public class HIDS extends Observable implements Observer {
                         } else if (action.equals("validate")) {
                             handleValidate(input.get(), none, isInt);
                         }
-
-                       /* Option<DataModel> trainedModel = currentDecisionEngine.learn(input.get(), none, isInt);
-                        if (trainedModel.isEmpty()) {
-                            System.out.println("empty model returned after learning");
-                        } else {
-                            System.out.println("--- add code to save returned model!");
-                        }*/
-
-
                     }
                 } else {
                     Option<DataWrapper> in = currentDataModule.getData(source, extensions);
@@ -379,17 +329,7 @@ public class HIDS extends Observable implements Observer {
                         } else if (action.equals("validate")) {
                             handleValidate(input, none, isInt);
                         }
-
-
-                        /*Option<DataModel> trainedModel = currentDecisionEngine.learn(input, none, isInt);
-                        if (trainedModel.isEmpty()) {
-                            System.out.println("empty model returned after learning");
-                        } else {
-                            System.out.println("--- add code to save returned model!");
-                        }*/
                     }
-
-
                 }
             }
         } else if (action.equals("loadModel")) {
@@ -412,51 +352,30 @@ public class HIDS extends Observable implements Observer {
     }
 
     private Option<DataModel> handleLearn(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt) {
-        Option<DataModel> trainedModel = currentDecisionEngine.learn(input, model, isInt);
-        if (trainedModel.isEmpty()) {
-            System.out.println("empty model returned after learning");
-        } else {
-            System.out.println("--- add code to save returned model!");
-
-        }
-        return trainedModel;
+        return currentDecisionEngine.learn(input, model, isInt);
     }
 
     private Option<DecisionEngineReport> handleClassify(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt){
-        System.out.println("handleClassify. is input empty: " + input.isEmpty());
-        Option<DecisionEngineReport> report = currentDecisionEngine.classify(input, model, isInt);
-        if(report.isEmpty()){
-            System.out.println("no DE report is returned!");
-        }else{
-            System.out.println("--- add code to save returned classify report!");
-        }
-        return report;
+        return currentDecisionEngine.classify(input, model, isInt);
     }
 
     private Option<DecisionEngineReport> handleValidate(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt){
-        System.out.println("handleValidate. is input empty: " + input.isEmpty());
-        Option<DecisionEngineReport> report = currentDecisionEngine.validate(input, model, isInt);
-        if(report.isEmpty()){
-            System.out.println("no DE report is returned!");
-        }else{
-            System.out.println("--- add code to save returned validate report!");
-        }
-        return report;
+        return currentDecisionEngine.validate(input, model, isInt);
     }
 
-    private void handleLoadModel(){
+    private void handleLoadModel() {
         DataModel dm = new DataModel();
         try {
             Option<DataModel> dmo = currentDataModule.loadModel(dm, source);
-            if(dmo.isEmpty()){
+            if (dmo.isEmpty()) {
                 showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
-            }else{
+            } else {
                 dm = dmo.get();
-                if(!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())){
+                if (!currentDecisionEngine.loadModel(dm, currentDecisionEngine.getGUI().get().isSetToInt())) {
                     showError("The Decision Engine could not load the model!", "Error");
                 }
             }
-        }catch(DataException de){
+        } catch (DataException de) {
             showError("An error occurred during 'Load Model' request processing.\nNo model was returned by the Data Processor module.", "Error");
         }
     }
@@ -522,7 +441,6 @@ public class HIDS extends Observable implements Observer {
         }
 
         private void srcTargetBtnHandler(String btnLabel) {
-
             String currDir = "...";
             try {
                 if (btnLabel.equals("Source") && (getSource() != null)) {
@@ -533,7 +451,6 @@ public class HIDS extends Observable implements Observer {
 
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int returnVal = fc.showOpenDialog(HIDS.this.frame);
-
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     if (btnLabel.equals("Source")) {
@@ -550,20 +467,16 @@ public class HIDS extends Observable implements Observer {
                             HIDS.this.setTarget(file);
                             targetPathL.setText(file.getCanonicalPath());
                         }
-
-                    }} else {
-                        //TODO - DELETE BELOW
-                        System.out.println("source but not Approve Option.");
                     }
-                } catch(IOException e){
-                    if (btnLabel.equals("Source")) {
-                        sourcePathL.setText(currDir);
-                    } else if (btnLabel.equals("Target")) {
-                        targetPathL.setText(currDir);
-                    }
-                    e.printStackTrace();
                 }
-
+            } catch (IOException e) {
+                if (btnLabel.equals("Source")) {
+                    sourcePathL.setText(currDir);
+                } else if (btnLabel.equals("Target")) {
+                    targetPathL.setText(currDir);
+                }
+                //e.printStackTrace();
+            }
         }
 
         private void preProcessHandler() {
