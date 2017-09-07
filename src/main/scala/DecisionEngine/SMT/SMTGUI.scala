@@ -261,6 +261,11 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) => plugin.target.isDefined && plugin.target.get.isDirectory && plugin.isTrained
   }
 
+  private def canSaveReport: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) => plugin.target.isDefined && plugin.target.get.isDirectory && plugin.hasReport
+  }
+
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String, listener: ActionListener) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
@@ -296,7 +301,7 @@ class SMTGUI extends DecisionEngineGUI {
     validateBtn.setEnabled(canClassify)
     loadModelBtn.setEnabled(canLoadModel)
     saveModelBtn.setEnabled(canSaveModel)
-    //saveReportBtn.setEnabled(canSaveReport)
+    saveReportBtn.setEnabled(canSaveReport)
   }
   private def renderRoot = {
     if(hasRoot){
@@ -452,6 +457,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "Validate" => classifyValidateHandler(isClassify = false)
         case "Load SMT" => loadSMTHandler
         case "Save SMT" => saveSMTHandler
+        case "Save report" => saveReportHandler
       }
     }
 
@@ -539,6 +545,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "validate" => pluginInstance.get.setValidateFlag
         case "loadModel" => pluginInstance.get.setLoadModelFlag
         case "saveModel" => pluginInstance.get.setSaveModelFlag
+        case "saveReport" => pluginInstance.get.setSaveReportFlag
         case _ =>
       })
       thread.start
@@ -584,6 +591,14 @@ class SMTGUI extends DecisionEngineGUI {
         setFlag("saveModel")
       }else{
         showError("An error occurred. Cannot save SMT model!", "Error")
+      }
+    }
+
+    private def saveReportHandler() = {
+      if(canSaveReport){
+        setFlag("saveReport")
+      }else {
+        showError("An error occurred. Cannot save last report!", "Error")
       }
     }
 

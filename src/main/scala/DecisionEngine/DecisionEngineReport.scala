@@ -7,4 +7,6 @@ trait DecisionEngineReport {
   type T
 
   def getReport(): Option[T]
+
+  def getReportName(): Option[String]
 }

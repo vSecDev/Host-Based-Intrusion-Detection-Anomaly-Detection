@@ -8,9 +8,16 @@ import DecisionEngine.DecisionEngineReport
   */
 class SMTValidationReport(report: SMTReport) extends DecisionEngineReport{
 
+  private val id = SMTValidationReport.inc
   private val df: DecimalFormat = new DecimalFormat("##.##")
+
   override type T = SMTReport
+
   override def getReport(): Option[SMTReport] = Some(report)
+
+  override def getReportName(): Option[String] = Some(getID.toString)
+
+  def getID = id
 
   def classificationError = report.anomalyPercentage
 
@@ -30,4 +37,9 @@ class SMTValidationReport(report: SMTReport) extends DecisionEngineReport{
   private def sensitivityStr = df.format(sensitivity.toDouble)
 
   override def toString: String = report.toString + "\nClassification error: " + classErrorStr + " = Sensitivity: " + sensitivityStr
+}
+
+object SMTValidationReport{
+  private var id = 0
+  private def inc = {id+= 1; id}
 }

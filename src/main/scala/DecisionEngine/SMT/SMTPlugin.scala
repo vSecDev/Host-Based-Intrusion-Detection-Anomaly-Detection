@@ -19,14 +19,15 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   private var isIntRoot: Boolean = false
   private var threshold: Option[Double] = None
   private var tolerance: Option[Double] = None
+  private var lastReport: Option[DecisionEngineReport] = None
   private var learnFlag: Boolean = false
   private var classifyFlag: Boolean = false
   private var validateFlag: Boolean = false
   private var loadModelFlag: Boolean = false
   private var saveModelFlag: Boolean = false
+  private var saveReportFlag: Boolean = false
 
   gui.setPluginInstance(this)
-  //registerHIDS(hids)
 
   override def registerHIDS(hids: HIDS): Boolean = {
     currHIDS = Some(hids)
@@ -129,8 +130,10 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       case Some(report: SMTReport) =>
         gui.appendText("Validation completed!")
         val vReport = new SMTValidationReport(report)
-        gui.appendText(vReport.toString)
         resetValidate
+        lastReport = Some(vReport)
+        gui.appendText(vReport.toString)
+        gui.render
         Some(vReport)
     }
 }
@@ -159,6 +162,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                 gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
               }else {
                 gui.appendText("Classification completed!\n" + report.get.toString)
+                lastReport = report
+                gui.render
               }
             }
             resetClassify
@@ -177,6 +182,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                   gui.appendText("Classification completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
                 }else {
                   gui.appendText("Classification completed!\n" + report.get.toString)
+                  lastReport = report
+                  gui.render
                 }
               }
               resetClassify
@@ -213,6 +220,18 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       Some(dm)
   }
 
+  override def saveModel: Option[DataModel] = {
+    resetSaveModel
+    println("in savemodel. after reset: " + saveModelFlag)
+    getModel
+  }
+
+  override def saveReport: Option[DecisionEngineReport] = {
+    resetSaveReport
+    println("in savereport. after reset: " + saveReportFlag)
+    lastReport
+  }
+
   override def getModelName: Option[String] = root match {
     case None => None
     case Some(node) =>
@@ -222,6 +241,22 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
           node.maxSeqCount.toString + "_" +
           node.smoothing.toString + "_" +
           node.prior.toString)
+  }
+
+
+  override def getReportName: Option[String] = root match {
+    case None => None
+    case Some(node) =>
+      lastReport match {
+        case None => None
+        case Some(r) =>
+          var name = node.maxDepth.toString + "_" +
+            node.maxPhi.toString + "_" +
+            node.maxSeqCount.toString + "_" +
+            node.smoothing.toString + "_" +
+            node.prior.toString + "_REPORT_" + r.getReportName.get
+          Some(name)
+      }
   }
 
   private def learnHelper(data: Vector[DataWrapper], node: Node[_, _], ints: Boolean): Option[DataModel] = {
@@ -346,6 +381,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   private def resetSaveModel = saveModelFlag =  false
 
+  private def resetSaveReport = saveReportFlag =  false
+
   private def setRoot(node: Node[_, _], isInt: Boolean) = {
     root = Some(node)
     isIntRoot = isInt
@@ -395,10 +432,18 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("saveModel")
   }
 
+  def setSaveReportFlag: Unit = {
+    saveReportFlag = true
+    setChanged
+    notifyObservers("saveReport")
+  }
+
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def isTrained: Boolean = root match {
     case None => false
     case Some(x: Node[_, _]) => x.getChildren.nonEmpty
   }
+
+  def hasReport: Boolean = lastReport.nonEmpty
 }

@@ -2,8 +2,11 @@ package Data.File
 
 import java.io.{BufferedWriter, File, FileWriter, IOException}
 import java.nio.file.{Files, Paths}
+
 import Data._
+import DecisionEngine.DecisionEngineReport
 import org.apache.commons.io.{FileUtils, FilenameUtils}
+
 import scala.collection.mutable
 
 class FileProcessor extends DataProcessor {
@@ -120,6 +123,21 @@ class FileProcessor extends DataProcessor {
       dm.deserialise(source)
     } catch {
       case de: DataException => throw de
+    }
+  }
+
+  @throws(classOf[DataException])
+  override def saveReport(report: DecisionEngineReport, target: File): Boolean = {
+    val bw = new BufferedWriter(new FileWriter(target))
+    try{
+      bw.write(report.getReport().get.toString())
+      bw.close()
+      true
+    }catch{
+      case t: Throwable => throw new DataException("DataException thrown during saving the report!", t)
+    }finally{
+      bw.close()
+      false
     }
   }
 

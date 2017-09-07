@@ -23,14 +23,30 @@ trait DecisionEnginePlugin extends Observer{
   }
 
   def registerHIDS(hids: HIDS): Boolean
+
   def configure(config: DecisionEngineConfig): Boolean
+
   def getConfiguration: Option[DecisionEngineConfig]
+
   def getGUI: Option[DecisionEngineGUI]
+
   def isIntModel: Boolean
+
   def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] //model is optional (if passed, the model is further trained with additional training examples
+
   def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
+
   def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]
+
   def loadModel(model: DataModel, isInt: Boolean): Boolean
+
   def getModel: Option[DataModel]
+
+  def saveModel: Option[DataModel]
+
+  def saveReport: Option[DecisionEngineReport]
+
   def getModelName: Option[String]
+
+  def getReportName: Option[String]
 }

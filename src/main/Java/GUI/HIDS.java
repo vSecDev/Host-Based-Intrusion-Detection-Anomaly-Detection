@@ -332,7 +332,7 @@ public class HIDS extends Observable implements Observer {
                     source == null ||
                     extensions.length == 0 ||
                     delimiters.length == 0) {
-                showError("An error occurred during "+ action + " request processing", "Error");
+                showError("An error occurred during " + action + " request processing", "Error");
             } else {
                 if (source.isDirectory()) {
                     Option<Vector<DataWrapper>> input = currentDataModule.getAllData(source, extensions);
@@ -343,11 +343,11 @@ public class HIDS extends Observable implements Observer {
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
 
-                        if(action.equals("learn")){
+                        if (action.equals("learn")) {
                             handleLearn(input.get(), none, isInt);
-                        }else if(action.equals("classify")){
+                        } else if (action.equals("classify")) {
                             handleClassify(input.get(), none, isInt);
-                        }else if(action.equals("validate")){
+                        } else if (action.equals("validate")) {
                             handleValidate(input.get(), none, isInt);
                         }
 
@@ -372,11 +372,11 @@ public class HIDS extends Observable implements Observer {
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
 
-                        if(action.equals("learn")){
+                        if (action.equals("learn")) {
                             handleLearn(input, none, isInt);
-                        }else if(action.equals("classify")){
+                        } else if (action.equals("classify")) {
                             handleClassify(input, none, isInt);
-                        }else if(action.equals("validate")){
+                        } else if (action.equals("validate")) {
                             handleValidate(input, none, isInt);
                         }
 
@@ -392,17 +392,21 @@ public class HIDS extends Observable implements Observer {
 
                 }
             }
-        }else if(action.equals("loadModel")){
-            if (currentDataModule == null || source == null || source.isDirectory()){
+        } else if (action.equals("loadModel")) {
+            if (currentDataModule == null || source == null || source.isDirectory()) {
                 showError("An error occurred during 'Load Model' request processing.\nCheck if source is set and is a file!", "Error");
-            }else{
-              handleLoadModel();
+            } else {
+                handleLoadModel();
             }
-        }else if(action.equals("saveModel")){
-            if (currentDecisionEngine == null || currentDataModule == null || target == null || target.isFile()){
-                showError("An error occurred during 'Save Model' request processing.\nCheck if target is set and is a folder!", "Error");
-            }else{
-                handleSaveModel();
+        } else if (action.equals("saveModel") || action.equals("saveReport")) {
+            if (currentDecisionEngine == null || currentDataModule == null || target == null || target.isFile()) {
+                showError("An error occurred during 'Save' request processing.\nCheck if target is set and is a folder!", "Error");
+            } else {
+                if (action.equals("saveModel")) {
+                    handleSaveModel();
+                } else if (action.equals("saveReport")) {
+                    handleSaveReport();
+                }
             }
         }
     }
@@ -458,8 +462,8 @@ public class HIDS extends Observable implements Observer {
     }
 
     private void handleSaveModel() {
-        Option<DataModel> dm = currentDecisionEngine.getModel();
-        if (!dm.isEmpty()) {
+        Option<DataModel> dm = currentDecisionEngine.saveModel();
+        if (dm.nonEmpty()) {
             try {
                 Option<String> fileName = currentDecisionEngine.getModelName();
                 if (fileName.nonEmpty()) {
@@ -478,6 +482,30 @@ public class HIDS extends Observable implements Observer {
             }
         } else {
             showError("An error occurred during 'Save Model' request processing.\nNo model was returned by the Decision Engine.", "Error");
+        }
+    }
+
+    private void handleSaveReport() {
+        Option<DecisionEngineReport> der = currentDecisionEngine.saveReport();
+        if (der.nonEmpty()) {
+            try {
+                Option<String> fileName = currentDecisionEngine.getReportName();
+                if (fileName.nonEmpty()) {
+                    File targetFile = new File(target.getCanonicalPath() + "\\" + fileName.get() + ".IDR");
+                    if (currentDataModule.saveReport(der.get(), targetFile)) {
+                        JOptionPane.showMessageDialog(new JPanel(), "The report has been saved to disk!",
+                                "Information", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        showError("The Data Processor module could not save the report!", "Error");
+                    }
+                } else {
+                    showError("An error occurred during 'Save Report' request processing.", "Error");
+                }
+            } catch (DataException | IOException e) {
+                showError("The Data Processor module could not save the report!", "Error");
+            }
+        } else {
+            showError("An error occurred during 'Save Report' request processing.\nNo report was returned by the Decision Engine.", "Error");
         }
     }
 

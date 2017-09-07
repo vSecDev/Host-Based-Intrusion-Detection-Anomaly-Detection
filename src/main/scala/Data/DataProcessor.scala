@@ -1,6 +1,9 @@
 package Data
 
 import java.io.File
+
+import DecisionEngine.DecisionEngineReport
+
 import scala.collection.mutable
 
 trait DataProcessor {
@@ -18,4 +21,5 @@ trait DataProcessor {
   @throws(classOf[DataException])
   def loadModel(model: DataModel, source: File): Option[DataModel]
 
+  def saveReport(report: DecisionEngineReport, target: File): Boolean
 }
