@@ -175,7 +175,5 @@ class SMTReportTest extends FunSuite {
     assert(a(1).subtraceCnt == 3)
     assert(a(1).anomalyCnt == 2)
     assert(a(1).normalCount == 1)
-
   }
-
 }

@@ -1,20 +1,16 @@
 package DecisionEngine.SMT
 
 import java.io.{File, FileInputStream, FileOutputStream, IOException, InvalidClassException, NotSerializableException, ObjectInputStream, ObjectOutputStream, Serializable, StreamCorruptedException, _}
-
-import Data.File.FileProcessor
-import Data.{DataException, DataModel, StringDataWrapper}
+import Data.DataException
 import org.apache.commons.io.FilenameUtils
 import org.scalatest.Matchers._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
-
-import scala.collection.immutable.ListMap
 
 /**
   * Created by Case on 20/07/2017.
   */
 class SMTTest extends FunSuite with BeforeAndAfterAll {
-  val isHome = true
+  val isHome = false
   val isWindows = true
   val serializePathHome = "C:\\Users\\Case\\Documents\\Uni\\Project\\Datasets\\Serialised\\"
   var extensions = if (isWindows) Array("GHC") else Array("txt")
@@ -2499,7 +2495,3 @@ class SMTTest extends FunSuite with BeforeAndAfterAll {
     assert(plugin.validate(Vector(wrapper3, wrapper4), Some(dm), true).isEmpty)
   }*/
 }
-
-
-
-

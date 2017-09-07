@@ -1,7 +1,6 @@
 package DecisionEngine.SMT
 
 import org.scalatest.FunSuite
-//import NodeTest._
 
 /**
   * Created by Case on 02/07/2017.
