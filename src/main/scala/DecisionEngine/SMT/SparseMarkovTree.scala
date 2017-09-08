@@ -1,6 +1,7 @@
 package DecisionEngine.SMT
 
 import java.io._
+
 import scala.annotation.tailrec
 import scala.collection.mutable.Map
 
@@ -8,9 +9,12 @@ import scala.collection.mutable.Map
 @SerialVersionUID(667L)
 abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _smoothing: Double, private val _prior: Double) extends Serializable {
 
+  private val id = SparseMarkovTree.inc
   var smoothing: Double
   var prior: Double
   var weight: Double
+
+  def getID = id
 
   def getSmoothing: Double = smoothing
 
@@ -23,6 +27,11 @@ abstract class SparseMarkovTree[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: In
   def getWeight: Double = weight
 
   def setWeight(aWeight: Double): Unit = if (aWeight > 0.0) weight = aWeight else throw new IllegalStateException("SparseMarkovTree weight cannot be negative")
+}
+
+object SparseMarkovTree{
+  private var id = 0
+  private def inc = {id+= 1; id}
 }
 
 case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _smoothing: Double, private val _prior: Double) extends SparseMarkovTree(maxDepth, maxPhi, maxSeqCount, _smoothing, _prior) {
@@ -198,7 +207,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   override def toString: String = {
     val buf = new StringBuilder
-    buf ++= "Node\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+    buf ++= "-------\nID: " + getID + "\n Node\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
       if (children.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + children(i).size
