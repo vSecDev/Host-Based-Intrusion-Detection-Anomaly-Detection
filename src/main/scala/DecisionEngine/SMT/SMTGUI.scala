@@ -6,8 +6,9 @@ import javax.swing.border.EtchedBorder
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.{DefaultCaret, _}
 import javax.swing.{BorderFactory, Box, JFormattedTextField, JOptionPane, JScrollPane, _}
+
 import Data.DataModel
-import DecisionEngine.DecisionEngineGUI
+import DecisionEngine.{DecisionEngineGUI, DecisionEngineVisualiser}
 
 class SMTGUI extends DecisionEngineGUI {
 
@@ -61,6 +62,10 @@ class SMTGUI extends DecisionEngineGUI {
   private final val loadModelBtn = new JButton("Load SMT")
   private final val saveModelBtn = new JButton("Save SMT")
   private final val saveReportBtn = new JButton("Save report")
+
+  //VISUALISE
+  private final val visualiseBtn = new JButton("Display SMT")
+
 
   private final val outputTxtA = new JTextArea(30,134)
   private final val outputScrollP = new JScrollPane(outputTxtA)
@@ -141,6 +146,11 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(p3, loadModelBtn, loadModelBtn.getText, listener)
     setupButton(p3, saveModelBtn, saveModelBtn.getText, listener)
     setupButton(p3, saveReportBtn, saveReportBtn.getText, listener)
+
+    //VISUALISE
+    setupButton(p3, visualiseBtn, visualiseBtn.getText, listener)
+
+
     inputPanel.add(p3)
 
     //Output panel
@@ -246,6 +256,11 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) => plugin.target.isDefined && plugin.target.get.isDirectory && plugin.hasReport
   }
 
+  private def canVisualise: Boolean = pluginInstance match {
+    case None => false
+    case Some(plugin) => plugin.isTrained
+  }
+
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String, listener: ActionListener) = {
     panel.add(btn)
     btn.setActionCommand(btnTxt)
@@ -282,6 +297,10 @@ class SMTGUI extends DecisionEngineGUI {
     loadModelBtn.setEnabled(canLoadModel)
     saveModelBtn.setEnabled(canSaveModel)
     saveReportBtn.setEnabled(canSaveReport)
+
+    //VISUALISE
+    visualiseBtn.setEnabled(canVisualise)
+
   }
 
   private def renderRoot = {
@@ -400,6 +419,7 @@ class SMTGUI extends DecisionEngineGUI {
         case "Load SMT" => loadSMTHandler
         case "Save SMT" => saveSMTHandler
         case "Save report" => saveReportHandler
+        case "Display SMT" => displaySMTHandler
       }
     }
 
@@ -517,6 +537,21 @@ class SMTGUI extends DecisionEngineGUI {
 
     private def saveReportHandler() = {
       if(canSaveReport) setFlag("saveReport") else showError("An error occurred. Cannot save last report!", "Error")
+    }
+
+    private def displaySMTHandler() = {
+      //TODO - CODE BELOW TO TEST!
+      if(canVisualise){
+        val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser
+        visualiser match{
+          case None => showError("An error occurred. Cannot display the SMT model!", "Error")
+          case Some(vis) =>
+            vis.getVisualisation match {
+              case None => showError("An error occurred. Cannot display the SMT model!", "Error")
+              case Some(dialog) => dialog.setVisible(true)
+            }
+        }
+      } else { showError("An error occurred. Cannot display the SMT model!", "Error") }
     }
 
     private def showError(txt: String, title: String) = {

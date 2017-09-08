@@ -6,7 +6,7 @@ package DecisionEngine
 trait DecisionEngineReport {
   type T
 
-  def getReport(): Option[T]
+  def getReport: Option[T]
 
-  def getReportName(): Option[String]
+  def getReportName: Option[String]
 }

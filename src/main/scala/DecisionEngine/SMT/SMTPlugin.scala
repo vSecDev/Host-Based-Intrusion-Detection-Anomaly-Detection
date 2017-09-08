@@ -430,6 +430,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("saveReport")
   }
 
+  def getVisualiser: Option[SMTVisualiser] = ???
+
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 
   def isTrained: Boolean = root match {
