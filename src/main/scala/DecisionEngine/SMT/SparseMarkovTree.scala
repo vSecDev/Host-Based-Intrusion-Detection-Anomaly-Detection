@@ -191,6 +191,11 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
+  def toXML: String = {
+    val buf = new StringBuilder
+    ""
+  }
+
   override def toString: String = {
     val buf = new StringBuilder
     buf ++= "Node\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"

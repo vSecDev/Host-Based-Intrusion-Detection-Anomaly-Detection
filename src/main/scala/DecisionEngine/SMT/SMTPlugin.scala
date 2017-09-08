@@ -38,13 +38,17 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
         c.getSettings match {
           case None => false
           case Some(s) => if (s.isIntTrace) {
-            setRoot(new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = true)
+            val newRoot = new Node[Int, Int](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior)
+            newRoot.setKey(Int.MinValue)
+            setRoot(newRoot, isInt = true)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
             gui.render
             true
           } else {
-            setRoot(new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior), isInt = false)
+            val newRoot = new Node[String, String](s.maxDepth, s.maxPhi, s.maxSeqCount, s.smoothing, s.prior)
+            newRoot.setKey("Root")
+            setRoot(newRoot, isInt = false)
             setThreshold(s.threshold)
             setTolerance(s.tolerance)
             gui.render
@@ -430,7 +434,9 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("saveReport")
   }
 
-  def getVisualiser: Option[SMTVisualiser] = ???
+  def getVisualiser: Option[SMTVisualiser] = if(isTrained){
+    Some(new SMTVisualiser(root.get))
+  }else None
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined
 

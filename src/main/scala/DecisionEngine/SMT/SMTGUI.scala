@@ -211,20 +211,24 @@ class SMTGUI extends DecisionEngineGUI {
   private def createPluginRoot: Option[Node[_, _]] = {
     if (canCreateRoot) {
       if (intCheckBox.isSelected) {
-        Some(new Node[Int, Int](
+        val newNode = new Node[Int, Int](
           maxDepthField.getText.toInt,
           maxPhiField.getText.toInt,
           maxSeqCntField.getText.toInt,
           smoothingField.getText.toDouble,
-          priorField.getText.toDouble))
+          priorField.getText.toDouble)
+        newNode.setKey(Int.MinValue)
+        Some(newNode)
       } else {
         //TODO - EXTEND FOR OTHER NODE TYPES
-        Some(new Node[String, String](
+        val newNode = new Node[String, String](
           maxDepthField.getText.toInt,
           maxPhiField.getText.toInt,
           maxSeqCntField.getText.toInt,
           smoothingField.getText.toDouble,
-          priorField.getText.toDouble))
+          priorField.getText.toDouble)
+        newNode.setKey("Root")
+        Some(newNode)
       }
     } else return None
   }
