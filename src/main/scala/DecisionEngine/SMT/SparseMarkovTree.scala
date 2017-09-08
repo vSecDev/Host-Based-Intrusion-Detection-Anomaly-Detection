@@ -202,17 +202,60 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   def toXML(): String = {
 
-    val sb = new StringBuilder
-    val nodes: Vector[String] = Vector()
-    val edges: Vector[String] = Vector()
+    def helper(parent: Option[SparseMarkovTree[_<:A,_<:B]], phi:Int, nodes: Vector[String], edges: Vector[String]): (Vector[String], Vector[String]) = {
+      if(children.isEmpty){
 
-    helper(this, -1, nodes, edges)
+        (nodes :+ (getID.toString + ",Root,N"), edges)
+        //; println("nodes for untrained: " + nodes)
+
+      }  //untrained root, add to nodes, no edge to parent
+      else{
+        var newNodes: Vector[String] = Vector()
+        var newEdges: Vector[String] = Vector()
+        if(parent.isEmpty){
+          newNodes = nodes :+ (getID.toString + ",Root,N")
+
+        }  //trained root, add to nodes, no edge to parent
+        else {
+          //non-root node, add to nodes, add edge to parent
+          newNodes = nodes :+ (getID.toString + "," + getKey.toString + ",N")
+          newEdges = edges :+ (parent.get.getID.toString + "," + getID.toString + "," + phi.toString)
+        }
+
+        for(i <- 0 to maxPhi){
+          if(children.size > i){
+            children(i)(0) match {
+              case sl: SequenceList[A,B] =>
+                newNodes = newNodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL")
+                newEdges = newEdges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString)
+              case _: Node[A,B] =>
+                val ns = children(i)
+                for(n <- ns){
+                  val newVars = helper(Some(n), i, newNodes, newEdges)
+                  newNodes = newVars._1
+                  newEdges = newVars._2
+                }
+            }
+          }
+        }
+        (newNodes, newEdges)
+      }
+    }
+
+    val sb = new StringBuilder
+    var nodes: Vector[String] = Vector()
+    var edges: Vector[String] = Vector()
+
+    val nodesEdges = helper(Some(this), -1, nodes, edges)
+    nodes = nodesEdges._1
+    edges = nodesEdges._2
 
     sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
 
     for(n <- nodes){
+      println("processing node")
       val nvs = n.split(",")
-      sb ++= "<node id=\"" + vs(0) + "\">\n <data key=\"key\">" + vs(1) + "</data>\n <data key=\"type\">" + vs(2) + "</data>\n </node>\n"
+      sb ++= "<node id=\"" + nvs(0) + "\">\n <data key=\"key\">" + nvs(1) + "</data>\n <data key=\"type\">" + nvs(2) + "</data>\n </node>\n"
     }
 
     sb ++= "\n<!-- edges -->\n"
@@ -223,34 +266,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     }
 
     sb ++= "</graph>\n</graphml>"
+
+
+
     sb.toString
-
-    def helper(parent: Option[Node[A,B]], phi:Int, nodes: Vector[String], edges: Vector[String]): Unit = {
-      if(children.isEmpty){ nodes :+ (getID.toString + ",Root,N") }  //untrained root, add to nodes, no edge to parent
-      else{
-        if(parent.isEmpty){ nodes :+ (getID.toString + ",Root,N") }  //trained root, add to nodes, no edge to parent
-        else {
-          //non-root node, add to nodes, add edge to parent
-          nodes :+ (getID.toString + "," + getKey.toString + ",N")
-          edges :+ (parent.get.getID.toString + "," + getID.toString + "," + phi.toString)
-        }
-
-        for(i <- 0 to maxPhi){
-          if(children.size > i){
-            children(i)(0) match {
-              case sl: SequenceList[A,B] =>
-                nodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL")
-                edges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString)
-              case _: Node[A,B] =>
-                val ns =  children(i)
-                for(n <- ns){
-                  helper(Some(this), i, nodes, edges)
-                }
-            }
-          }
-        }
-      }
-    }
   }
 
   override def toString: String = {
