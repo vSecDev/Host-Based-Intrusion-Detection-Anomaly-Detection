@@ -201,9 +201,56 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
   }
 
   def toXML(): String = {
+
+    val sb = new StringBuilder
     val nodes: Vector[String] = Vector()
     val edges: Vector[String] = Vector()
 
+    helper(this, -1, nodes, edges)
+
+    sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
+
+    for(n <- nodes){
+      val nvs = n.split(",")
+      sb ++= "<node id=\"" + vs(0) + "\">\n <data key=\"key\">" + vs(1) + "</data>\n <data key=\"type\">" + vs(2) + "</data>\n </node>\n"
+    }
+
+    sb ++= "\n<!-- edges -->\n"
+
+    for(e <- edges){
+      val evs = e.split(",")
+      sb ++= "<edge source=\"" + evs(0) + "\" target=\"" + evs(1) + "\" phi=\"" + evs(2) + "\"></edge>\n"
+    }
+
+    sb ++= "</graph>\n</graphml>"
+    sb.toString
+
+    def helper(parent: Option[Node[A,B]], phi:Int, nodes: Vector[String], edges: Vector[String]): Unit = {
+      if(children.isEmpty){ nodes :+ (getID.toString + ",Root,N") }  //untrained root, add to nodes, no edge to parent
+      else{
+        if(parent.isEmpty){ nodes :+ (getID.toString + ",Root,N") }  //trained root, add to nodes, no edge to parent
+        else {
+          //non-root node, add to nodes, add edge to parent
+          nodes :+ (getID.toString + "," + getKey.toString + ",N")
+          edges :+ (parent.get.getID.toString + "," + getID.toString + "," + phi.toString)
+        }
+
+        for(i <- 0 to maxPhi){
+          if(children.size > i){
+            children(i)(0) match {
+              case sl: SequenceList[A,B] =>
+                nodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL")
+                edges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString)
+              case _: Node[A,B] =>
+                val ns =  children(i)
+                for(n <- ns){
+                  helper(Some(this), i, nodes, edges)
+                }
+            }
+          }
+        }
+      }
+    }
   }
 
   override def toString: String = {
