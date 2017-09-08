@@ -200,9 +200,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML: String = {
-    val buf = new StringBuilder
-    ""
+  def toXML(): String = {
+    val nodes: Vector[String] = Vector()
+    val edges: Vector[String] = Vector()
+
   }
 
   override def toString: String = {
