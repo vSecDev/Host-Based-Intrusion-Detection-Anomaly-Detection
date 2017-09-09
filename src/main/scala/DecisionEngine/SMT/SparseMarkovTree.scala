@@ -198,8 +198,27 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML(): (Vector[String], Vector[String]) = {
-    xmlOuter(0, Some(this), getChildren)
+  def toXML: String = {
+    val sb = new StringBuilder
+    val elements = xmlOuter(0, Some(this), getChildren)
+
+    sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
+
+    for(n <- elements._1){
+      println("processing node")
+      val nvs = n.split(",")
+      sb ++= "<node id=\"" + nvs(0) + "\">\n <data key=\"key\">" + nvs(1) + "</data>\n <data key=\"type\">" + nvs(2) + "</data>\n </node>\n"
+    }
+
+    sb ++= "\n<!-- edges -->\n"
+
+    for(e <- elements._2){
+      val evs = e.split(",")
+      sb ++= "<edge source=\"" + evs(0) + "\" target=\"" + evs(1) + "\" phi=\"" + evs(2) + "\"></edge>\n"
+    }
+
+    sb ++= "</graph>\n</graphml>"
+    sb.toString
   }
 
   private def xmlInner(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]]): (Vector[String], Vector[String]) = {
