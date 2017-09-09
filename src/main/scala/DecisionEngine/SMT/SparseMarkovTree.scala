@@ -184,8 +184,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       }
     }
 
-    innerHelper(condition, event, children, (0.0, 0.0))
-  }
+    innerHelper(condition, event, children, (0.0, 0.0))  }
 
   private def outer(condition: Vector[A], event: B, children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]]): (Double, Double) = {
     @tailrec
@@ -196,11 +195,74 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       }
       case _ => acc
     }
-
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML(): String = {
+
+
+
+
+  def toXML(): (Vector[String], Vector[String]) = {
+    xmlOuter(0, Some(this), getChildren)
+  }
+
+  private def xmlInner(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]]): (Vector[String], Vector[String]) = {
+    @tailrec
+    def xmlInnerHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]], acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = {
+      children match {
+        case x +: xs => x match {
+          case sl: SequenceList[A, B] => {
+            println("in sequence list")
+            val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
+            xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
+          }
+
+          case n: Node[A, B] => {
+            println("in node")
+            var res: (Vector[String], Vector[String]) = (Vector(), Vector())
+            parent match {
+              case None => res = (Vector(n.getID.toString + ",Root,N"), Vector())
+              case Some(p) => res = (Vector(n.getID.toString + "," + n.getKey.toString + ",N"),
+                Vector(p.getID.toString + "," + n.getID.toString + "," + phi.toString))
+            }
+
+            xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
+          }
+        }
+        case _ => acc
+      }
+    }
+
+    xmlInnerHelper(phi = 0, None, children, (Vector(),Vector()))
+  }
+
+
+
+
+  private def xmlOuter(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]]): (Vector[String], Vector[String]) = {
+
+    @tailrec
+    def xmlOuterHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = children match {
+      case x +: xs => {
+        val sub = xmlInner(phi, parent, x)
+        xmlOuterHelper(phi+1, parent, xs, (acc._1 ++ sub._1, acc._2 ++ sub._2))
+      }
+      case _ => acc
+    }
+
+    xmlOuterHelper(phi, parent, children, (Vector(), Vector()))
+  }
+
+
+
+
+
+
+
+
+
+
+/*  def toXML(): String = {
 
     def helper(parent: Option[SparseMarkovTree[_<:A,_<:B]], phi:Int, nodes: Vector[String], edges: Vector[String]): (Vector[String], Vector[String]) = {
       if(children.isEmpty){
@@ -226,19 +288,21 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
           if(children.size > i){
             children(i)(0) match {
               case sl: SequenceList[A,B] =>
-                newNodes = newNodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL")
-                newEdges = newEdges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString)
+                (newNodes = newNodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL"),
+                newEdges = newEdges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString))
               case _: Node[A,B] =>
                 val ns = children(i)
                 for(n <- ns){
-                  val newVars = helper(Some(n), i, newNodes, newEdges)
+                  /*val newVars = helper(Some(n), i, newNodes, newEdges)
                   newNodes = newVars._1
-                  newEdges = newVars._2
+                  newEdges = newVars._2*/
+                  helper(Some(n), i, newNodes, newEdges)
+
                 }
             }
           }
         }
-        (newNodes, newEdges)
+        //(newNodes, newEdges)
       }
     }
 
@@ -246,7 +310,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     var nodes: Vector[String] = Vector()
     var edges: Vector[String] = Vector()
 
-    val nodesEdges = helper(Some(this), -1, nodes, edges)
+    val nodesEdges = helper(None, -1, nodes, edges)
     nodes = nodesEdges._1
     edges = nodesEdges._2
 
@@ -270,7 +334,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
 
     sb.toString
-  }
+  }*/
 
   override def toString: String = {
     val buf = new StringBuilder
