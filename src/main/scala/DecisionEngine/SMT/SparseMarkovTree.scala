@@ -198,10 +198,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-
-
-
-
   def toXML(): (Vector[String], Vector[String]) = {
     xmlOuter(0, Some(this), getChildren)
   }
@@ -212,19 +208,33 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       children match {
         case x +: xs => x match {
           case sl: SequenceList[A, B] => {
-            println("in sequence list")
+            println("in sequence list. has parent? -> " + parent.nonEmpty)
+            println("are there any others sequencelists under this parent? -> " + xs.nonEmpty)
+            println("sl ID: " + sl.getID.toString)
+            println("sl stored sequence count: " + sl.sequences.length)
+            println("sl parent ID: " + parent.get.getID.toString)
             val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
+            println("res class: " + res.getClass.getName)
             xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
           }
 
           case n: Node[A, B] => {
+
+
             println("in node")
-            var res: (Vector[String], Vector[String]) = (Vector(), Vector())
+            var sub1: (Vector[String], Vector[String]) = (Vector(), Vector())
             parent match {
-              case None => res = (Vector(n.getID.toString + ",Root,N"), Vector())
-              case Some(p) => res = (Vector(n.getID.toString + "," + n.getKey.toString + ",N"),
-                Vector(p.getID.toString + "," + n.getID.toString + "," + phi.toString))
+              case None =>
+                sub1 = (sub1._1 ++ Vector[String](n.getID.toString + ",Root,N"), sub1._2 ++ Vector[String]())
+              case Some(p) =>
+                sub1 = (sub1._1 ++ Vector[String](n.getID.toString + "," + n.getKey.get.toString + ",N"), sub1._2 ++ Vector[String](p.getID.toString + "," + n.getID.toString + "," + phi.toString))
             }
+            println("\nprocessing a node. sub1 after adding this node's info:\n" + sub1)
+
+            val sub2 = xmlOuter(0, Some(n), n.getChildren)
+            println("\nprocessing a node. sub2 after adding this node's info:\n" + sub2)
+            val res = (sub1._1 ++ sub2._1, sub1._2 ++ sub2._2)
+            println("\nprocessing a node. res after adding this node's info:\n" + res)
 
             xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
           }
@@ -233,7 +243,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       }
     }
 
-    xmlInnerHelper(phi = 0, None, children, (Vector(),Vector()))
+    xmlInnerHelper(phi, parent, children, (Vector(),Vector()))
   }
 
 
@@ -250,7 +260,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       case _ => acc
     }
 
-    xmlOuterHelper(phi, parent, children, (Vector(), Vector()))
+    xmlOuterHelper(phi, parent, children, (Vector[String](), Vector[String]()))
   }
 
 
@@ -338,7 +348,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   override def toString: String = {
     val buf = new StringBuilder
-    buf ++= "-------\nID: " + getID + "\n Node\nKey: " + getKey + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+    buf ++= "-------\nID: " + getID + "\n Node\nKey: " + getKey.get + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
     for (i <- 0 to maxPhi) {
       if (children.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + children(i).size
