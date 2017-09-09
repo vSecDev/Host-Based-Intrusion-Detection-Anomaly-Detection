@@ -204,6 +204,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
     sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
 
+
+    sb ++= "<node id=\"" + getID + "\">\n <data key=\"key\">Root</data>\n <data key=\"type\">N</data>\n </node>\n"
     for(n <- elements._1){
       println("processing node")
       val nvs = n.split(",")
