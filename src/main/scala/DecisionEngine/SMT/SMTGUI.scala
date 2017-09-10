@@ -262,7 +262,13 @@ class SMTGUI extends DecisionEngineGUI {
 
   private def canVisualise: Boolean = pluginInstance match {
     case None => false
-    case Some(plugin) => plugin.isTrained
+    case Some(plugin) =>
+      if(plugin.isTrained){
+      val root = plugin.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
+        root.maxDepth <= 6 &&
+        root.maxPhi <= 5 &&
+        root.maxSeqCount >= 20
+      }else{ false }
   }
 
   private def setupButton(panel: JPanel, btn: JButton, btnTxt: String, listener: ActionListener) = {
@@ -546,7 +552,7 @@ class SMTGUI extends DecisionEngineGUI {
     private def displaySMTHandler() = {
       //TODO - CODE BELOW TO TEST!
       if(canVisualise){
-        val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser
+        val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser(pruned = false)
         visualiser match{
           case None => showError("An error occurred. Cannot display the SMT model!", "Error")
           case Some(vis) =>

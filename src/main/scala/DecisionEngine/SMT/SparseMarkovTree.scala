@@ -207,7 +207,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
     sb ++= "<node id=\"" + getID + "\">\n <data key=\"key\">Root</data>\n <data key=\"type\">N</data>\n </node>\n"
     for(n <- elements._1){
-      println("processing node")
       val nvs = n.split(",")
       sb ++= "<node id=\"" + nvs(0) + "\">\n <data key=\"key\">" + nvs(1) + "</data>\n <data key=\"type\">" + nvs(2) + "</data>\n </node>\n"
     }
