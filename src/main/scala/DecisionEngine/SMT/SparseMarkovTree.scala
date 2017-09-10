@@ -230,13 +230,13 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
           case sl: SequenceList[A, B] => {
 
 
-           /* if(pruned && sl.sequences.length == 1){*/
+            if(pruned && sl.sequences.length == 1){
               xmlInnerHelper(phi, parent, xs, pruned, (acc._1, acc._2))
-         /*   }else {
+            }else {
               val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
               xmlInnerHelper(phi, parent, xs, pruned, (acc._1 ++ res._1, acc._2 ++ res._2))
 
-            }*/
+            }
 
           }
           case n: Node[A, B] => {

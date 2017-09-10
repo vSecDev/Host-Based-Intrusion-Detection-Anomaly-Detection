@@ -1,9 +1,9 @@
 package DecisionEngine.SMT
 
+import java.awt.{BorderLayout, Color}
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import javax.swing.{JDialog, _}
-
 import Data.DataException
 import DecisionEngine.DecisionEngineVisualiser
 import prefuse.action.assignment.{ColorAction, DataColorAction}
@@ -18,11 +18,11 @@ import prefuse.util.ColorLib
 import prefuse.visual.VisualItem
 import prefuse.{Constants, Display, Visualization}
 
-
 class SMTVisualiser(tree: Node[_,_], pruned: Boolean) extends DecisionEngineVisualiser {
 
   @throws(classOf[DataException])
   override def getVisualisation: Option[JDialog] = {
+  //  override def getVisualisation: Option[JPanel] = {
     val xmlStr = tree.toXML(pruned)
 
     val graph: Option[Graph] = try {
@@ -43,7 +43,8 @@ class SMTVisualiser(tree: Node[_,_], pruned: Boolean) extends DecisionEngineVisu
     r.setRoundedCorner(8, 8)
     vis.setRendererFactory(new DefaultRendererFactory(r))
 
-    var palette = Array(ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255))
+    //var palette = Array(ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255))
+    var palette = Array(ColorLib.rgb(248, 65, 8), ColorLib.rgb(78, 182, 211))
     var fill = new DataColorAction("graph.nodes", "type",
       Constants.NOMINAL, VisualItem.FILLCOLOR, palette)
 
@@ -67,14 +68,16 @@ class SMTVisualiser(tree: Node[_,_], pruned: Boolean) extends DecisionEngineVisu
 
     var display = new Display(vis)
     display.setSize(720 * 2, 500 * 2)
+    display.setBackground(new Color(0,142,164))
     display.addControlListener(new DragControl())
     display.addControlListener(new PanControl())
     display.addControlListener(new ZoomControl())
 
+    val p: JPanel = new JPanel(new BorderLayout())
+    p.add(display, BorderLayout.CENTER)
     val d: JDialog = new JDialog(new JDialog(), "Sparse Markov Tree Visualisation")
-
+    d.add(p)
     d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-    d.add(display)
     d.pack()
     vis.run("color")
     vis.run("layout")

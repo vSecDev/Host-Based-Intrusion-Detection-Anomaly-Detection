@@ -62,8 +62,6 @@ class SMTGUI extends DecisionEngineGUI {
   private final val loadModelBtn = new JButton("Load SMT")
   private final val saveModelBtn = new JButton("Save SMT")
   private final val saveReportBtn = new JButton("Save report")
-
-  //VISUALISE
   private final val visualiseBtn = new JButton("Display SMT")
 
 
@@ -146,8 +144,6 @@ class SMTGUI extends DecisionEngineGUI {
     setupButton(p3, loadModelBtn, loadModelBtn.getText, listener)
     setupButton(p3, saveModelBtn, saveModelBtn.getText, listener)
     setupButton(p3, saveReportBtn, saveReportBtn.getText, listener)
-
-    //VISUALISE
     setupButton(p3, visualiseBtn, visualiseBtn.getText, listener)
 
 
@@ -266,7 +262,7 @@ class SMTGUI extends DecisionEngineGUI {
       if(plugin.isTrained){
       val root = plugin.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
         root.maxDepth <= 6 &&
-        root.maxPhi <= 5 &&
+        root.maxPhi <= 3 &&
         root.maxSeqCount >= 20
       }else{ false }
   }
@@ -307,8 +303,7 @@ class SMTGUI extends DecisionEngineGUI {
     loadModelBtn.setEnabled(canLoadModel)
     saveModelBtn.setEnabled(canSaveModel)
     saveReportBtn.setEnabled(canSaveReport)
-
-    //VISUALISE
+    saveReportBtn.setEnabled(canSaveReport)
     visualiseBtn.setEnabled(canVisualise)
 
   }
@@ -552,7 +547,10 @@ class SMTGUI extends DecisionEngineGUI {
     private def displaySMTHandler() = {
       //TODO - CODE BELOW TO TEST!
       if(canVisualise){
-        val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser(pruned = false)
+        val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
+        val pruned = root.maxDepth >= 5 && root.maxPhi >= 3 // && root.maxSeqCount == 20
+        println("pruned: " + pruned)
+        val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser(pruned)
         visualiser match{
           case None => showError("An error occurred. Cannot display the SMT model!", "Error")
           case Some(vis) =>

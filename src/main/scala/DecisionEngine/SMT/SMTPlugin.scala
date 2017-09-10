@@ -213,8 +213,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       case m: Node[_, _] =>
         setRoot(m, isInt)
         gui.appendText("New root loaded:\n" + root.get.toString)
-        gui.appendText("\n\n\nTEST:\n\n\n" + root.get.toXML(pruned = true))
-        //gui.appendText("\n\n\nTEST:\n\n\n" + root.get.toXML(pruned = false))
         resetLoadModel
         true
       case _ =>
