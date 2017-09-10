@@ -298,7 +298,6 @@ public class HIDS extends Observable implements Observer {
                     if (input.isEmpty()) {
                         showError("An error occurred during data processing! No input data is sent to the Decision Engine.", "Error");
                     } else {
-                        System.out.println("input size: " + input.get().size());
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
 
@@ -317,8 +316,6 @@ public class HIDS extends Observable implements Observer {
                     } else {
                         Vector<DataWrapper> input = new Vector<DataWrapper>(0, 0, 0);
                         input = input.appendBack(in.get());
-                        System.out.println("input size: " + input.size());
-
                         Boolean isInt = currentDecisionEngine.getGUI().get().isSetToInt();
                         scala.Option<DataModel> none = scala.Option.apply(null);
 
@@ -352,7 +349,13 @@ public class HIDS extends Observable implements Observer {
     }
 
     private Option<DataModel> handleLearn(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt) {
-        return currentDecisionEngine.learn(input, model, isInt);
+        try {
+            Option<DataModel> trainedModel = currentDecisionEngine.learn(input, model, isInt);
+            return trainedModel;
+        }catch(DataException de){
+            showError("An error occurred during learning. Please check the SMT parameters!\nLarge MaxDepth/MaxPhi and small Maximum Sequence count may cause the tree to become too large!", "Error");
+            return scala.Option.apply(null);
+        }
     }
 
     private Option<DecisionEngineReport> handleClassify(Vector<DataWrapper> input, Option<DataModel> model, boolean isInt){

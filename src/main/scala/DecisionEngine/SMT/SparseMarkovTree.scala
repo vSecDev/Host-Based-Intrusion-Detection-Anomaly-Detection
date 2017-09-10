@@ -198,9 +198,9 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML: String = {
+  def toXML(pruned: Boolean): String = {
     val sb = new StringBuilder
-    val elements = xmlOuter(0, Some(this), getChildren)
+    val elements = xmlOuter(0, Some(this), getChildren, pruned)
 
     sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
 
@@ -223,26 +223,24 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     sb.toString
   }
 
-  private def xmlInner(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]]): (Vector[String], Vector[String]) = {
+  private def xmlInner(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]], pruned: Boolean): (Vector[String], Vector[String]) = {
     @tailrec
-    def xmlInnerHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]], acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = {
+    def xmlInnerHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[SparseMarkovTree[_ <: A, _ <: B]], pruned: Boolean, acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = {
       children match {
         case x +: xs => x match {
           case sl: SequenceList[A, B] => {
-            println("in sequence list. has parent? -> " + parent.nonEmpty)
-            println("are there any others sequencelists under this parent? -> " + xs.nonEmpty)
-            println("sl ID: " + sl.getID.toString)
-            println("sl stored sequence count: " + sl.sequences.length)
-            println("sl parent ID: " + parent.get.getID.toString)
-            val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
-            println("res class: " + res.getClass.getName)
-            xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
+
+
+           /* if(pruned && sl.sequences.length == 1){*/
+              xmlInnerHelper(phi, parent, xs, pruned, (acc._1, acc._2))
+         /*   }else {
+              val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
+              xmlInnerHelper(phi, parent, xs, pruned, (acc._1 ++ res._1, acc._2 ++ res._2))
+
+            }*/
+
           }
-
           case n: Node[A, B] => {
-
-
-            println("in node")
             var sub1: (Vector[String], Vector[String]) = (Vector(), Vector())
             parent match {
               case None =>
@@ -250,122 +248,29 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
               case Some(p) =>
                 sub1 = (sub1._1 ++ Vector[String](n.getID.toString + "," + n.getKey.get.toString + ",N"), sub1._2 ++ Vector[String](p.getID.toString + "," + n.getID.toString + "," + phi.toString))
             }
-            println("\nprocessing a node. sub1 after adding this node's info:\n" + sub1)
-
-            val sub2 = xmlOuter(0, Some(n), n.getChildren)
-            println("\nprocessing a node. sub2 after adding this node's info:\n" + sub2)
+            val sub2 = xmlOuter(0, Some(n), n.getChildren, pruned)
             val res = (sub1._1 ++ sub2._1, sub1._2 ++ sub2._2)
-            println("\nprocessing a node. res after adding this node's info:\n" + res)
-
-            xmlInnerHelper(phi, parent, xs, (acc._1 ++ res._1, acc._2 ++ res._2))
+            xmlInnerHelper(phi, parent, xs, pruned, (acc._1 ++ res._1, acc._2 ++ res._2))
           }
         }
         case _ => acc
       }
     }
-
-    xmlInnerHelper(phi, parent, children, (Vector(),Vector()))
+    xmlInnerHelper(phi, parent, children, pruned, (Vector(),Vector()))
   }
 
-
-
-
-  private def xmlOuter(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]]): (Vector[String], Vector[String]) = {
+  private def xmlOuter(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], pruned: Boolean): (Vector[String], Vector[String]) = {
 
     @tailrec
-    def xmlOuterHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = children match {
+    def xmlOuterHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], pruned: Boolean, acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = children match {
       case x +: xs => {
-        val sub = xmlInner(phi, parent, x)
-        xmlOuterHelper(phi+1, parent, xs, (acc._1 ++ sub._1, acc._2 ++ sub._2))
+        val sub = xmlInner(phi, parent, x, pruned)
+        xmlOuterHelper(phi+1, parent, xs, pruned, (acc._1 ++ sub._1, acc._2 ++ sub._2))
       }
       case _ => acc
     }
-
-    xmlOuterHelper(phi, parent, children, (Vector[String](), Vector[String]()))
+    xmlOuterHelper(phi, parent, children, pruned, (Vector[String](), Vector[String]()))
   }
-
-
-
-
-
-
-
-
-
-
-/*  def toXML(): String = {
-
-    def helper(parent: Option[SparseMarkovTree[_<:A,_<:B]], phi:Int, nodes: Vector[String], edges: Vector[String]): (Vector[String], Vector[String]) = {
-      if(children.isEmpty){
-
-        (nodes :+ (getID.toString + ",Root,N"), edges)
-        //; println("nodes for untrained: " + nodes)
-
-      }  //untrained root, add to nodes, no edge to parent
-      else{
-        var newNodes: Vector[String] = Vector()
-        var newEdges: Vector[String] = Vector()
-        if(parent.isEmpty){
-          newNodes = nodes :+ (getID.toString + ",Root,N")
-
-        }  //trained root, add to nodes, no edge to parent
-        else {
-          //non-root node, add to nodes, add edge to parent
-          newNodes = nodes :+ (getID.toString + "," + getKey.toString + ",N")
-          newEdges = edges :+ (parent.get.getID.toString + "," + getID.toString + "," + phi.toString)
-        }
-
-        for(i <- 0 to maxPhi){
-          if(children.size > i){
-            children(i)(0) match {
-              case sl: SequenceList[A,B] =>
-                (newNodes = newNodes :+ (sl.getID.toString + "," + sl.sequences.length + ",SL"),
-                newEdges = newEdges :+ (getID.toString + "," + sl.getID.toString + "," + i.toString))
-              case _: Node[A,B] =>
-                val ns = children(i)
-                for(n <- ns){
-                  /*val newVars = helper(Some(n), i, newNodes, newEdges)
-                  newNodes = newVars._1
-                  newEdges = newVars._2*/
-                  helper(Some(n), i, newNodes, newEdges)
-
-                }
-            }
-          }
-        }
-        //(newNodes, newEdges)
-      }
-    }
-
-    val sb = new StringBuilder
-    var nodes: Vector[String] = Vector()
-    var edges: Vector[String] = Vector()
-
-    val nodesEdges = helper(None, -1, nodes, edges)
-    nodes = nodesEdges._1
-    edges = nodesEdges._2
-
-    sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
-
-    for(n <- nodes){
-      println("processing node")
-      val nvs = n.split(",")
-      sb ++= "<node id=\"" + nvs(0) + "\">\n <data key=\"key\">" + nvs(1) + "</data>\n <data key=\"type\">" + nvs(2) + "</data>\n </node>\n"
-    }
-
-    sb ++= "\n<!-- edges -->\n"
-
-    for(e <- edges){
-      val evs = e.split(",")
-      sb ++= "<edge source=\"" + evs(0) + "\" target=\"" + evs(1) + "\" phi=\"" + evs(2) + "\"></edge>\n"
-    }
-
-    sb ++= "</graph>\n</graphml>"
-
-
-
-    sb.toString
-  }*/
 
   override def toString: String = {
     val buf = new StringBuilder

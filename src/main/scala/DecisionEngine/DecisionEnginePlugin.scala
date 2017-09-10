@@ -2,7 +2,8 @@ package DecisionEngine
 
 import java.io.File
 import java.util.{Observable, Observer}
-import Data.{DataModel, DataWrapper}
+
+import Data.{DataException, DataModel, DataWrapper}
 import GUI.HIDS
 
 trait DecisionEnginePlugin extends Observer{
@@ -30,6 +31,7 @@ trait DecisionEnginePlugin extends Observer{
 
   def isIntModel: Boolean
 
+  @throws(classOf[DataException])
   def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] //model is optional (if passed, the model is further trained with additional training examples
 
   def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport]

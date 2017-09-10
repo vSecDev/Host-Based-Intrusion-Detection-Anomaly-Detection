@@ -1,7 +1,8 @@
 package DecisionEngine.SMT
 
 import java.util.Observable
-import Data.{DataModel, DataWrapper, StringDataWrapper}
+
+import Data.{DataException, DataModel, DataWrapper, StringDataWrapper}
 import DecisionEngine.{DecisionEngineConfig, DecisionEngineGUI, DecisionEnginePlugin, DecisionEngineReport}
 import GUI.HIDS
 
@@ -78,45 +79,52 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     gui.render
   }
 
+  @throws(classOf[DataException])
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
-    gui.appendText("Training SMT...")
+    try {
+      gui.appendText("Training SMT...")
 
-    if (data.isEmpty) {
-      gui.appendText("No data to process...")
-      resetLearn
-      return model
-    }
+      if (data.isEmpty) {
+        gui.appendText("No data to process...")
+        resetLearn
+        return model
+      }
 
-    model match {
-      case None =>
-        root match {
-          case None =>
-            resetLearn
-            None //No model/SMT to train
-          case Some(node) =>
-            val result = learnHelper(data, node, ints)
-            resetLearn
-            gui.appendText("Training completed.")
-            gui.render
-            result
-        }
-      case Some(w) =>
-        w.retrieve match {
-          case None =>
-            resetLearn
-            None
-          case Some(m) => m match {
-            case node: Node[_, _] =>
+      model match {
+        case None =>
+          root match {
+            case None =>
+              resetLearn
+              None //No model/SMT to train
+            case Some(node) =>
               val result = learnHelper(data, node, ints)
               resetLearn
               gui.appendText("Training completed.")
               gui.render
               result
-            case _ =>
+          }
+        case Some(w) =>
+          w.retrieve match {
+            case None =>
               resetLearn
               None
+            case Some(m) => m match {
+              case node: Node[_, _] =>
+                val result = learnHelper(data, node, ints)
+                resetLearn
+                gui.appendText("Training completed.")
+                gui.render
+                result
+              case _ =>
+                resetLearn
+                None
+            }
           }
-        }
+      }
+    }catch{
+      case t: Throwable =>
+      resetLearn
+      throw new DataException("Exception thrown during learning.", t)
     }
   }
 
@@ -205,7 +213,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
       case m: Node[_, _] =>
         setRoot(m, isInt)
         gui.appendText("New root loaded:\n" + root.get.toString)
-        gui.appendText("\n\n\nTEST:\n\n\n" + root.get.toXML)
+        gui.appendText("\n\n\nTEST:\n\n\n" + root.get.toXML(pruned = true))
+        //gui.appendText("\n\n\nTEST:\n\n\n" + root.get.toXML(pruned = false))
         resetLoadModel
         true
       case _ =>
