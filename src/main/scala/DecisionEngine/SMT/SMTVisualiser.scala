@@ -4,7 +4,6 @@ import java.awt.{BorderLayout, Color}
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import javax.swing.{JDialog, _}
-
 import Data.DataException
 import DecisionEngine.DecisionEngineVisualiser
 import prefuse.action.assignment.{ColorAction, DataColorAction}
@@ -45,7 +44,6 @@ class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVi
     r.setRoundedCorner(8, 8)
     vis.setRendererFactory(new DefaultRendererFactory(r))
 
-    //var palette = Array(ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255))
     var palette = Array(ColorLib.rgb(248, 65, 8), ColorLib.rgb(78, 182, 211))
     var fill = new DataColorAction("graph.nodes", "type",
       Constants.NOMINAL, VisualItem.FILLCOLOR, palette)
@@ -66,15 +64,9 @@ class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVi
 
     val forces = fdl.getForceSimulator.getForces
     val sf = forces(2).asInstanceOf[SpringForce]
-    println("spring coeff: " + sf.getParameter(0))
-    println("spring length: " + sf.getParameter(1))
     sf.setParameter(0, 0.05E-4f)
-    println("spring coeff: " + sf.getParameter(0))
-    println("spring length: " + sf.getParameter(1))
 
-    //layout.add(new ForceDirectedLayout("graph"))
     layout.add(fdl)
-
     layout.add(new RepaintAction())
 
     vis.putAction("color", color)
@@ -89,7 +81,11 @@ class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVi
 
     val p: JPanel = new JPanel(new BorderLayout())
     p.add(display, BorderLayout.CENTER)
-    val d: JDialog = new JDialog(new JDialog(), "Sparse Markov Tree Visualisation")
+    val d: JDialog = new JDialog(new JDialog(),
+      "Sparse Markov Tree Visualisation - Max Depth: " + tree.maxDepth +
+        "  -  Max Phi: " + tree.maxPhi +
+        "  -  Max Sequence Count in leaves: " + tree.maxSeqCount)
+
     d.add(p)
     d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     d.pack()

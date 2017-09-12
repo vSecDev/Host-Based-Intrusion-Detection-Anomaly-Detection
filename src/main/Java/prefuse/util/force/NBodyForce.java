@@ -298,12 +298,12 @@ public class NBodyForce extends AbstractForce {
                 }
             }
         }catch(StackOverflowError soe){
-            System.out.println("STACKOVERFLOWERROR HERE!!!");
+            //System.out.println("STACKOVERFLOWERROR HERE!!!");
             throw soe;
 
         }catch (Throwable t){
-            System.out.println("OTHER THROWABLE!");
-            System.out.println(t.getMessage());
+            /*System.out.println("OTHER THROWABLE!");
+            System.out.println(t.getMessage());*/
             throw t;
 
         }

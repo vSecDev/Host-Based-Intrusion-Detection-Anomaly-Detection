@@ -315,7 +315,6 @@ class SMTPluginTest extends  FunSuite {
     //Passing in new model to learn - root should not change
     val n2 = Node[Int, Int](maxDepth, maxPhi, maxSeqCount, smoothing, prior)
     val childrenCountBefore = n2.getChildren.size
-    println("childrencoundbefore: " + childrenCountBefore)
     val dm2 = new DataModel
     dm2.store(n2)
 
