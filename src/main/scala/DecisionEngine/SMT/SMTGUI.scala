@@ -64,7 +64,6 @@ class SMTGUI extends DecisionEngineGUI {
   private final val saveReportBtn = new JButton("Save report")
   private final val visualiseBtn = new JButton("Display SMT")
 
-
   private final val outputTxtA = new JTextArea(30,134)
   private final val outputScrollP = new JScrollPane(outputTxtA)
   private final val intCheckBox = new JCheckBox("Integer traces")
@@ -261,8 +260,8 @@ class SMTGUI extends DecisionEngineGUI {
     case Some(plugin) =>
       if(plugin.isTrained){
       val root = plugin.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
-        root.maxDepth <= 6 &&
-        root.maxPhi <= 3 &&
+        root.maxDepth <= 8 &&
+        root.maxPhi <= 7 &&
         root.maxSeqCount >= 20
       }else{ false }
   }
@@ -548,7 +547,8 @@ class SMTGUI extends DecisionEngineGUI {
       //TODO - CODE BELOW TO TEST!
       if(canVisualise){
         val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
-        val pruned = root.maxDepth >= 5 && root.maxPhi >= 3 // && root.maxSeqCount == 20
+        //val pruned = root.maxDepth >= 5 && root.maxPhi >= 3 // && root.maxSeqCount == 20
+        val pruned = true
         println("pruned: " + pruned)
         val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser(pruned)
         visualiser match{

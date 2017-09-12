@@ -96,8 +96,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     updateWeight(newEvent)
   }
 
-  private def updateWeight(newEvent: B): Unit = weight *= getProbability(newEvent)
-
   def updatePredictions(): Unit = {
     for ((k, v) <- events) {
       if (predictions.contains(k)) predictions.update(k, (v.toDouble + smoothing) / eventCount)
@@ -105,7 +103,29 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     }
   }
 
-  private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
+  //NODECOUNT/VISUALISATION TEST
+  def nodeCount: (Int, Int) = {
+    var nodes = 0
+    var leaves = 0
+
+    for (i <- 0 to maxPhi) {
+      if (children.size > i) {
+        children(i)(0) match {
+          case sl: SequenceList[A, B] =>
+            leaves += 1
+          case _: Node[A, B] =>
+            val ns = children(i).asInstanceOf[Vector[Node[A,B]]]
+            for (n <- ns) {
+              nodes += 1
+              val subTreeNodes = n.nodeCount
+              nodes += subTreeNodes._1
+              leaves += subTreeNodes._2
+            }
+        }
+      }
+    }
+    (nodes, leaves)
+  }
 
   def learn(condition: Vector[A], event: B): Unit = {
 
@@ -156,6 +176,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outer(condition, event, getChildren)
   }
 
+  private def updateWeight(newEvent: B): Unit = weight *= getProbability(newEvent)
+
+  private def getNewPrior: Double = if(maxDepth > maxPhi) prior * (1.0 / (maxPhi+1)) else prior * (1.0 / maxDepth)
+
   //TODO - FIX TAIL RECURSION
   private def inner(condition: Vector[A], event: B, children: Vector[SparseMarkovTree[_ <: A, _ <: B]]): (Double, Double) = {
     @tailrec
@@ -203,9 +227,8 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     val elements = xmlOuter(0, Some(this), getChildren, pruned)
 
     sb ++= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<graphml xmlns=\"http://graphml.smt.org/xmlns\">\n<graph edgedefault=\"undirected\">\n \n<!-- data schema -->\n<key id=\"key\" for=\"node\" attr.name=\"key\" attr.type=\"string\"/>\n<key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>\n \n<!-- nodes -->\n"
-
-
     sb ++= "<node id=\"" + getID + "\">\n <data key=\"key\">Root</data>\n <data key=\"type\">N</data>\n </node>\n"
+
     for(n <- elements._1){
       val nvs = n.split(",")
       sb ++= "<node id=\"" + nvs(0) + "\">\n <data key=\"key\">" + nvs(1) + "</data>\n <data key=\"type\">" + nvs(2) + "</data>\n </node>\n"
@@ -228,16 +251,13 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
       children match {
         case x +: xs => x match {
           case sl: SequenceList[A, B] => {
-
-
-            if(pruned && sl.sequences.length == 1){
+            //if(pruned && sl.sequences.length == 1){
+            if(pruned){
               xmlInnerHelper(phi, parent, xs, pruned, (acc._1, acc._2))
             }else {
               val res = (Vector(sl.getID.toString + "," + sl.sequences.length + ",SL"), Vector(parent.get.getID.toString + "," + sl.getID.toString + "," + phi.toString))
               xmlInnerHelper(phi, parent, xs, pruned, (acc._1 ++ res._1, acc._2 ++ res._2))
-
             }
-
           }
           case n: Node[A, B] => {
             var sub1: (Vector[String], Vector[String]) = (Vector(), Vector())
@@ -259,7 +279,6 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
   }
 
   private def xmlOuter(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], pruned: Boolean): (Vector[String], Vector[String]) = {
-
     @tailrec
     def xmlOuterHelper(phi: Int, parent: Option[SparseMarkovTree[_ <: A, _ <: B]], children: Vector[Vector[SparseMarkovTree[_ <: A, _ <: B]]], pruned: Boolean, acc: (Vector[String], Vector[String])): (Vector[String], Vector[String]) = children match {
       case x +: xs => {

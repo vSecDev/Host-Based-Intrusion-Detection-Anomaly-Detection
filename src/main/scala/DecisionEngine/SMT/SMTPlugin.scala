@@ -100,6 +100,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
               val result = learnHelper(data, node, ints)
               resetLearn
               gui.appendText("Training completed.")
+              gui.appendText(node.toXML(false))
+              gui.appendText("Tree size => nodes: " + root.get.nodeCount._1 + " - leaves: " + root.get.nodeCount._2)
               gui.render
               result
           }
@@ -113,6 +115,8 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                 val result = learnHelper(data, node, ints)
                 resetLearn
                 gui.appendText("Training completed.")
+                gui.appendText(node.toXML(false))
+                gui.appendText("Tree size => nodes: " + root.get.nodeCount._1 + " - leaves: " + root.get.nodeCount._2)
                 gui.render
                 result
               case _ =>
