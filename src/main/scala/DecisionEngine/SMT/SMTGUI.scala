@@ -548,7 +548,7 @@ class SMTGUI extends DecisionEngineGUI {
       if(canVisualise){
         val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
         //val pruned = root.maxDepth >= 5 && root.maxPhi >= 3 // && root.maxSeqCount == 20
-        val pruned = true
+        val pruned = false
         println("pruned: " + pruned)
         val visualiser: Option[DecisionEngineVisualiser] = pluginInstance.get.getVisualiser(pruned)
         visualiser match{
