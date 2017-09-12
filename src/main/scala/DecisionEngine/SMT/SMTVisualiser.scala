@@ -4,6 +4,7 @@ import java.awt.{BorderLayout, Color}
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import javax.swing.{JDialog, _}
+
 import Data.DataException
 import DecisionEngine.DecisionEngineVisualiser
 import prefuse.action.assignment.{ColorAction, DataColorAction}
@@ -15,6 +16,7 @@ import prefuse.data.Graph
 import prefuse.data.io.GraphMLReader
 import prefuse.render.{DefaultRendererFactory, LabelRenderer}
 import prefuse.util.ColorLib
+import prefuse.util.force.SpringForce
 import prefuse.visual.VisualItem
 import prefuse.{Constants, Display, Visualization}
 
@@ -60,7 +62,18 @@ class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVi
     color.add(edges)
 
     var layout = new ActionList(Activity.INFINITY)
-    layout.add(new ForceDirectedLayout("graph"))
+    val fdl = new ForceDirectedLayout("graph")
+
+    val forces = fdl.getForceSimulator.getForces
+    val sf = forces(2).asInstanceOf[SpringForce]
+    println("spring coeff: " + sf.getParameter(0))
+    println("spring length: " + sf.getParameter(1))
+    sf.setParameter(0, 0.05E-4f)
+    println("spring coeff: " + sf.getParameter(0))
+    println("spring length: " + sf.getParameter(1))
+
+    //layout.add(new ForceDirectedLayout("graph"))
+    layout.add(fdl)
 
     layout.add(new RepaintAction())
 
