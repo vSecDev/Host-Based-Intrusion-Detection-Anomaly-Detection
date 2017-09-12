@@ -10,6 +10,8 @@ import DecisionEngine.DecisionEngineReport;
 import javafx.util.Pair;
 import scala.Option;
 import scala.collection.immutable.Vector;
+import sun.misc.Launcher;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
@@ -27,7 +29,7 @@ import java.util.List;
 
 public class HIDS extends Observable implements Observer {
 
-    private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
+ //   private static final String configPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\config.properties";
     private Properties props = null;
     private String[] extensions = new String[0];
     private String[] delimiters = new String[0];
@@ -88,7 +90,8 @@ public class HIDS extends Observable implements Observer {
     public static void main(String[] args) {
 
         HIDS hids = new HIDS();
-        hids.loadProperties(configPath);
+        //hids.loadProperties(configPath);
+        hids.loadProperties();
         if (!(hids.moduleInit() && hids.extensionsInit() && hids.delimitersInit())) {
             hids.showError("An error occurred during initialisation!", "Error");
         }
@@ -143,11 +146,15 @@ public class HIDS extends Observable implements Observer {
         return false;
     }
 
-    private Properties loadProperties(String path) {
+    //private Properties loadProperties(String path) {
+    private Properties loadProperties() {
         props = new Properties();
         InputStream input = null;
         try {
-            input = new FileInputStream(path);
+            //input = new FileInputStream(path);
+            //input = new FileInputStream(configPath);
+            input = Launcher.class.getResourceAsStream("/config.properties");
+
             props.load(input);
             return props;
         } catch (IOException ex) {
