@@ -104,7 +104,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
   }
 
   //NODECOUNT/VISUALISATION TEST
-  def nodeCount: (Int, Int) = {
+  def nodeAndLeafCount: (Int, Int) = {
     var nodes = 0
     var leaves = 0
 
@@ -117,7 +117,7 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
             val ns = children(i).asInstanceOf[Vector[Node[A,B]]]
             for (n <- ns) {
               nodes += 1
-              val subTreeNodes = n.nodeCount
+              val subTreeNodes = n.nodeAndLeafCount
               nodes += subTreeNodes._1
               leaves += subTreeNodes._2
             }
@@ -222,7 +222,12 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML(pruned: Boolean): String = {
+  def toXML(canPrune: Boolean): String = {
+    val count = nodeAndLeafCount
+    val overallCount = count._1 + count._2 //sum of node and leaf count in tree
+    var pruned = false
+    if(overallCount > 4800) { println("all node count: " + overallCount + " - nodes: " + count._1 + " - leaves: " + count._2 + " -> Will prune!!!"); pruned = true}
+
     val sb = new StringBuilder
     val elements = xmlOuter(0, Some(this), getChildren, pruned)
 

@@ -11,6 +11,7 @@ import GUI.HIDS
   */
 class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
+  final val MAX_DISPLAYED_NODES: Int = 4800
   override val pluginName: String = "Sparse Markov Tree"
   private var currHIDS: Option[HIDS] = None
   private var root: Option[Node[_, _]] = None
@@ -101,7 +102,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
               resetLearn
               gui.appendText("Training completed.")
               gui.appendText(node.toXML(false))
-              gui.appendText("Tree size => nodes: " + root.get.nodeCount._1 + " - leaves: " + root.get.nodeCount._2)
+              gui.appendText("Tree size => nodes: " + root.get.nodeAndLeafCount._1 + " - leaves: " + root.get.nodeAndLeafCount._2)
               gui.render
               result
           }
@@ -116,7 +117,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                 resetLearn
                 gui.appendText("Training completed.")
                 gui.appendText(node.toXML(false))
-                gui.appendText("Tree size => nodes: " + root.get.nodeCount._1 + " - leaves: " + root.get.nodeCount._2)
+                gui.appendText("Tree size => nodes: " + root.get.nodeAndLeafCount._1 + " - leaves: " + root.get.nodeAndLeafCount._2)
                 gui.render
                 result
               case _ =>
@@ -446,8 +447,10 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
     notifyObservers("saveReport")
   }
 
-  def getVisualiser(pruned: Boolean): Option[SMTVisualiser] = if(isTrained){
-    Some(new SMTVisualiser(root.get, pruned))
+  def canVisualise: Boolean = isTrained && root.get.nodeAndLeafCount._1 <= MAX_DISPLAYED_NODES
+
+  def getVisualiser(canPrune: Boolean): Option[SMTVisualiser] = if(canVisualise){
+    Some(new SMTVisualiser(root.get, canPrune))
   }else None
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined

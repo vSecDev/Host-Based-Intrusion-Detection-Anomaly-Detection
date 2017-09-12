@@ -18,12 +18,12 @@ import prefuse.util.ColorLib
 import prefuse.visual.VisualItem
 import prefuse.{Constants, Display, Visualization}
 
-class SMTVisualiser(tree: Node[_,_], pruned: Boolean) extends DecisionEngineVisualiser {
+class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVisualiser {
 
   @throws(classOf[DataException])
   override def getVisualisation: Option[JDialog] = {
-  //  override def getVisualisation: Option[JPanel] = {
-    val xmlStr = tree.toXML(pruned)
+
+    val xmlStr = tree.toXML(canPrune)
 
     val graph: Option[Graph] = try {
       val gr = new GraphMLReader
@@ -61,6 +61,7 @@ class SMTVisualiser(tree: Node[_,_], pruned: Boolean) extends DecisionEngineVisu
 
     var layout = new ActionList(Activity.INFINITY)
     layout.add(new ForceDirectedLayout("graph"))
+
     layout.add(new RepaintAction())
 
     vis.putAction("color", color)
