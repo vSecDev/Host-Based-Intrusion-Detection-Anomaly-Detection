@@ -18,7 +18,7 @@ public interface TableWriter {
      * @param filename the file to write the table to
      * @throws DataWriteException
      */
-    public void writeTable(Table table, String filename) throws DataIOException;
+    void writeTable(Table table, String filename) throws DataIOException;
     
     /**
      * Write a table to the given File.
@@ -26,7 +26,7 @@ public interface TableWriter {
      * @param f the file to write the table to
      * @throws DataWriteException
      */
-    public void writeTable(Table table, File f) throws DataIOException;
+    void writeTable(Table table, File f) throws DataIOException;
     
     /**
      * Write a table from the given OutputStream.
@@ -34,6 +34,6 @@ public interface TableWriter {
      * @param os the OutputStream to write the table to
      * @throws DataWriteException
      */
-    public void writeTable(Table table, OutputStream os) throws DataIOException;
+    void writeTable(Table table, OutputStream os) throws DataIOException;
     
 } // end of interface TableWriter

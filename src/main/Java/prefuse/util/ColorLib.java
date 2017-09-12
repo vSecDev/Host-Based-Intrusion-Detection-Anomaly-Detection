@@ -578,7 +578,7 @@ public class ColorLib {
     public static int[] getGrayscalePalette(int size) {
         int[] cm = new int[size];
         for ( int i=0, g; i<size; i++ ) {
-            g = (int)Math.round(255*(0.2f + 0.6f*((float)i)/(size-1)));
+            g = Math.round(255*(0.2f + 0.6f*((float)i)/(size-1)));
             cm[size-i-1] = gray(g);
         }
         return cm;

@@ -23,6 +23,6 @@ public interface TableListener extends EventListener {
      * {@link EventConstants#INSERT}, {@link EventConstants#DELETE}, or
      * {@link EventConstants#UPDATE}.
      */
-    public void tableChanged(Table t, int start, int end, int col, int type);
+    void tableChanged(Table t, int start, int end, int col, int type);
     
 } // end of interface TableListener

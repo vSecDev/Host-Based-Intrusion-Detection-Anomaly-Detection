@@ -196,7 +196,7 @@ public class TimeLib {
      */
     public static Date getDate(Class type, long d) {
         try {
-            Constructor c = type.getConstructor(new Class[] {long.class});
+            Constructor c = type.getConstructor(long.class);
             return (Date)c.newInstance(new Object[] {new Long(d)});
         } catch ( Exception e ) {
             e.printStackTrace();

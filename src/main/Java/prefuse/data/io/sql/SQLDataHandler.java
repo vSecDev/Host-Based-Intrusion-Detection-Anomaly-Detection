@@ -25,7 +25,7 @@ public interface SQLDataHandler {
      * to access the correct data field of the Table.
      * @throws SQLException if an error occurs accessing the ResultSet
      */
-    public void process(Table t, int trow, ResultSet rset, int rcol)
+    void process(Table t, int trow, ResultSet rset, int rcol)
         throws SQLException;
     
     /**
@@ -36,6 +36,6 @@ public interface SQLDataHandler {
      * in the {@link java.sql.Types} class.
      * @return the Java Class data type
      */
-    public Class getDataType(String columnName, int sqlType);
+    Class getDataType(String columnName, int sqlType);
     
 } // end of interface SQLDataValueHandler

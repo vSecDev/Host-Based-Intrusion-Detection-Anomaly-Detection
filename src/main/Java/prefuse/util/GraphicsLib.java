@@ -286,11 +286,7 @@ public class GraphicsLib {
 
         angle = (Math.PI - angle1) - angle2;
 
-        if (angle <= 0.0) {
-            return(true);
-        } else {
-            return(false);
-        }
+        return angle <= 0.0;
     }
     
     /**

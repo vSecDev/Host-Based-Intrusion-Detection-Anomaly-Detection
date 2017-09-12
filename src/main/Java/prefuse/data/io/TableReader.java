@@ -24,7 +24,7 @@ public interface TableReader {
      * @throws DataIOException
      * @see prefuse.util.io.IOLib#streamFromString(String)
      */
-    public Table readTable(String location) throws DataIOException;
+    Table readTable(String location) throws DataIOException;
     
     /**
      * Read in a table from the given URL.
@@ -32,7 +32,7 @@ public interface TableReader {
      * @return the loaded Table
      * @throws DataIOException
      */
-    public Table readTable(URL url) throws DataIOException;
+    Table readTable(URL url) throws DataIOException;
     
     /**
      * Read in a table from the given File.
@@ -40,7 +40,7 @@ public interface TableReader {
      * @return the loaded Table
      * @throws DataIOException
      */
-    public Table readTable(File f) throws DataIOException;
+    Table readTable(File f) throws DataIOException;
     
     /**
      * Read in a table from the given InputStream.
@@ -48,6 +48,6 @@ public interface TableReader {
      * @return the loaded Table
      * @throws DataIOException
      */
-    public Table readTable(InputStream is) throws DataIOException;
+    Table readTable(InputStream is) throws DataIOException;
     
 } // end of interface TableReader

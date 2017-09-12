@@ -55,35 +55,35 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
      * String tokens used in the GraphML format.
      */
     public interface Tokens {
-        public static final String ID         = "id";
-        public static final String GRAPH      = "graph";
-        public static final String EDGEDEF    = "edgedefault";
-        public static final String DIRECTED   = "directed";
-        public static final String UNDIRECTED = "undirected";
+        String ID         = "id";
+        String GRAPH      = "graph";
+        String EDGEDEF    = "edgedefault";
+        String DIRECTED   = "directed";
+        String UNDIRECTED = "undirected";
         
-        public static final String KEY        = "key";
-        public static final String FOR        = "for";
-        public static final String ALL        = "all";
-        public static final String ATTRNAME   = "attr.name";
-        public static final String ATTRTYPE   = "attr.type";
-        public static final String DEFAULT    = "default";
+        String KEY        = "key";
+        String FOR        = "for";
+        String ALL        = "all";
+        String ATTRNAME   = "attr.name";
+        String ATTRTYPE   = "attr.type";
+        String DEFAULT    = "default";
         
-        public static final String NODE   = "node";
-        public static final String EDGE   = "edge";
-        public static final String SOURCE = "source";
-        public static final String TARGET = "target";
-        public static final String DATA   = "data";
-        public static final String TYPE   = "type";
+        String NODE   = "node";
+        String EDGE   = "edge";
+        String SOURCE = "source";
+        String TARGET = "target";
+        String DATA   = "data";
+        String TYPE   = "type";
         
-        public static final String INT = "int";
-        public static final String INTEGER = "integer";
-        public static final String LONG = "long";
-        public static final String FLOAT = "float";
-        public static final String DOUBLE = "double";
-        public static final String REAL = "real";
-        public static final String BOOLEAN = "boolean";
-        public static final String STRING = "string";
-        public static final String DATE = "date";
+        String INT = "int";
+        String INTEGER = "integer";
+        String LONG = "long";
+        String FLOAT = "float";
+        String DOUBLE = "double";
+        String REAL = "real";
+        String BOOLEAN = "boolean";
+        String STRING = "string";
+        String DATE = "date";
     }
     
     /**

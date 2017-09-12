@@ -72,7 +72,7 @@ public class PredicateChain {
         Expression expr = m_head;
         while ( expr instanceof IfExpression ) {
             IfExpression ifex = (IfExpression)expr;
-            Predicate test = (Predicate)ifex.getTestPredicate();
+            Predicate test = ifex.getTestPredicate();
             if ( p.equals(test) ) {
                 Expression elseex = ifex.getElseExpression();
                 ifex.setElseExpression(new ObjectLiteral(null));

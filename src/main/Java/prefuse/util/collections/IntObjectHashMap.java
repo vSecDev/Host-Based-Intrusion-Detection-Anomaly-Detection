@@ -114,9 +114,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     public Object clone() {
         try {
             IntObjectHashMap copy = (IntObjectHashMap) super.clone();
-            copy.table = (int[]) copy.table.clone();
-            copy.values = (Object[]) copy.values.clone();
-            copy.state = (byte[]) copy.state.clone();
+            copy.table = copy.table.clone();
+            copy.values = copy.values.clone();
+            copy.state = copy.state.clone();
             return copy;
         } catch (CloneNotSupportedException e) {
             // won't happen

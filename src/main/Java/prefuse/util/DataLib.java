@@ -375,7 +375,7 @@ public class DataLib {
         for ( ; tuples.hasNext(); ++i ) {
             if ( i >= t.length )
                 t = ArrayLib.resize(t, 3*t.length/2);
-            t[i] = (Tuple)tuples.next();
+            t[i] = tuples.next();
         }
         t = ArrayLib.trim(t, i);
         

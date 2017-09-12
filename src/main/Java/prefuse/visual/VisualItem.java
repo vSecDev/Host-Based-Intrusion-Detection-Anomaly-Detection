@@ -44,14 +44,14 @@ public interface VisualItem extends Tuple {
      * Get the backing Visualization of which this VisualItem is a part.
      * @return the backing Visualization
      */
-    public Visualization getVisualization();
+    Visualization getVisualization();
     
     /**
      * Get the primary data group of which this VisualItem is a member.
      * Returns the name of the group of this item's backing VisualTable.
      * @return the item's primary group
      */
-    public String getGroup();
+    String getGroup();
     
     /**
      * Indicates if this item is a member of a given group. This includes both
@@ -60,7 +60,7 @@ public interface VisualItem extends Tuple {
      * @param group the group to check for membership.
      * @return true if this item is in the group, false otherwise.
      */
-    public boolean isInGroup(String group);
+    boolean isInGroup(String group);
     
     /**
      * Returns the original backing data set from which this VisualItem is
@@ -69,7 +69,7 @@ public interface VisualItem extends Tuple {
      * @return the backing data set from which this VisualItem is derived,
      * or null if none.
      */
-    public TupleSet getSourceData();
+    TupleSet getSourceData();
 
     /**
      * Returns the original backing data tuple from which this VisualItem is
@@ -78,7 +78,7 @@ public interface VisualItem extends Tuple {
      * @return the backing data tuple from which this VisualItem is derived,
      * or null if none.
      */
-    public Tuple getSourceTuple();
+    Tuple getSourceTuple();
     
     
     // ------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public interface VisualItem extends Tuple {
      * RendererFactory, and then using the Renderer to draw this item.
      * @param g the graphics context to render into.
      */
-    public void render(Graphics2D g);
+    void render(Graphics2D g);
     
     /**
      * Get the Renderer instance for drawing this VisualItem. The Renderer is
@@ -98,7 +98,7 @@ public interface VisualItem extends Tuple {
      * RendererFactory.
      * @return the Renderer for this VisualItem
      */
-    public Renderer getRenderer();
+    Renderer getRenderer();
     
     /**
      * Validate the bounds of this VisualItem. When a data value for a
@@ -107,7 +107,7 @@ public interface VisualItem extends Tuple {
      * causes the bounds of the item to be recomputed and made current.
      * @return the validated boundig box of this item
      */
-    public Rectangle2D validateBounds();
+    Rectangle2D validateBounds();
     
     // -- Boolean Flags -------------------------------------------------------
       
@@ -117,7 +117,7 @@ public interface VisualItem extends Tuple {
      * @return true if validated, false otherwise
      * @see #VALIDATED
      */
-    public boolean isValidated();
+    boolean isValidated();
     
     /**
      * Set this item's validated flag. This is for internal use by prefuse and,
@@ -125,7 +125,7 @@ public interface VisualItem extends Tuple {
      * @param value the value of the validated flag to set.
      * @see #VALIDATED
      */
-    public void setValidated(boolean value);
+    void setValidated(boolean value);
     
     /**
      * Indicates if this VisualItem is currently set to be visible. Items with
@@ -135,14 +135,14 @@ public interface VisualItem extends Tuple {
      * @return true if visible, false if invisible
      * @see #VISIBLE
      */
-    public boolean isVisible();
+    boolean isVisible();
     
     /**
      * Set this item's visibility.
      * @param value true to make the item visible, false otherwise.
      * @see #VISIBLE
      */
-    public void setVisible(boolean value);
+    void setVisible(boolean value);
     
     /**
      * Indicates if the start visible flag is set to true. This is the
@@ -151,14 +151,14 @@ public interface VisualItem extends Tuple {
      * @return true if this item starts out visible, false otherwise.
      * @see #STARTVISIBLE
      */
-    public boolean isStartVisible();
+    boolean isStartVisible();
     
     /**
      * Set the start visible flag.
      * @param value true to set the start visible flag, false otherwise
      * @see #STARTVISIBLE
      */
-    public void setStartVisible(boolean value);
+    void setStartVisible(boolean value);
 
     /**
      * Indictes if the end visible flag is set to true. This is the
@@ -167,14 +167,14 @@ public interface VisualItem extends Tuple {
      * @return true if this items ends visible, false otherwise.
      * @see #ENDVISIBLE
      */
-    public boolean isEndVisible();
+    boolean isEndVisible();
     
     /**
      * Set the end visible flag.
      * @param value true to set the end visible flag, false otherwise
      * @see #ENDVISIBLE
      */
-    public void setEndVisible(boolean value);
+    void setEndVisible(boolean value);
     
     /**
      * Indicates if this item is interactive, meaning it can potentially
@@ -182,14 +182,14 @@ public interface VisualItem extends Tuple {
      * @return true if the item is interactive, false otherwise
      * @see #INTERACTIVE
      */
-    public boolean isInteractive();
+    boolean isInteractive();
 
     /**
      * Set the interactive status of this VisualItem.
      * @param value true for interactive, false for non-interactive
      * @see #INTERACTIVE
      */
-    public void setInteractive(boolean value);
+    void setInteractive(boolean value);
     
     /**
      * Indicates this item is expanded. Only used for items that are
@@ -197,14 +197,14 @@ public interface VisualItem extends Tuple {
      * @return true if expanded, false otherwise
      * @see #EXPANDED
      */
-    public boolean isExpanded();
+    boolean isExpanded();
 
     /**
      * Set the expanded flag.
      * @param value true to set as expanded, false as collapsed.
      * @see #EXPANDED
      */
-    public void setExpanded(boolean value);
+    void setExpanded(boolean value);
     
     /**
      * Indicates if the item is fixed, and so will not have its position
@@ -212,21 +212,21 @@ public interface VisualItem extends Tuple {
      * @return true if the item has a fixed position, false otherwise
      * @see #FIXED
      */
-    public boolean isFixed();
+    boolean isFixed();
 
     /**
      * Sets if the item is fixed in its position.
      * @param value true to fix the item, false otherwise
      * @see #FIXED
      */
-    public void setFixed(boolean value);
+    void setFixed(boolean value);
     
     /**
      * Indicates if the item is highlighted.
      * @return true for highlighted, false for not highlighted
      * @see #HIGHLIGHT
      */
-    public boolean isHighlighted();
+    boolean isHighlighted();
     
     /**
      * Set the highlighted status of this item. How higlighting values are
@@ -237,14 +237,14 @@ public interface VisualItem extends Tuple {
      * @param value true to highlight the item, false for no highlighting.
      * @see #HIGHLIGHT
      */
-    public void setHighlighted(boolean value);
+    void setHighlighted(boolean value);
 
     /**
      * Indicates if the item currently has the mouse pointer over it.
      * @return true if the mouse pointer is over this item, false otherwise
      * @see #HOVER
      */
-    public boolean isHover();
+    boolean isHover();
     
     /**
      * Set the hover flag. This is set automatically by the prefuse framework,
@@ -252,7 +252,7 @@ public interface VisualItem extends Tuple {
      * @param value true to set the hover flag, false otherwise
      * @see #HOVER
      */
-    public void setHover(boolean value);
+    void setHover(boolean value);
     
     // ------------------------------------------------------------------------
     
@@ -261,84 +261,84 @@ public interface VisualItem extends Tuple {
      * @return the current x-coordinate
      * @see #X
      */
-    public double getX();
+    double getX();
 
     /**
      * Set the current x-coordinate of this item.
      * @param x the new current x-coordinate
      * @see #X
      */
-    public void setX(double x);
+    void setX(double x);
     
     /**
      * Get the current y-coordinate of this item.
      * @return the current y-coordinate
      * @see #Y
      */
-    public double getY();
+    double getY();
     
     /**
      * Set the current y-coordinate of this item.
      * @param y the new current y-coordinate
      * @see #Y
      */
-    public void setY(double y);
+    void setY(double y);
     
     /**
      * Get the starting x-coordinate of this item.
      * @return the starting x-coordinate
      * @see #STARTX
      */
-    public double getStartX();
+    double getStartX();
     
     /**
      * Set the starting x-coordinate of this item.
      * @param x the new starting x-coordinate
      * @see #STARTX
      */
-    public void setStartX(double x);
+    void setStartX(double x);
     
     /**
      * Get the starting y-coordinate of this item.
      * @return the starting y-coordinate
      * @see #STARTY
      */
-    public double getStartY();
+    double getStartY();
     
     /**
      * Set the starting y-coordinate of this item.
      * @param y the new starting y-coordinate
      * @see #STARTY
      */
-    public void setStartY(double y);
+    void setStartY(double y);
     
     /**
      * Get the ending x-coordinate of this item.
      * @return the ending x-coordinate
      * @see #ENDX
      */
-    public double getEndX();
+    double getEndX();
     
     /**
      * Set the ending x-coordinate of this item.
      * @param x the new ending x-coordinate
      * @see #ENDX
      */
-    public void setEndX(double x);
+    void setEndX(double x);
     
     /**
      * Get the ending y-coordinate of this item.
      * @return the ending y-coordinate
      * @see #ENDY
      */
-    public double getEndY();
+    double getEndY();
     
     /**
      * Set the ending y-coordinate of this item.
      * @param y the new ending y-coordinate
      * @see #ENDY
      */
-    public void setEndY(double y);
+    void setEndY(double y);
 
     /**
      * Get the bounding box for this VisualItem. If necessary, the bounds
@@ -346,7 +346,7 @@ public interface VisualItem extends Tuple {
      * @return the item's bounding box
      * @see #BOUNDS
      */
-    public Rectangle2D getBounds();
+    Rectangle2D getBounds();
     
     /**
      * Set the bounding box for this item. This method is used by Renderer
@@ -359,7 +359,7 @@ public interface VisualItem extends Tuple {
      * @param h the height of this item
      * @see #BOUNDS
      */
-    public void setBounds(double x, double y, double w, double h);
+    void setBounds(double x, double y, double w, double h);
     
     // ------------------------------------------------------------------------
     
@@ -373,7 +373,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STROKECOLOR
      */
-    public int getStrokeColor();
+    int getStrokeColor();
     
     /**
      * Set the current stroke color of this item. The stroke color is used to
@@ -385,7 +385,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STROKECOLOR
      */
-    public void setStrokeColor(int color);
+    void setStrokeColor(int color);
     
     /**
      * Get the starting stroke color of this item. The stroke color is used to
@@ -397,7 +397,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTSTROKECOLOR
      */
-    public int getStartStrokeColor();
+    int getStartStrokeColor();
     
     /**
      * Set the starting stroke color of this item. The stroke color is used to
@@ -409,7 +409,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTSTROKECOLOR
      */
-    public void setStartStrokeColor(int color);
+    void setStartStrokeColor(int color);
     
     /**
      * Get the ending stroke color of this item. The stroke color is used to
@@ -421,7 +421,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDSTROKECOLOR
      */
-    public int getEndStrokeColor();
+    int getEndStrokeColor();
     
     /**
      * Set the ending stroke color of this item. The stroke color is used to
@@ -433,7 +433,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDSTROKECOLOR
      */
-    public void setEndStrokeColor(int color);
+    void setEndStrokeColor(int color);
     
     /**
      * Get the current fill color of this item. The fill color is used to
@@ -445,7 +445,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #FILLCOLOR
      */
-    public int getFillColor();
+    int getFillColor();
     
     /**
      * Set the current fill color of this item. The fill color is used to
@@ -457,7 +457,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #FILLCOLOR
      */
-    public void setFillColor(int color);
+    void setFillColor(int color);
     
     /**
      * Get the starting fill color of this item. The fill color is used to
@@ -469,7 +469,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTFILLCOLOR
      */
-    public int getStartFillColor();
+    int getStartFillColor();
 
     /**
      * Set the starting fill color of this item. The fill color is used to
@@ -481,7 +481,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTFILLCOLOR
      */
-    public void setStartFillColor(int color);
+    void setStartFillColor(int color);
     
     /**
      * Get the ending fill color of this item. The fill color is used to
@@ -493,7 +493,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDFILLCOLOR
      */
-    public int getEndFillColor();
+    int getEndFillColor();
     
     /**
      * Set the ending fill color of this item. The fill color is used to
@@ -505,7 +505,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDFILLCOLOR
      */
-    public void setEndFillColor(int color);
+    void setEndFillColor(int color);
     
     /**
      * Get the current text color of this item. The text color is used to
@@ -517,7 +517,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #TEXTCOLOR
      */
-    public int getTextColor();
+    int getTextColor();
     
     /**
      * Set the current text color of this item. The text color is used to
@@ -529,7 +529,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #TEXTCOLOR
      */
-    public void setTextColor(int color);
+    void setTextColor(int color);
     
     /**
      * Get the starting text color of this item. The text color is used to
@@ -541,7 +541,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTTEXTCOLOR
      */
-    public int getStartTextColor();
+    int getStartTextColor();
     
     /**
      * Set the starting text color of this item. The text color is used to
@@ -553,7 +553,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #STARTTEXTCOLOR
      */
-    public void setStartTextColor(int color);
+    void setStartTextColor(int color);
     
     /**
      * Get the ending text color of this item. The text color is used to
@@ -565,7 +565,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDTEXTCOLOR
      */
-    public int getEndTextColor();
+    int getEndTextColor();
     
     /**
      * Set the ending text color of this item. The text color is used to
@@ -577,7 +577,7 @@ public interface VisualItem extends Tuple {
      * @see prefuse.util.ColorLib
      * @see #ENDTEXTCOLOR
      */
-    public void setEndTextColor(int color);
+    void setEndTextColor(int color);
     
     // ------------------------------------------------------------------------
     
@@ -588,7 +588,7 @@ public interface VisualItem extends Tuple {
      * @return the current size value
      * @see #SIZE
      */
-    public double getSize();
+    double getSize();
     
     /**
      * Set the current size value of the item. Size values are typically used
@@ -597,7 +597,7 @@ public interface VisualItem extends Tuple {
      * @param size the current size value
      * @see #SIZE
      */
-    public void setSize(double size);
+    void setSize(double size);
     
     /**
      * Get the starting size value of the item. Size values are typically used
@@ -606,7 +606,7 @@ public interface VisualItem extends Tuple {
      * @return the starting size value
      * @see #STARTSIZE
      */
-    public double getStartSize();
+    double getStartSize();
     
     /**
      * Set the starting size value of the item. Size values are typically used
@@ -615,7 +615,7 @@ public interface VisualItem extends Tuple {
      * @param size the starting size value
      * @see #STARTSIZE
      */
-    public void setStartSize(double size);
+    void setStartSize(double size);
     
     /**
      * Get the ending size value of the item. Size values are typically used
@@ -624,7 +624,7 @@ public interface VisualItem extends Tuple {
      * @return the ending size value
      * @see #ENDSIZE
      */
-    public double getEndSize();
+    double getEndSize();
     
     /**
      * Set the ending size value of the item. Size values are typically used
@@ -633,7 +633,7 @@ public interface VisualItem extends Tuple {
      * @param size the ending size value
      * @see #ENDSIZE
      */
-    public void setEndSize(double size);
+    void setEndSize(double size);
     
     // ------------------------------------------------------------------------
     
@@ -645,7 +645,7 @@ public interface VisualItem extends Tuple {
      * @return the current shape value
      * @see #SHAPE
      */
-    public int getShape();
+    int getShape();
     
     /**
      * Set the current shape value of the item. One of the SHAPE constants
@@ -655,7 +655,7 @@ public interface VisualItem extends Tuple {
      * @param shape the shape value to use
      * @see #SHAPE
      */
-    public void setShape(int shape);
+    void setShape(int shape);
     
     // ------------------------------------------------------------------------
     
@@ -663,13 +663,13 @@ public interface VisualItem extends Tuple {
      * Get the current stroke used to draw lines and shape outlines.
      * @return the stroke used to draw lines and shape outlines
      */
-    public BasicStroke getStroke();
+    BasicStroke getStroke();
     
     /**
      * Set the current stroke used to draw lines and shape outlines.
      * @param stroke the stroke to use to draw lines and shape outlines
      */
-    public void setStroke(BasicStroke stroke);
+    void setStroke(BasicStroke stroke);
     
     // ------------------------------------------------------------------------
     
@@ -679,7 +679,7 @@ public interface VisualItem extends Tuple {
      * @return the current font value
      * @see #FONT
      */
-    public Font getFont();
+    Font getFont();
 
     /**
      * Set the current font for the item. The font is used as the default
@@ -687,7 +687,7 @@ public interface VisualItem extends Tuple {
      * @param font the current font value
      * @see #FONT
      */
-    public void setFont(Font font);
+    void setFont(Font font);
     
     /**
      * Get the starting font for the item. The font is used as the default
@@ -695,7 +695,7 @@ public interface VisualItem extends Tuple {
      * @return the starting font value
      * @see #STARTFONT
      */
-    public Font getStartFont();
+    Font getStartFont();
 
     /**
      * Set the starting font for the item. The font is used as the default
@@ -703,7 +703,7 @@ public interface VisualItem extends Tuple {
      * @param font the starting font value
      * @see #STARTFONT
      */
-    public void setStartFont(Font font);
+    void setStartFont(Font font);
     
     /**
      * Get the ending font for the item. The font is used as the default
@@ -711,7 +711,7 @@ public interface VisualItem extends Tuple {
      * @return the ending font value
      * @see #ENDFONT
      */
-    public Font getEndFont();
+    Font getEndFont();
     
     /**
      * Set the ending font for the item. The font is used as the default
@@ -719,7 +719,7 @@ public interface VisualItem extends Tuple {
      * @param font the ending font value
      * @see #ENDFONT
      */
-    public void setEndFont(Font font);
+    void setEndFont(Font font);
     
     // ------------------------------------------------------------------------
     
@@ -732,7 +732,7 @@ public interface VisualItem extends Tuple {
      * @return the DOI value of this item
      * @see #DOI
      */
-    public double getDOI();
+    double getDOI();
     
     /**
      * Set the degree-of-interest (DOI) value. The degree-of-interet is an
@@ -743,116 +743,116 @@ public interface VisualItem extends Tuple {
      * @param doi the DOI value of this item
      * @see #DOI
      */
-    public void setDOI(double doi);
+    void setDOI(double doi);
     
     // ------------------------------------------------------------------------
     // VisualItem Base Schema
         
     /** The validated data field */
-    public static final String VALIDATED
+    String VALIDATED
         = PrefuseLib.FIELD_PREFIX+"validated";
     /** The visible data field */
-    public static final String VISIBLE
+    String VISIBLE
         = PrefuseLib.FIELD_PREFIX+"visible";
     /** The start visible data field */
-    public static final String STARTVISIBLE
+    String STARTVISIBLE
         = PrefuseLib.getStartField(VISIBLE);
     /** The end visible data field */
-    public static final String ENDVISIBLE
+    String ENDVISIBLE
         = PrefuseLib.getEndField(VISIBLE);
     /** The interactive data field */
-    public static final String INTERACTIVE
+    String INTERACTIVE
         = PrefuseLib.FIELD_PREFIX+"interactive";
     /** The expanded data field */
-    public static final String EXPANDED
+    String EXPANDED
         = PrefuseLib.FIELD_PREFIX+"expanded";
     /** The fixed data field */
-    public static final String FIXED
+    String FIXED
         = PrefuseLib.FIELD_PREFIX+"fixed";
     /** The highlight data field */
-    public static final String HIGHLIGHT
+    String HIGHLIGHT
         = PrefuseLib.FIELD_PREFIX+"highlight";
     /** The hover data field */
-    public static final String HOVER
+    String HOVER
         = PrefuseLib.FIELD_PREFIX+"hover";
     /** The x data field */
-    public static final String X
+    String X
         = PrefuseLib.FIELD_PREFIX+"x";
     /** The y data field */
-    public static final String Y
+    String Y
         = PrefuseLib.FIELD_PREFIX+"y";
     /** The start x data field */
-    public static final String STARTX
+    String STARTX
         = PrefuseLib.getStartField(X);
     /** The start y data field */
-    public static final String STARTY
+    String STARTY
         = PrefuseLib.getStartField(Y);
     /** The end x data field */
-    public static final String ENDX
+    String ENDX
         = PrefuseLib.getEndField(X);
     /** The end y data field */
-    public static final String ENDY
+    String ENDY
         = PrefuseLib.getEndField(Y);
     /** The bounds data field */
-    public static final String BOUNDS
+    String BOUNDS
         = PrefuseLib.FIELD_PREFIX+"bounds";
     /** The stroke color data field */
-    public static final String STROKECOLOR
+    String STROKECOLOR
         = PrefuseLib.FIELD_PREFIX+"strokeColor";
     /** The start stroke color data field */
-    public static final String STARTSTROKECOLOR
+    String STARTSTROKECOLOR
         = PrefuseLib.getStartField(STROKECOLOR);
     /** The end stroke color data field */
-    public static final String ENDSTROKECOLOR
+    String ENDSTROKECOLOR
         = PrefuseLib.getEndField(STROKECOLOR);
     /** The fill color data field */
-    public static final String FILLCOLOR
+    String FILLCOLOR
         = PrefuseLib.FIELD_PREFIX+"fillColor";
     /** The start fill color data field */
-    public static final String STARTFILLCOLOR
+    String STARTFILLCOLOR
         = PrefuseLib.getStartField(FILLCOLOR);
     /** The end fill color data field */
-    public static final String ENDFILLCOLOR
+    String ENDFILLCOLOR
         = PrefuseLib.getEndField(FILLCOLOR);
     /** The text color data field */
-    public static final String TEXTCOLOR
+    String TEXTCOLOR
         = PrefuseLib.FIELD_PREFIX+"textColor";
     /** The start text color data field */
-    public static final String STARTTEXTCOLOR
+    String STARTTEXTCOLOR
         = PrefuseLib.getStartField(TEXTCOLOR);
     /** The end text color data field */
-    public static final String ENDTEXTCOLOR
+    String ENDTEXTCOLOR
         = PrefuseLib.getEndField(TEXTCOLOR);
     /** The size data field */
-    public static final String SIZE
+    String SIZE
         = PrefuseLib.FIELD_PREFIX+"size";
     /** The start size data field */
-    public static final String STARTSIZE
+    String STARTSIZE
         = PrefuseLib.getStartField(SIZE);
     /** The end size data field */
-    public static final String ENDSIZE
+    String ENDSIZE
         = PrefuseLib.getEndField(SIZE);
     /** The shape data field */
-    public static final String SHAPE
+    String SHAPE
         = PrefuseLib.FIELD_PREFIX+"shape";
     /** The stroke data field */
-    public static final String STROKE
+    String STROKE
         = PrefuseLib.FIELD_PREFIX+"stroke";
     /** The font data field */
-    public static final String FONT
+    String FONT
         = PrefuseLib.FIELD_PREFIX+"font";
     /** The start font data field */
-    public static final String STARTFONT
+    String STARTFONT
         = PrefuseLib.getStartField(FONT);
     /** The end font data field */
-    public static final String ENDFONT
+    String ENDFONT
         = PrefuseLib.getEndField(FONT);
     /** The doi data field */
-    public static final String DOI
+    String DOI
         = PrefuseLib.FIELD_PREFIX+"doi";
     
     /** A permanent, locked copy of the base VisualItem schema */
-    public static final Schema SCHEMA
+    Schema SCHEMA
         = PrefuseLib.getVisualItemSchema().lockSchema();
     
     /** 
@@ -860,7 +860,7 @@ public interface VisualItem extends Tuple {
      *  because a unique (non-inherited) validated field is required of all
      *  VisualItems, and should always be the first field included.
      */
-    public static final int IDX_VALIDATED 
+    int IDX_VALIDATED
         = SCHEMA.getColumnIndex(VALIDATED);
     
     // ------------------------------------------------------------------------
@@ -868,49 +868,49 @@ public interface VisualItem extends Tuple {
     
     /** The label data field.
      * Not included in the VisualItem schema by default */
-    public static final String LABEL
+    String LABEL
         = PrefuseLib.FIELD_PREFIX+"label";
     /** The value data field.
      * Not included in the VisualItem schema by default */
-    public static final String VALUE
+    String VALUE
         = PrefuseLib.FIELD_PREFIX+"value";
     
     /** The polygon data field.
      * Not included in the VisualItem schema by default */
-    public static final String POLYGON
+    String POLYGON
         = PrefuseLib.FIELD_PREFIX+"polygon";
     /** The start polygon data field.
      * Not included in the VisualItem schema by default */
-    public static final String STARTPOLYGON
+    String STARTPOLYGON
         = PrefuseLib.getStartField(POLYGON);
     /** The end polygon data field.
      * Not included in the VisualItem schema by default */
-    public static final String ENDPOLYGON
+    String ENDPOLYGON
         = PrefuseLib.getEndField(POLYGON);
     
     /** The x2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String X2
+    String X2
         = PrefuseLib.FIELD_PREFIX+"x2";
     /** The y2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String Y2
+    String Y2
         = PrefuseLib.FIELD_PREFIX+"y2";
     /** The start x2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String STARTX2
+    String STARTX2
         = PrefuseLib.getStartField(X2);
     /** The start y2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String STARTY2
+    String STARTY2
         = PrefuseLib.getStartField(Y2);
     /** The end x2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String ENDX2
+    String ENDX2
         = PrefuseLib.getEndField(X2);
     /** The end y2 data field.
      * Not included in the VisualItem schema by default */
-    public static final String ENDY2
+    String ENDY2
         = PrefuseLib.getEndField(Y2);
     
 } // end of interface VisualItem

@@ -15,13 +15,13 @@ public interface EdgeItem extends VisualItem, Edge {
      * Get the first, or source, NodeItem upon which this edge is incident.
      * @return the source NodeItem
      */
-    public NodeItem getSourceItem();
+    NodeItem getSourceItem();
     
     /**
      * Get the second, or target, NodeItem upon which this edge is incident.
      * @return the target NodeItem
      */
-    public NodeItem getTargetItem();
+    NodeItem getTargetItem();
     
     /**
      * Get the NodeItem connected to the given NodeItem by this edge.
@@ -29,6 +29,6 @@ public interface EdgeItem extends VisualItem, Edge {
      * is not connected to this edge, a runtime exception will be thrown.
      * @return the other NodeItem connected to this edge
      */
-    public NodeItem getAdjacentItem(NodeItem n);
+    NodeItem getAdjacentItem(NodeItem n);
     
 } // end of interface EdgeItem

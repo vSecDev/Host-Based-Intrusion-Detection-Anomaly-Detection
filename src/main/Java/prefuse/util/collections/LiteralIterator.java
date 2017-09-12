@@ -7,19 +7,19 @@ import java.util.Iterator;
  */
 public interface LiteralIterator extends Iterator {
     
-    public int nextInt();
-    public boolean isIntSupported();
+    int nextInt();
+    boolean isIntSupported();
     
-    public long nextLong();
-    public boolean isLongSupported();
+    long nextLong();
+    boolean isLongSupported();
     
-    public float nextFloat();
-    public boolean isFloatSupported();
+    float nextFloat();
+    boolean isFloatSupported();
     
-    public double nextDouble();
-    public boolean isDoubleSupported();
+    double nextDouble();
+    boolean isDoubleSupported();
     
-    public boolean nextBoolean();
-    public boolean isBooleanSupported();
+    boolean nextBoolean();
+    boolean isBooleanSupported();
     
 } // end of interface LiteralIterator

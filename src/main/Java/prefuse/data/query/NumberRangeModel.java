@@ -260,7 +260,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
             double f = (val-min)/(double)(max-min);
             double m = m_min.doubleValue();
             double v = m + f*(m_max.doubleValue()-m);
-            return (m_type==float.class ? (Number)new Float((float)v) 
+            return (m_type==float.class ? new Float((float)v)
                                         : new Double(v));
         } else if ( m_type == long.class ) {
             long m = m_min.longValue();

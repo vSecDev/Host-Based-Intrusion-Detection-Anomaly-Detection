@@ -19,6 +19,6 @@ public interface TupleSetListener extends EventListener {
      * @param added an array (potentially zero-length) of added tuples
      * @param removed an array (potentially zero-length) of removed tuples
      */
-    public void tupleSetChanged(TupleSet tset, Tuple[] added, Tuple[] removed);
+    void tupleSetChanged(TupleSet tset, Tuple[] added, Tuple[] removed);
     
 } // end of interface TupleSetListener

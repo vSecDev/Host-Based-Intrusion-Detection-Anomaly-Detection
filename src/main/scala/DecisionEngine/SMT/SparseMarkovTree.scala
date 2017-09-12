@@ -222,11 +222,10 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
     outerHelper(condition, event, children, (0.0, 0.0))
   }
 
-  def toXML(canPrune: Boolean): String = {
+  def toXML(canPrune: Boolean, maxNodeCount: Int): String = {
     val count = nodeAndLeafCount
     val overallCount = count._1 + count._2 //sum of node and leaf count in tree
-    var pruned = false
-    if(overallCount > 4800) { println("all node count: " + overallCount + " - nodes: " + count._1 + " - leaves: " + count._2 + " -> Will prune!!!"); pruned = true}
+    val pruned = overallCount > maxNodeCount
 
     val sb = new StringBuilder
     val elements = xmlOuter(0, Some(this), getChildren, pruned)

@@ -851,7 +851,7 @@ public class Visualization {
             return true;
         
         TupleSet tset = getGroup(group);
-        return ( tset==null ? false : tset.containsTuple(item) );
+        return (tset != null && tset.containsTuple(item));
     }
     
     /**

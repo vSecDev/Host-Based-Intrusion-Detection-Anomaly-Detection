@@ -22,7 +22,7 @@ public interface AggregateItem extends VisualItem {
      * contained in the aggregation.
      * @return the aggregate size
      */
-    public int getAggregateSize();
+    int getAggregateSize();
     
     /**
      * Indicates is a given VisualItem is contained in the aggregation.
@@ -30,36 +30,36 @@ public interface AggregateItem extends VisualItem {
      * @return true if the given item is contained in this aggregate,
      * false otherwise.
      */
-    public boolean containsItem(VisualItem item);
+    boolean containsItem(VisualItem item);
     
     /**
      * Add a VisualItem to this aggregate.
      * @param item the item to add
      */
-    public void addItem(VisualItem item);
+    void addItem(VisualItem item);
     
     /**
      * Remove a VisualItem from this aggregate.
      * @param item the item to remove
      */
-    public void removeItem(VisualItem item);
+    void removeItem(VisualItem item);
     
     /**
      * Remove all items contained in this aggregate.
      */
-    public void removeAllItems();
+    void removeAllItems();
     
     /**
      * Get an iterator over all the items contained in this aggregate.
      * @return an iterator over the items in this aggregate
      */
-    public Iterator items();
+    Iterator items();
     
     /**
      * Get a filtered iterator over all the items contained in this aggregate.
      * @param filter a Predicate instance indicating the filter criteria
      * @return an iterator over the items in this aggregate
      */
-    public Iterator items(Predicate filter);
+    Iterator items(Predicate filter);
     
 } // end of interface AggregateItem

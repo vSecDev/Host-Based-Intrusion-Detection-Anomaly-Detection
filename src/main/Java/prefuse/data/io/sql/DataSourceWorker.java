@@ -146,17 +146,17 @@ public class DataSourceWorker extends Thread {
      * a submitted data query and processing job.
      * @author <a href="http://jheer.org">jeffrey heer</a>
      */
-    public static interface Listener {
+    public interface Listener {
         /**
          * Notification that the query is about to be issued.
          * @param job the current job being processed
          */
-        public void preQuery(DataSourceWorker.Entry job);
+        void preQuery(DataSourceWorker.Entry job);
         /**
          * Notification that the query processing has just completed.
          * @param job the current job being processed
          */
-        public void postQuery(DataSourceWorker.Entry job);
+        void postQuery(DataSourceWorker.Entry job);
     }
     
 } // end of class DataSourceWorker

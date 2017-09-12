@@ -15,6 +15,6 @@ public interface RendererFactory {
      * @param item the item for which to retrieve the renderer
      * @return the Renderer for the given VisualItem
      */
-    public Renderer getRenderer(VisualItem item);
+    Renderer getRenderer(VisualItem item);
 
 } // end of interface RendererFactory

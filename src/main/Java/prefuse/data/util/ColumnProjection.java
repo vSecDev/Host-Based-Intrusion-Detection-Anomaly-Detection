@@ -19,18 +19,18 @@ public interface ColumnProjection {
      * @param name the name of the column
      * @return true if the column passes the projection, false otherwise
      */
-    public boolean include(Column col, String name);
+    boolean include(Column col, String name);
     
     /**
      * Add a listener to this column projection
      * @param lstnr the listener to add
      */
-    public void addProjectionListener(ProjectionListener lstnr);
+    void addProjectionListener(ProjectionListener lstnr);
     
     /**
      * Remove a listener from this column projection
      * @param lstnr the listener to remove
      */
-    public void removeProjectionListener(ProjectionListener lstnr);
+    void removeProjectionListener(ProjectionListener lstnr);
     
 } // end of interface ColumnProjection

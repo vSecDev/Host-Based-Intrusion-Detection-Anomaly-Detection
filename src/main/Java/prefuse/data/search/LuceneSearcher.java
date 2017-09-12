@@ -84,7 +84,7 @@ public class LuceneSearcher {
         m_hitCountCache = new HashMap();
         directory = dir;
         analyzer = new StandardAnalyzer();
-        this.fields = (String[])fields.clone();
+        this.fields = fields.clone();
         try {
             writer = new IndexWriter(directory, analyzer, !readOnly);
             writer.close();
@@ -246,7 +246,7 @@ public class LuceneSearcher {
      * @return returns the indexed Document fields
      */
     public String[] getFields() {
-        return (String[])fields.clone();
+        return fields.clone();
     }
     
     /**
@@ -256,7 +256,7 @@ public class LuceneSearcher {
      * param fields the indexed Document fields to use
      */
     public void setFields(String[] fields) {
-        this.fields = (String[])fields.clone();
+        this.fields = fields.clone();
     }
     
     /**

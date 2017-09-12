@@ -8,18 +8,18 @@ import java.util.Comparator;
  */
 public interface IntSortedMap {
   
-    public int getMinimum();
-    public int getMaximum();
-    public int getMedian();
-    public int getUniqueCount();
+    int getMinimum();
+    int getMaximum();
+    int getMedian();
+    int getUniqueCount();
     
-    public boolean isAllowDuplicates();
-    public int size();
-    public boolean isEmpty();
-    public Comparator comparator();
+    boolean isAllowDuplicates();
+    int size();
+    boolean isEmpty();
+    Comparator comparator();
     
-    public void clear();
-    public boolean containsValue(int value);
-    public IntIterator valueIterator(boolean ascending);
+    void clear();
+    boolean containsValue(int value);
+    IntIterator valueIterator(boolean ascending);
     
 }

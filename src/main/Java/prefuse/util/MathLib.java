@@ -161,7 +161,7 @@ public class MathLib {
      * the quantile boundary values, in that order
      */
     public static double[] quantiles(int n, double[] values) {
-        values = (double[])values.clone();
+        values = values.clone();
         Arrays.sort(values);
         double[] qtls = new double[n+1];
         for ( int i=0; i<=n; ++i ) {

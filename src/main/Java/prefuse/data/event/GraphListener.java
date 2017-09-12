@@ -24,7 +24,7 @@ public interface GraphListener extends EventListener {
      * {@link EventConstants#INSERT}, {@link EventConstants#DELETE}, or
      * {@link EventConstants#UPDATE}.
      */
-    public void graphChanged(Graph g, String table, 
-            int start, int end, int col, int type);
+    void graphChanged(Graph g, String table,
+                      int start, int end, int col, int type);
     
 } // end of interface GraphListener

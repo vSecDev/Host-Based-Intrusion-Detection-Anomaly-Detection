@@ -19,12 +19,12 @@ public interface VisualTupleSet extends TupleSet {
      * Get the Visualization associated with this VisualTupleSet.
      * @return the Visualization instance
      */
-    public Visualization getVisualization();
+    Visualization getVisualization();
     
     /**
      * Get the data group name for this VisualTupleSet.
      * @return the data group name
      */
-    public String getGroup();
+    String getGroup();
     
 } // end of interface VisualTupleSet

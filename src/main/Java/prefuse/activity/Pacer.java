@@ -21,6 +21,6 @@ public interface Pacer {
      * @param f the input value, should be between 0-1
      * @return the output value, should be between 0-1
      */
-    public double pace(double f);
+    double pace(double f);
     
 } // end of interface Pacer

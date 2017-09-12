@@ -250,7 +250,7 @@ public class FruchtermanReingoldLayout extends Layout {
     protected void initSchema(TupleSet ts) {
         try {
             ts.addColumns(PARAMS_SCHEMA);
-        } catch ( IllegalArgumentException iae ) {};
+        } catch ( IllegalArgumentException iae ) {}
     }
     
     private Params getParams(VisualItem item) {

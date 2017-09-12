@@ -15,6 +15,6 @@ public interface DecoratorItem extends VisualItem {
      * Get the VisualItem that this item is decorating.
      * @return the decorated VisualItem
      */
-    public VisualItem getDecoratedItem();
+    VisualItem getDecoratedItem();
     
 } // end of interface DecoratorItem

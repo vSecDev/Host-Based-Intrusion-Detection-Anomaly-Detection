@@ -27,7 +27,7 @@ public interface GraphReader {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Graph readGraph(String location) throws DataIOException;
+    Graph readGraph(String location) throws DataIOException;
     
     /**
      * Read in a graph from the given URL.
@@ -35,7 +35,7 @@ public interface GraphReader {
      * @return the loaded Graph
      * @throws IOException
      */
-    public Graph readGraph(URL url) throws DataIOException;
+    Graph readGraph(URL url) throws DataIOException;
     
     /**
      * Read in a graph from the given File.
@@ -44,7 +44,7 @@ public interface GraphReader {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Graph readGraph(File f) throws DataIOException;
+    Graph readGraph(File f) throws DataIOException;
     
     /**
      * Read in a graph from the given InputStream.
@@ -52,6 +52,6 @@ public interface GraphReader {
      * @return the loaded Graph
      * @throws IOException
      */
-    public Graph readGraph(InputStream is) throws DataIOException;
+    Graph readGraph(InputStream is) throws DataIOException;
 
 } // end of interface GraphReader

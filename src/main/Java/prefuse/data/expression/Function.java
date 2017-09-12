@@ -9,25 +9,25 @@ package prefuse.data.expression;
 public interface Function extends Expression {
 
     /** Constant indicating a vriable argument count */
-    public static final int VARARGS = -1;
+    int VARARGS = -1;
     
     /**
      * Get the name of this function.
      * @return the function name
      */
-    public String getName();
+    String getName();
     
     /**
      * Add a parameter value sub-expression to this function.
      * @param e the parameter sub-expression
      */
-    public void addParameter(Expression e);
+    void addParameter(Expression e);
     
     /**
      * Get the maximum number of parameters accepted by this Function.
      * @return the maximum number of parametes accepted, or
      * {@link #VARARGS} is the number is variable.
      */
-    public int getParameterCount();
+    int getParameterCount();
     
 } // end of interface Function

@@ -100,7 +100,7 @@ public abstract class AbstractTreeMap implements IntSortedMap {
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(int value) {
-        return (root == NIL ? false : containsValue(root, value));
+        return (root != NIL && containsValue(root, value));
     }
     
     private boolean containsValue(Entry e, int value) {
@@ -506,9 +506,7 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         EntryIterator(Entry first, Entry last) {
             next = first;
             end = last;
-            reverse = first==NIL ? true 
-                    : last==NIL ? false 
-                    : compare(first,last) > 0;
+            reverse = first == NIL || last != NIL && compare(first, last) > 0;
         }
 
         public boolean hasNext() {

@@ -50,30 +50,30 @@ public class TreeMLReader extends AbstractGraphReader {
     /**
      * String tokens used in the TreeML format.
      */
-    public static interface Tokens {
-        public static final String TREE   = "tree";
-        public static final String BRANCH = "branch";
-        public static final String LEAF   = "leaf";
-        public static final String ATTR   = "attribute";
-        public static final String NAME   = "name";
-        public static final String VALUE  = "value";
-        public static final String TYPE   = "type";
+    public interface Tokens {
+        String TREE   = "tree";
+        String BRANCH = "branch";
+        String LEAF   = "leaf";
+        String ATTR   = "attribute";
+        String NAME   = "name";
+        String VALUE  = "value";
+        String TYPE   = "type";
         
-        public static final String DECLS  = "declarations";
-        public static final String DECL   = "attributeDecl";
+        String DECLS  = "declarations";
+        String DECL   = "attributeDecl";
         
-        public static final String INT = "Int";
-        public static final String INTEGER = "Integer";
-        public static final String LONG = "Long";
-        public static final String FLOAT = "Float";
-        public static final String REAL = "Real";
-        public static final String STRING = "String";
-        public static final String DATE = "Date";
-        public static final String CATEGORY = "Category";
+        String INT = "Int";
+        String INTEGER = "Integer";
+        String LONG = "Long";
+        String FLOAT = "Float";
+        String REAL = "Real";
+        String STRING = "String";
+        String DATE = "Date";
+        String CATEGORY = "Category";
         
         // prefuse-specific allowed types
-        public static final String BOOLEAN = "Boolean";
-        public static final String DOUBLE = "Double";
+        String BOOLEAN = "Boolean";
+        String DOUBLE = "Double";
     }
     
     /**

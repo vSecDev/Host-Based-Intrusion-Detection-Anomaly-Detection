@@ -22,7 +22,7 @@ public interface GraphWriter {
      * @param filename the file to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, String filename) throws DataIOException;
+    void writeGraph(Graph graph, String filename) throws DataIOException;
     
     /**
      * Write a graph to the given File.
@@ -30,7 +30,7 @@ public interface GraphWriter {
      * @param f the file to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, File f) throws DataIOException;
+    void writeGraph(Graph graph, File f) throws DataIOException;
     
     /**
      * Write a graph from the given OutputStream.
@@ -38,6 +38,6 @@ public interface GraphWriter {
      * @param os the OutputStream to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, OutputStream os) throws DataIOException;
+    void writeGraph(Graph graph, OutputStream os) throws DataIOException;
     
 } // end of interface GraphWriter

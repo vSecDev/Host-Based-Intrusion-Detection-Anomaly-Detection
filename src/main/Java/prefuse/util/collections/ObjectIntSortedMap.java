@@ -9,29 +9,29 @@ import java.util.Iterator;
  */
 public interface ObjectIntSortedMap extends IntSortedMap {
 
-    public static final Object MAX_KEY = new Object();
-    public static final Object MIN_KEY = new Object();
+    Object MAX_KEY = new Object();
+    Object MIN_KEY = new Object();
     
-    public Object firstKey();
+    Object firstKey();
 
-    public Object lastKey();
+    Object lastKey();
 
-    public boolean containsKey(Object key);
+    boolean containsKey(Object key);
     
-    public IntIterator valueRangeIterator(Object fromKey, boolean fromInc, 
-                                          Object toKey,   boolean toInc);
+    IntIterator valueRangeIterator(Object fromKey, boolean fromInc,
+                                   Object toKey, boolean toInc);
     
-    public Iterator keyIterator();
+    Iterator keyIterator();
 
-    public Iterator keyRangeIterator(Object fromKey, boolean fromInc, 
-                                     Object toKey,   boolean toInc);
+    Iterator keyRangeIterator(Object fromKey, boolean fromInc,
+                              Object toKey, boolean toInc);
 
-    public int get(Object key);
+    int get(Object key);
 
-    public int remove(Object key);
+    int remove(Object key);
     
-    public int remove(Object key, int val);
+    int remove(Object key, int val);
 
-    public int put(Object key, int value);
+    int put(Object key, int value);
     
 } // end of interface ObjectIntSortedMap

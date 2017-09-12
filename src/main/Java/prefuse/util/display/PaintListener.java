@@ -19,13 +19,13 @@ public interface PaintListener extends EventListener {
      * @param d the Display about to paint itself
      * @param g the Graphics context for the Display
      */
-    public void prePaint(Display d, Graphics2D g);
+    void prePaint(Display d, Graphics2D g);
     
     /**
      * Notification that Display painting has completed.
      * @param d the Display about to paint itself
      * @param g the Graphics context for the Display
      */
-    public void postPaint(Display d, Graphics2D g);
+    void postPaint(Display d, Graphics2D g);
     
 } // end of interface PaintListener

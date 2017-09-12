@@ -7,26 +7,26 @@ package prefuse.util.collections;
  */
 public interface LongIntSortedMap extends IntSortedMap {
 
-    public long firstKey();
+    long firstKey();
 
-    public long lastKey();
+    long lastKey();
 
-    public boolean containsKey(long key);
+    boolean containsKey(long key);
     
-    public IntIterator valueRangeIterator(long fromKey, boolean fromInc, 
-                                          long toKey,   boolean toInc);
+    IntIterator valueRangeIterator(long fromKey, boolean fromInc,
+                                   long toKey, boolean toInc);
     
-    public LiteralIterator keyIterator();
+    LiteralIterator keyIterator();
 
-    public LiteralIterator keyRangeIterator(long fromKey, boolean fromInc, 
-                                            long toKey,   boolean toInc);
+    LiteralIterator keyRangeIterator(long fromKey, boolean fromInc,
+                                     long toKey, boolean toInc);
 
-    public int get(long key);
+    int get(long key);
 
-    public int remove(long key);
+    int remove(long key);
     
-    public int remove(long key, int value);
+    int remove(long key, int value);
 
-    public int put(long key, int value);
+    int put(long key, int value);
     
 } // end of interface LongIntSortedMap

@@ -16,6 +16,6 @@ public interface ProjectionListener extends EventListener {
      * Notification that the internal state of a projection has been updated.
      * @param projection the source of the change notification
      */
-    public void projectionChanged(ColumnProjection projection);
+    void projectionChanged(ColumnProjection projection);
     
 } // end of interface ProjectionListener

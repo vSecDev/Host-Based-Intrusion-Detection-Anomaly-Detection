@@ -19,7 +19,7 @@ public interface TableReadListener {
      * @param value the text string representing the data value
      * @throws DataParseException if an error occurs while parsing the data
      */
-    public void readValue(int line, int col, String value)
+    void readValue(int line, int col, String value)
         throws DataParseException;
     
 } // end of interface TableReadListener

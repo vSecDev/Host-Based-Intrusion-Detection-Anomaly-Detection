@@ -866,7 +866,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public boolean canGet(String field, Class type) {
         Column c = getColumn(field);
-        return ( c==null ? false : c.canGet(type) );
+        return (c != null && c.canGet(type));
     }
     
     /**
@@ -883,7 +883,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public boolean canSet(String field, Class type) {
         Column c = getColumn(field);
-        return ( c==null ? false : c.canSet(type) );
+        return (c != null && c.canSet(type));
     }
     
     /**
@@ -990,7 +990,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetInt(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetInt() );
+        return (col != null && col.canGetInt());
     }
     
     /**
@@ -1002,7 +1002,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetInt(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetInt() );
+        return (col != null && col.canSetInt());
     }
     
     /**
@@ -1069,7 +1069,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetLong(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetLong() );
+        return (col != null && col.canGetLong());
     }
     
     /**
@@ -1081,7 +1081,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetLong(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetLong() );
+        return (col != null && col.canSetLong());
     }
     
     /**
@@ -1148,7 +1148,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetFloat(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetFloat() );
+        return (col != null && col.canGetFloat());
     }
     
     /**
@@ -1160,7 +1160,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetFloat(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetFloat() );
+        return (col != null && col.canSetFloat());
     }
     
     /**
@@ -1227,7 +1227,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetDouble(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetDouble() );
+        return (col != null && col.canGetDouble());
     }
     
     /**
@@ -1239,7 +1239,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetDouble(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetDouble() );
+        return (col != null && col.canSetDouble());
     }
     
     /**
@@ -1306,7 +1306,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetBoolean(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetBoolean() );
+        return (col != null && col.canGetBoolean());
     }
     
     /**
@@ -1318,7 +1318,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetBoolean(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetBoolean() );
+        return (col != null && col.canSetBoolean());
     }
     
     /**
@@ -1385,7 +1385,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetString(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetString() );
+        return (col != null && col.canGetString());
     }
     
     /**
@@ -1397,7 +1397,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetString(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetString() );
+        return (col != null && col.canSetString());
     }
     
     /**
@@ -1464,7 +1464,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canGetDate(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canGetDate() );
+        return (col != null && col.canGetDate());
     }
     
     /**
@@ -1476,7 +1476,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final boolean canSetDate(String field) {
         Column col = getColumn(field);
-        return ( col==null ? false : col.canSetDate() );
+        return (col != null && col.canSetDate());
     }
     
     /**

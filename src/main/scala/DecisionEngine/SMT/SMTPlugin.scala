@@ -83,7 +83,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   @throws(classOf[DataException])
   override def learn(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DataModel] = {
     try {
-      gui.appendText("Training SMT...")
+      gui.appendText("\nTraining SMT...")
 
       if (data.isEmpty) {
         gui.appendText("No data to process...")
@@ -101,7 +101,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
               val result = learnHelper(data, node, ints)
               resetLearn
               gui.appendText("Training completed.")
-              gui.appendText(node.toXML(false))
               gui.appendText("Tree size => nodes: " + root.get.nodeAndLeafCount._1 + " - leaves: " + root.get.nodeAndLeafCount._2)
               gui.render
               result
@@ -116,7 +115,6 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
                 val result = learnHelper(data, node, ints)
                 resetLearn
                 gui.appendText("Training completed.")
-                gui.appendText(node.toXML(false))
                 gui.appendText("Tree size => nodes: " + root.get.nodeAndLeafCount._1 + " - leaves: " + root.get.nodeAndLeafCount._2)
                 gui.render
                 result
@@ -135,7 +133,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
 
   override def validate(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
 
-    gui.appendText("Validating input...")
+    gui.appendText("\nValidating input...")
     classify(data, model, ints) match {
       case None =>
         gui.appendText("Validation completed! No trace report to display. The analysed files may be empty or may contain too short traces.")
@@ -155,7 +153,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   override def classify(data: Vector[DataWrapper], model: Option[DataModel], ints: Boolean): Option[DecisionEngineReport] = {
 
     if (!validateFlag)
-      gui.appendText("Classifying input...")
+      gui.appendText("\nClassifying input...")
 
     if (data.isEmpty || threshold.isEmpty || tolerance.isEmpty) {
       gui.appendText("No data to process or threshold or tolerance not set...")
@@ -450,7 +448,7 @@ class SMTPlugin(gui: SMTGUI) extends Observable with DecisionEnginePlugin {
   def canVisualise: Boolean = isTrained && root.get.nodeAndLeafCount._1 <= MAX_DISPLAYED_NODES
 
   def getVisualiser(canPrune: Boolean): Option[SMTVisualiser] = if(canVisualise){
-    Some(new SMTVisualiser(root.get, canPrune))
+    Some(new SMTVisualiser(root.get, canPrune, MAX_DISPLAYED_NODES))
   }else None
 
   def isConfigured: Boolean = root.isDefined && threshold.isDefined && tolerance.isDefined

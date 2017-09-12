@@ -10,12 +10,12 @@ import javax.swing.event.TableModelEvent;
 public interface EventConstants {
 
     /** Indicates a data insert operation. */
-    public static final int INSERT = TableModelEvent.INSERT;
+    int INSERT = TableModelEvent.INSERT;
     /** Indicates a data update operation. */
-    public static final int UPDATE = TableModelEvent.UPDATE;
+    int UPDATE = TableModelEvent.UPDATE;
     /** Indicates a data delete operation. */
-    public static final int DELETE = TableModelEvent.DELETE;
+    int DELETE = TableModelEvent.DELETE;
     /** Indicates an operation that affects all columns of a table. */
-    public static final int ALL_COLUMNS = TableModelEvent.ALL_COLUMNS;
+    int ALL_COLUMNS = TableModelEvent.ALL_COLUMNS;
     
 } // end of interface EventConstants

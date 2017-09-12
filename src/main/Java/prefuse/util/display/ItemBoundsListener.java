@@ -19,6 +19,6 @@ public interface ItemBoundsListener {
      * a particular Display.
      * @param d the Display whose item bounds has changed
      */
-    public void itemBoundsChanged(Display d);
+    void itemBoundsChanged(Display d);
     
 } // end of interface ItemBoundsListener

@@ -19,12 +19,12 @@ import prefuse.util.force.SpringForce
 import prefuse.visual.VisualItem
 import prefuse.{Constants, Display, Visualization}
 
-class SMTVisualiser(tree: Node[_,_], canPrune: Boolean) extends DecisionEngineVisualiser {
+class SMTVisualiser(tree: Node[_,_], canPrune: Boolean, maxNodeCount: Int) extends DecisionEngineVisualiser {
 
   @throws(classOf[DataException])
   override def getVisualisation: Option[JDialog] = {
 
-    val xmlStr = tree.toXML(canPrune)
+    val xmlStr = tree.toXML(canPrune, maxNodeCount)
 
     val graph: Option[Graph] = try {
       val gr = new GraphMLReader

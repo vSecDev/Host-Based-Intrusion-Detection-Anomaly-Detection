@@ -119,7 +119,7 @@ public abstract class CompositePredicate extends AbstractPredicate {
     public Predicate getSubPredicate(Predicate p) {
         CompositePredicate cp = null;
         try {
-            cp  = (CompositePredicate)this.getClass().newInstance();
+            cp  = this.getClass().newInstance();
         } catch (InstantiationException e) {
             // won't happen
         } catch (IllegalAccessException e) {

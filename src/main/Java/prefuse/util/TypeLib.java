@@ -90,11 +90,7 @@ public class TypeLib {
             return true;
         } else if ( byte.class == type && instance instanceof Byte ) {
             return true;
-        } else if ( char.class == type && instance instanceof Character ) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return char.class == type && instance instanceof Character;
     }
     
     /**

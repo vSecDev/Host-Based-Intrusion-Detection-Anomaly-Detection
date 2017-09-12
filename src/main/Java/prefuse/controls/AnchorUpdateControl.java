@@ -69,7 +69,7 @@ public class AnchorUpdateControl extends ControlAdapter {
      */
     public AnchorUpdateControl(Layout[] layout, String action, boolean overItem)
     {
-        m_layouts = (Layout[])layout.clone();
+        m_layouts = layout.clone();
         m_action = action;
         m_anchorOverItem = overItem;
     }

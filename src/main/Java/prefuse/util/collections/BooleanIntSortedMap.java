@@ -7,26 +7,26 @@ package prefuse.util.collections;
  */
 public interface BooleanIntSortedMap extends IntSortedMap {
 
-    public boolean firstKey();
+    boolean firstKey();
 
-    public boolean lastKey();
+    boolean lastKey();
 
-    public boolean containsKey(boolean key);
+    boolean containsKey(boolean key);
     
-    public IntIterator valueRangeIterator(boolean fromKey, boolean fromInc, 
-                                          boolean toKey,   boolean toInc);
+    IntIterator valueRangeIterator(boolean fromKey, boolean fromInc,
+                                   boolean toKey, boolean toInc);
     
-    public LiteralIterator keyIterator();
+    LiteralIterator keyIterator();
 
-    public LiteralIterator keyRangeIterator(boolean fromKey, boolean fromInc, 
-                                            boolean toKey,   boolean toInc);
+    LiteralIterator keyRangeIterator(boolean fromKey, boolean fromInc,
+                                     boolean toKey, boolean toInc);
 
-    public int get(boolean key);
+    int get(boolean key);
 
-    public int remove(boolean key);
+    int remove(boolean key);
     
-    public int remove(boolean key, int value);
+    int remove(boolean key, int value);
 
-    public int put(boolean key, int value);
+    int put(boolean key, int value);
     
 } // end of interface LongIntSortedMap

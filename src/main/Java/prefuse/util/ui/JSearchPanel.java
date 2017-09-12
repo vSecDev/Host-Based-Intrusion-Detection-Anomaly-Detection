@@ -431,7 +431,7 @@ public class JSearchPanel extends JPanel
      * @see java.awt.Component#setFont(java.awt.Font)
      */
     public void setFont(Font f) {
-        super.setFont(f);;
+        super.setFont(f);
         if ( m_queryF  != null ) m_queryF.setFont(f);
         if ( m_resultL != null ) m_resultL.setFont(f);
         if ( m_searchL != null ) m_searchL.setFont(f);

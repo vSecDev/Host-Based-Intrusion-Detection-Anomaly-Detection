@@ -137,7 +137,7 @@ public abstract class AbstractShapeRenderer implements Renderer {
         if ( item.getBounds().contains(p) ) {
             // if within bounds, check within shape outline
             Shape s = getShape(item);
-            return (s != null ? s.contains(p) : false);
+            return (s != null && s.contains(p));
         } else {
             return false;
         }

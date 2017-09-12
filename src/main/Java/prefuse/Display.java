@@ -1132,7 +1132,7 @@ public class Display extends JComponent {
      *  (i.e. item-space) co-ordinates
      * @param scale the amount to zoom by
      */
-    public synchronized void zoomAbs(final Point2D p, double scale) {;
+    public synchronized void zoomAbs(final Point2D p, double scale) {
         double zx = p.getX(), zy = p.getY();
         damageReport();
         m_transform.translate(zx, zy);

@@ -30,7 +30,7 @@ public class BooleanParser implements DataParser {
         if ( !(value instanceof Boolean) )
             throw new IllegalArgumentException(
               "This class can only format Objects of type Boolean.");
-        return ((Boolean)value).toString();
+        return value.toString();
     }
     
     /**

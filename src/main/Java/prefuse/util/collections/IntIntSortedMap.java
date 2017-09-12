@@ -7,32 +7,32 @@ package prefuse.util.collections;
  */
 public interface IntIntSortedMap extends IntSortedMap {
 
-    public int firstKey();
+    int firstKey();
 
-    public int lastKey();
+    int lastKey();
 
-    public boolean containsKey(int key);
+    boolean containsKey(int key);
     
-    public IntIterator valueRangeIterator(int fromKey, boolean fromInc, 
-                                          int toKey,   boolean toInc);
+    IntIterator valueRangeIterator(int fromKey, boolean fromInc,
+                                   int toKey, boolean toInc);
     
-    public LiteralIterator keyIterator();
+    LiteralIterator keyIterator();
     
-    public LiteralIterator keyRangeIterator(int fromKey, boolean fromInc, 
-                                            int toKey,   boolean toInc);
+    LiteralIterator keyRangeIterator(int fromKey, boolean fromInc,
+                                     int toKey, boolean toInc);
 
-    public int get(int key);
+    int get(int key);
 
-    public int remove(int key);
+    int remove(int key);
     
-    public int remove(int key, int value);
+    int remove(int key, int value);
 
-    public int put(int key, int value);
+    int put(int key, int value);
     
-    public int getLast(int key);
+    int getLast(int key);
     
-    public int getNextValue(int key, int value);
+    int getNextValue(int key, int value);
     
-    public int getPreviousValue(int key, int value);
+    int getPreviousValue(int key, int value);
     
 } // end of interface IntIntSortedMap

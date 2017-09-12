@@ -894,7 +894,7 @@ static private final int jjMoveNfa_0(int startState, int curPos)
       }
       else
       {
-         int hiByte = (int)(curChar >> 8);
+         int hiByte = curChar >> 8;
          int i1 = hiByte >> 6;
          long l1 = 1L << (hiByte & 077);
          int i2 = (curChar & 0xff) >> 6;
@@ -953,10 +953,8 @@ private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, lo
    {
       case 0:
          return ((jjbitVec2[i2] & l2) != 0L);
-      default : 
-         if ((jjbitVec0[i1] & l1) != 0L)
-            return true;
-         return false;
+      default :
+          return (jjbitVec0[i1] & l1) != 0L;
    }
 }
 private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)
@@ -973,10 +971,8 @@ private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, lo
          return ((jjbitVec7[i2] & l2) != 0L);
       case 61:
          return ((jjbitVec8[i2] & l2) != 0L);
-      default : 
-         if ((jjbitVec3[i1] & l1) != 0L)
-            return true;
-         return false;
+      default :
+          return (jjbitVec3[i1] & l1) != 0L;
    }
 }
 public static final String[] jjstrLiteralImages = {

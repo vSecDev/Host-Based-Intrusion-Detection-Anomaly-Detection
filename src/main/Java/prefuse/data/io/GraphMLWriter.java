@@ -37,9 +37,9 @@ public class GraphMLWriter extends AbstractGraphWriter {
      * String tokens used in the GraphML format.
      */
     public interface Tokens extends GraphMLReader.Tokens  {
-        public static final String GRAPHML = "graphml";
+        String GRAPHML = "graphml";
         
-        public static final String GRAPHML_HEADER =
+        String GRAPHML_HEADER =
             "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" 
             +"  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
             +"  xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n"

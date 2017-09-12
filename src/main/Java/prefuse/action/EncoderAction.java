@@ -118,7 +118,7 @@ public abstract class EncoderAction extends ItemAction {
      * @return true if a rule was successfully removed, false otherwise
      */
     public boolean remove(Predicate p) {
-        return ( m_chain != null ? m_chain.remove(p) : false );
+        return (m_chain != null && m_chain.remove(p));
     }
     
     /**

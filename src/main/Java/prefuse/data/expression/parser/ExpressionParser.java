@@ -654,8 +654,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OR:
-        ;
-        break;
+          break;
       default:
         jj_la1[1] = jj_gen;
         break label_1;
@@ -679,8 +678,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case XOR:
-        ;
-        break;
+          break;
       default:
         jj_la1[2] = jj_gen;
         break label_2;
@@ -704,8 +702,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
-        ;
-        break;
+          break;
       default:
         jj_la1[3] = jj_gen;
         break label_3;
@@ -730,8 +727,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case EQ:
       case NE:
-        ;
-        break;
+          break;
       default:
         jj_la1[4] = jj_gen;
         break label_4;
@@ -766,8 +762,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       case LT:
       case LE:
       case GE:
-        ;
-        break;
+          break;
       default:
         jj_la1[6] = jj_gen;
         break label_5;
@@ -820,8 +815,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       case ADD:
       case SUB:
       case MOD:
-        ;
-        break;
+          break;
       default:
         jj_la1[8] = jj_gen;
         break label_6;
@@ -868,8 +862,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       case MUL:
       case DIV:
       case POW:
-        ;
-        break;
+          break;
       default:
         jj_la1[10] = jj_gen;
         break label_7;
@@ -1105,8 +1098,7 @@ public class ExpressionParser implements ExpressionParserConstants {
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case 43:
-              ;
-              break;
+                break;
             default:
               jj_la1[16] = jj_gen;
               break label_8;
@@ -1118,15 +1110,13 @@ public class ExpressionParser implements ExpressionParserConstants {
           break;
         default:
           jj_la1[17] = jj_gen;
-          ;
         }
         jj_consume_token(RPAREN);
         break;
       default:
         jj_la1[18] = jj_gen;
-        ;
       }
-      {if (true) return f==null ? new ColumnExpression(s) : (Expression)f;}
+      {if (true) return f==null ? new ColumnExpression(s) : f;}
       break;
     default:
       jj_la1[19] = jj_gen;

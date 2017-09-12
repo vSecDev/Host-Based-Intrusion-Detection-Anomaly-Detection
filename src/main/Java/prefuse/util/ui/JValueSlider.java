@@ -225,7 +225,7 @@ public class JValueSlider extends JComponent {
             double min = m_min.doubleValue();
             double max = m_max.doubleValue();
             double val = min + f*(max-min);
-            return (m_value instanceof Double ? (Number)new Double(val)
+            return (m_value instanceof Double ? new Double(val)
                                               : new Float((float)val));
         }
     }
@@ -266,7 +266,7 @@ public class JValueSlider extends JComponent {
                 // TODO handle exception
                 return m_value;
             }
-            return m_value instanceof Double ? (Number)new Double(v) 
+            return m_value instanceof Double ? new Double(v)
                                              : new Float((float)v);
         } else {
             long v;
@@ -280,7 +280,7 @@ public class JValueSlider extends JComponent {
                 // TODO handle exception
                 return m_value;
             }
-            return m_value instanceof Long ? (Number)new Long(v) 
+            return m_value instanceof Long ? new Long(v)
                                            : new Integer((int)v);
         }
     }

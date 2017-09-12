@@ -39,66 +39,66 @@ public interface Expression {
      * Returns the type that this expression evaluates to when tuples
      * with the given Schema are provided as input.
      */
-    public Class getType(Schema s);
+    Class getType(Schema s);
     
     /**
      * Passes the visitor through this expression and any sub expressions
      * @param v the ExpressionVisitor
      */
-    public void visit(ExpressionVisitor v);
+    void visit(ExpressionVisitor v);
     
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as an Object
      */
-    public Object get(Tuple t);
+    Object get(Tuple t);
     
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as an int
      */
-    public int getInt(Tuple t);
+    int getInt(Tuple t);
     
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as a long
      */
-    public long getLong(Tuple t);
+    long getLong(Tuple t);
     
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as a float
      */
-    public float getFloat(Tuple t);
+    float getFloat(Tuple t);
 
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as a double
      */
-    public double getDouble(Tuple t);
+    double getDouble(Tuple t);
 
     /**
      * Evaluate the Expression on the given input Tuple.
      * @param t the input Tuple
      * @return the Expression return value, as a boolean
      */
-    public boolean getBoolean(Tuple t);
+    boolean getBoolean(Tuple t);
     
     /**
      * Add a listener to this Expression.
      * @param lstnr the expression listener to add
      */
-    public void addExpressionListener(ExpressionListener lstnr);
+    void addExpressionListener(ExpressionListener lstnr);
     
     /**
      * Remove a listener to this Expression.
      * @param lstnr the expression listener to remove
      */
-    public void removeExpressionListener(ExpressionListener lstnr);
+    void removeExpressionListener(ExpressionListener lstnr);
     
 } // end of interface Expression

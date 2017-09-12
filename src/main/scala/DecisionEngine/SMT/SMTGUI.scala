@@ -462,8 +462,7 @@ class SMTGUI extends DecisionEngineGUI {
             }else{
               showError("An error occurred during SMT root initialisation!", "Error")
             }
-          }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
-          else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
+          }
         }else{
           pluginInstance.get.setThreshold(thresholdField.getText().toDouble)
           pluginInstance.get.setTolerance(toleranceField.getText().toDouble)
@@ -501,11 +500,17 @@ class SMTGUI extends DecisionEngineGUI {
 
     private def compareParams(): Boolean = {
       val root = pluginInstance.get.getModel.get.retrieve.get.asInstanceOf[Node[_,_]]
-      maxDepthField.getText.toInt.equals(root.maxDepth) &&
-      maxPhiField.getText.toInt.equals(root.maxPhi) &&
-      maxSeqCntField.getText.toInt.equals(root.maxSeqCount) &&
-      smoothingField.getText.toDouble.equals(root.smoothing) &&
-      priorField.getText.toDouble.equals(root.prior)
+      try {
+        maxDepthField.getText.toInt.equals(root.maxDepth) &&
+          maxPhiField.getText.toInt.equals(root.maxPhi) &&
+          maxSeqCntField.getText.toInt.equals(root.maxSeqCount) &&
+          smoothingField.getText.toDouble.equals(root.smoothing) &&
+          priorField.getText.toDouble.equals(root.prior)
+      }catch{
+        case t: Throwable =>
+          showError("Please make sure the SMT parameters are valid!", "Error")
+          false
+      }
     }
 
     private def loadSMTHandler() = {
@@ -521,8 +526,7 @@ class SMTGUI extends DecisionEngineGUI {
 
              if (response == JOptionPane.YES_OPTION) {
                setFlag("loadModel")
-             }else if (response == JOptionPane.CLOSED_OPTION) System.out.println("JOptionPane closed")
-             else if (response == JOptionPane.NO_OPTION) System.out.println("No button clicked")
+             }
          }
        }
      } else{ showError("An error occurred. Cannot load SMT model!", "Error") }

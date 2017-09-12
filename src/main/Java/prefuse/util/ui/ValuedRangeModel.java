@@ -17,25 +17,25 @@ public interface ValuedRangeModel extends BoundedRangeModel {
      * the absolute minimum value possible for the range span.
      * @return the minimum value
      */
-    public Object getMinValue();
+    Object getMinValue();
 
     /**
      * Get the maximum value backing the range model. This is
      * the absolute maximum value possible for the range span.
      * @return the maximum value
      */
-    public Object getMaxValue();
+    Object getMaxValue();
     
     /**
      * Get the value at the low point of the range span.
      * @return the lowest value of the current range
      */
-    public Object getLowValue();
+    Object getLowValue();
 
     /**
      * Get the value at the high point of the range span.
      * @return the highest value of the current range
      */
-    public Object getHighValue();
+    Object getHighValue();
     
 } // end of interface ValuedRangeModel
