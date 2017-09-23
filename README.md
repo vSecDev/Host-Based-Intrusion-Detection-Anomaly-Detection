@@ -1,6 +1,7 @@
 #MSc Computer Science Final Project (WIP)
-- Implementation of an extensible anomaly-based classifier consisting of a main framework, a Data Source and a Decision Engine module.
-- The Decision Engine module is an implementation of Sparse Markov Transducers: ( https://noble.gs.washington.edu/papers/smt.pdf ) used for establishing a baseline for normal system behaviour and classification of previously unseen call traces. The classifier may be evaluated using the ADFA datasets: https://www.unsw.adfa.edu.au/australian-centre-for-cyber-security/cybersecurity/ADFA-IDS-Datasets/) 
+- Implementation of an extensible anomaly-based classifier consisting of the main HIDS framework, a Data Source module and a Decision Engine module.
+- The Decision Engine module provides an implementation of Sparse Markov Transducers used for establishing a baseline for normal system behaviour and classification of previously unseen call traces. (https://noble.gs.washington.edu/papers/smt.pdf)
+- The classifier may be evaluated using the ADFA datasets: https://www.unsw.adfa.edu.au/australian-centre-for-cyber-security/cybersecurity/ADFA-IDS-Datasets/) 
 
 MIT License
 
