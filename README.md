@@ -1,2 +1,25 @@
 #MSc Computer Science Final Project (WIP)
-- Implementation of Sparse Markov Transducers ( https://noble.gs.washington.edu/papers/smt.pdf ) for establishing a baseline for normal system behaviour and classification of previously unseen call traces. The DecisionEngine.SMT forms part of the Decision Engine module of a basic  "proof of concept" host-based intrusion detection app. (ADFA datasets: https://www.unsw.adfa.edu.au/australian-centre-for-cyber-security/cybersecurity/ADFA-IDS-Datasets/) 
+- Implementation of an extensible anomaly-based classifier consisting of a main framework, a Data Source and a Decision Engine module.
+- The Decision Engine module is an implementation of Sparse Markov Transducers: ( https://noble.gs.washington.edu/papers/smt.pdf ) used for establishing a baseline for normal system behaviour and classification of previously unseen call traces. The classifier may be evaluated using the ADFA datasets: https://www.unsw.adfa.edu.au/australian-centre-for-cyber-security/cybersecurity/ADFA-IDS-Datasets/) 
+
+MIT License
+
+Copyright (c) [2017] 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
