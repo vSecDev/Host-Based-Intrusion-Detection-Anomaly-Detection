@@ -185,29 +185,29 @@ public class HIDS extends Observable implements Observer {
                         if (pair == null) {
                             return false;
                         }
-                        if (propName == "dePlugin") {
+                        if (propName.equals("dePlugin")) {
                             DecisionEnginePlugin plugin = (DecisionEnginePlugin) pair.getKey().newInstance(pair.getValue());
                             hids.decisionEngines.add(plugin);
-                        } else if (propName == "dataModule") {
+                        } else if (propName.equals("dataModule")) {
                             DataProcessor dataProcessor = (DataProcessor) pair.getKey().newInstance(pair.getValue());
                             hids.dataModules.add(dataProcessor);
                         }
                     }
                 } else {
                     Class c = classLoader.loadClass(de);
-                    if (propName == "dePlugin") {
+                    if (propName.equals("dePlugin")) {
                         DecisionEnginePlugin plugin = (DecisionEnginePlugin) c.newInstance();
                         hids.decisionEngines.add(plugin);
-                    } else if (propName == "dataModule") {
+                    } else if (propName.equals("dataModule")) {
                         DataProcessor dataProcessor = (DataProcessor) c.newInstance();
                         hids.dataModules.add(dataProcessor);
                     }
                 }
             }
 
-            if (propName == "dePlugin") {
+            if (propName.equals("dePlugin")) {
                 return hids.decisionEngines.size() > 0;
-            } else if (propName == "dataModule") {
+            } else if (propName.equals("dataModule")) {
                 return hids.dataModules.size() > 0;
             }
             return false;
