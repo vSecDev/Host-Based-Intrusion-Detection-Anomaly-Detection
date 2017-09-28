@@ -296,7 +296,13 @@ case class Node[A,B](maxDepth: Int, maxPhi: Int, maxSeqCount: Int, private val _
 
   override def toString: String = {
     val buf = new StringBuilder
-    buf ++= "-------\nID: " + getID + "\n Node\nKey: " + getKey.get + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+    val keyStr = getKey match {
+      case None => "No key"
+      case Some(x) => if(x.toString.equals(Int.MinValue.toString)) "Root" else x.toString
+    }
+   // buf ++= "-------\nID: " + getID + "\n Node\nKey: " + getKey.get + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+    buf ++= "-------\nID: " + getID + "\n Node\nKey: " + keyStr + "\nmaxDepth: " + maxDepth + " - maxPhi: " + maxPhi + " - maxSeqCount: " + maxSeqCount + "\nChildrenGroup size: " + children.size + "\nChildren:"
+
     for (i <- 0 to maxPhi) {
       if (children.size > i) {
         buf ++= "\n-Phi_" + i + ":\nsize: " + children(i).size
