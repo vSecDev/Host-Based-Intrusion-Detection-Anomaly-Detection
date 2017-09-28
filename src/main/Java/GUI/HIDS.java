@@ -175,8 +175,8 @@ public class HIDS extends Observable implements Observer {
 
         ClassLoader classLoader = HIDS.class.getClassLoader();
         try {
-            String[] decisionEngines = props.getProperty(propName).trim().split("\\s*,\\s*");
-            for (String de : decisionEngines) {
+            String[] modules = props.getProperty(propName).trim().split("\\s*,\\s*");
+            for (String de : modules) {
                 //get constructor params
                 if (props.containsKey(de)) {
                     String[] params = props.getProperty(de).trim().split("\\s*,\\s*");
